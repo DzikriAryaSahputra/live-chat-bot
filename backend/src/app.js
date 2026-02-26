@@ -18,21 +18,6 @@ app.use(cors());
 app.use(express.json());
 
 // ==========================================
-// 1. WHATSAPP GATEWAY (CADANGAN)
-// ==========================================
-const waClient = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }
-});
-
-waClient.on('qr', (qr) => {
-    console.log('📱 SCAN QR CODE INI UNTUK LOGIN WHATSAPP (Cadangan):');
-    qrcode.generate(qr, { small: true });
-});
-waClient.on('ready', () => console.log('✅ Fitur Cadangan: WhatsApp Gateway Siap!'));
-waClient.initialize();
-
-// ==========================================
 // 2. LOGIKA REAL-TIME CHAT (SOCKET.IO)
 // ==========================================
 let activeSessions = {};
