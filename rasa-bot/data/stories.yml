@@ -1,0 +1,26 @@
+version: "3.1"
+stories:
+- story: alur sapaan ramah
+  steps:
+  - intent: sapaan
+  - action: utter_sapaan
+
+- story: alur tanya data
+  steps:
+  - intent: tanya_data_statistik
+  - action: utter_tanya_data_statistik
+
+- story: alur tanya sensus ekonomi
+  steps:
+  - intent: tanya_sensus_ekonomi
+  - action: utter_tanya_sensus_ekonomi
+
+- story: alur minta disambungkan ke petugas (Handover Trigger)
+  steps:
+  - intent: minta_admin
+  - action: utter_minta_admin
+
+- story: jawab sawit
+  steps:
+      - intent: sawit
+      - action: utter_jawab_sawit

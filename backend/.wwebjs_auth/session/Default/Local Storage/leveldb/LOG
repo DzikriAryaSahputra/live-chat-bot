@@ -1,0 +1,6 @@
+2026/02/24-19:35:11.136 7698 Reusing MANIFEST D:\Codingan\Magang\bps-chatbot\backend\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
+2026/02/24-19:35:11.310 7698 Recovering log #4
+2026/02/24-19:35:11.311 7698 Reusing old log D:\Codingan\Magang\bps-chatbot\backend\.wwebjs_auth\session\Default\Local Storage\leveldb/000004.log 
+2026/02/24-20:35:26.280 918c Level-0 table #8: started
+2026/02/24-20:35:26.301 918c Level-0 table #8: 12655 bytes OK
+2026/02/24-20:35:26.337 918c Delete type=0 #4

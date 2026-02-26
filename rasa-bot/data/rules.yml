@@ -1,0 +1,22 @@
+version: "3.1"
+
+rules:
+  - rule: Respon sapaan kapan saja
+    steps:
+      - intent: sapaan
+      - action: utter_sapaan
+
+  - rule: Handover ke admin kapan saja diminta
+    steps:
+      - intent: minta_admin
+      - action: utter_minta_admin
+    
+  - rule: Arahkan ke link BPS Kota Jambi saat diminta
+    steps:
+      - intent: cari_info_website
+      - action: action_cari_website_bps
+
+  - rule: jawab
+    steps:
+      - intent: sawit
+      - action: utter_jawab_sawit

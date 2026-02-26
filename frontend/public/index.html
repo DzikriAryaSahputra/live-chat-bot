@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>BPS Floating Chat Widget</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
+        :root {
+            --bps-blue: #005596;
+            --bps-dark-blue: #003366;
+            --bps-orange: #F7941D;
+            --bps-light-blue: #E6F0F9;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            height: 100vh;
+            overflow: hidden;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="relative h-screen w-full">
+    <div class="p-8 hidden md:block opacity-30">
+        <h1 class="text-3xl font-bold text-[var(--bps-blue)]">Badan Pusat Statistik</h1>
+        <p class="mt-4 text-gray-600">Website content placeholder...</p>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans">
+        <div
+            class="chat-container w-[360px] h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden transition-all transform origin-bottom-right">
+
+            <div
+                class="chat-header bg-gradient-to-r from-[var(--bps-blue)] to-[var(--bps-dark-blue)] p-4 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow-md">
+                        <img alt="Logo BPS" class="w-full h-full object-contain"
+                            src="img/pngwing.com.png" />
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm leading-tight">Layanan Informasi BPS</h3>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                            <p class="text-xs text-blue-100 font-light">Online</p>
+                        </div>
+                    </div>
+                </div>
+                <button aria-label="Close"
+                    class="text-white/80 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+            </div>
+
+            <div class="chat-box flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3" id="chat-box">
+            </div>
+
+            <div class="chat-input-area p-3 bg-white border-t border-gray-100 shrink-0">
+                <div class="relative flex items-center gap-2">
+                    <input autocomplete="off"
+                        class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--bps-blue)] focus:border-transparent text-sm transition-all placeholder-gray-400"
+                        id="user-input" placeholder="Ketik pesan..." type="text" />
+                    <button
+                        class="absolute right-1.5 p-2 bg-[var(--bps-orange)] hover:bg-orange-600 text-white rounded-full shadow-sm flex items-center justify-center transition-transform active:scale-95"
+                        id="send-btn">
+                        <span class="material-symbols-outlined text-[18px] translate-x-0.5">send</span>
+                    </button>
+                </div>
+                <div class="text-center mt-2">
+                    <p class="text-[10px] text-gray-400">Didukung oleh AI BPS</p>
+                </div>
+            </div>
+        </div>
+
+        <button
+            class="w-14 h-14 rounded-full bg-[var(--bps-orange)] hover:bg-orange-600 shadow-lg hover:shadow-xl text-white flex items-center justify-center transition-all transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-4 focus:ring-orange-200 group">
+            <span
+                class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">chat_bubble</span>
+        </button>
+    </div>
+
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

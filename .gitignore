@@ -1,0 +1,12 @@
+# Mengabaikan folder raksasa (akan di-install ulang di laptop)
+node_modules/
+venv/
+__pycache__/
+
+# Mengabaikan file database dan data sensitif
+*.sql
+*.sqlite
+*.db
+
+# Mengabaikan file environment (tempat menyimpan password jika ada)
+.env

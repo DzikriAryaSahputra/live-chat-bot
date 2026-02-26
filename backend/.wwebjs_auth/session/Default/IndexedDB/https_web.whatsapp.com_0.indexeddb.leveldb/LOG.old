@@ -1,0 +1,12 @@
+2026/02/23-19:33:04.118 9984 Reusing MANIFEST D:\Codingan\Magang\bps-chatbot\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/02/23-19:33:04.219 9984 Recovering log #10
+2026/02/23-19:33:04.381 9984 Reusing old log D:\Codingan\Magang\bps-chatbot\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000010.log 
+2026/02/23-19:33:07.689 9984 Level-0 table #16: started
+2026/02/23-19:33:07.937 9984 Level-0 table #16: 1206361 bytes OK
+2026/02/23-19:33:08.044 9984 Delete type=0 #10
+2026/02/23-19:33:08.179 9984 Compacting 1@1 + 1@2 files
+2026/02/23-19:33:08.424 9984 Generated table #17@1: 37608 keys, 1557544 bytes
+2026/02/23-19:33:08.424 9984 Compacted 1@1 + 1@2 files => 1557544 bytes
+2026/02/23-19:33:08.625 9984 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/02/23-19:33:08.626 9984 Delete type=2 #13
+2026/02/23-19:33:08.626 9984 Delete type=2 #16

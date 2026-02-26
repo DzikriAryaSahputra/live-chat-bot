@@ -1,0 +1,75 @@
+version: "3.1"
+nlu:
+- intent: sapaan
+  examples: |
+    - halo
+    - selamat pagi
+    - permisi admin
+    - hai bps
+    - halo bps
+    - halo asisten virtual
+    - halo asisten bps
+    - halo asisten virtual bps
+    - siang
+    - selamat siang
+    - selamat sore
+    - selamat malam
+- intent: tanya_data_statistik
+  examples: |
+    - kapan rilis data inflasi terbaru?
+    - rilis berita resmi statistik kapan?
+    - tolong info data inflasi di Jambi bulan ini dong
+    - berapa angka kemiskinan terbaru di Jambi?
+    - mau cari data ekspor impor
+    - saya mau cari data kependudukan
+    - saya mau cari data statistik terbaru
+- intent: tanya_sensus_ekonomi
+  examples: |
+    - kapan sensus penduduk lagi?
+    - kapan sensus ekonomi lagi?
+    - kapan sensus ekonomi?
+    - sensus ekonomi kapan?
+    - kapan sensus ekonomi 2026?
+    - kapan SE2026?
+    - sensus ekonomi
+- intent: minta_admin
+  examples: |
+    - saya mau bicara dengan petugas
+    - tolong sambungkan ke admin
+    - chat dengan manusia asli dong
+    - ada petugas yang bisa ditanya?
+    - saya mau tanya langsung ke petugas
+    - saya mau minta bantuan petugas
+    - saya mau minta admin
+    - saya mau minta tolong petugas
+    - saya mau minta bantuan admin
+    - saya mau minta bantuan manusia asli
+    - saya mau ngobrol langsung dengan petugas
+    - saya mau ngobrol langsung dengan admin
+    - saya mau ngobrol langsung dengan manusia asli
+    - ngomong dengan orang asli dong
+    - ngomong dengan petugas dong
+- intent: cari_info_website
+  examples: |
+    - minta link publikasi dong
+    - mau lihat data tabel statistik jambi kota
+    - berita resmi statistik rilis dimana?
+    - adakah buku atau publikasi terbaru?
+    - mau baca berita kegiatan bps kota jambi
+    - saya penasaran dengan kegiatan bps     
+    - info kegiatan bps apa saja
+    - ada kabar atau berita terbaru?
+    - cari data inflasi di tabel
+    - minta link website resmi
+    - minta infografik dong
+    - minta grafik dong
+    - minta data sensus 2020 dong
+    - minta meta data statistik dong
+    - saya mau lihat data sensus 2020
+    - saya mau lihat meta data statistik
+    - saya mau lihat infografik statistik
+    - saya mau lihat grafik statistik
+- intent: sawit
+  examples: |
+    - Menurutmu dia masih ingat aku?
+    - Menurutmu dia masih sayang sama aku?

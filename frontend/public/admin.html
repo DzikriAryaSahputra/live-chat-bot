@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin BPS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* --- RESET DAN BASE STYLE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* --- SIDEBAR KIRI --- */
+        .sidebar {
+            background-color: #1e293b;
+            border-right: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background-color: #0f172a;
+            border-bottom: 1px solid #334155;
+        }
+
+        .sidebar-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        .user-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .user-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .user-list::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .user-item {
+            padding: 14px;
+            margin-bottom: 10px;
+            background-color: #334155;
+            border: 1px solid transparent;
+            border-left: 4px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-direction: column;
+        }
+
+        .user-item:hover {
+            background-color: #475569;
+            border-color: #64748b;
+        }
+
+        .user-item.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #3b82f6;
+            border-left: 4px solid #60a5fa;
+        }
+
+        .user-item.active .user-info small {
+            color: #dbeafe;
+        }
+
+        .user-item.unread {
+            background-color: #3b4c6b;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .user-info {
+            width: 100%;
+        }
+
+        .user-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .user-info strong {
+            font-size: 15px;
+        }
+
+        .user-info small {
+            font-size: 12px;
+            color: #94a3b8;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .badge-unread {
+            background: #f59e0b;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: none;
+            text-transform: uppercase;
+        }
+
+        .user-item.unread .badge-unread {
+            display: block;
+        }
+
+        .badge-help {
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+            align-self: center;
+            width: 100%;
+            text-align: center;
+        }
+
+        .user-item.needs-help .badge-help {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* --- AREA CHAT KANAN --- */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #0f172a;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            flex-shrink: 0;
+            padding: 20px 24px;
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            height: 75px;
+        }
+
+        .chat-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .chat-box {
+            flex: 1;
+            min-height: 0;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+            border: 2px solid #0f172a;
+        }
+
+        .empty-state {
+            margin: auto;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-state span {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-width: 85%;
+        }
+
+        .wrapper-warga {
+            align-items: flex-start;
+            align-self: flex-start;
+        }
+
+        .wrapper-admin {
+            align-items: flex-end;
+            align-self: flex-end;
+        }
+
+        .sender-label {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 4px;
+        }
+
+        .label-warga {
+            color: #94a3b8;
+        }
+
+        .label-bot {
+            color: #38bdf8;
+        }
+
+        .label-admin {
+            color: #4ade80;
+        }
+
+        .message {
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 14.5px;
+            line-height: 1.6;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .msg-warga {
+            background-color: #334155;
+            color: #f1f5f9;
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-admin {
+            background-color: #2563eb;
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .msg-bot {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            border-bottom-left-radius: 4px;
+            opacity: 0.9;
+        }
+
+        .chat-input-area {
+            flex-shrink: 0;
+            display: flex;
+            padding: 20px 24px;
+            background-color: #1e293b;
+            border-top: 1px solid #334155;
+            gap: 12px;
+        }
+
+        #admin-input {
+            flex: 1;
+            padding: 16px;
+            background-color: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        #admin-input:focus:not(:disabled) {
+            border-color: #3b82f6;
+            background-color: #172033;
+        }
+
+        #admin-input:disabled {
+            background-color: #1e293b;
+            color: #64748b;
+            cursor: not-allowed;
+            border-color: transparent;
+        }
+
+        #send-btn {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        #send-btn:hover:not(:disabled) {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        #send-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        #send-btn:disabled {
+            background-color: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>
+                    <img src="img/pngwing.com.png" alt="Logo BPS" style="width: 28px; height: auto;">
+                    BPS Live Monitor
+                </h3>
+                <p>Daftar antrean percakapan warga</p>
+            </div>
+            <div class="user-list" id="user-list">
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <h3 id="active-user-title">👋 Selamat Datang, Admin!</h3>
+            </div>
+
+            <div class="chat-box" id="chat-box">
+                <div class="empty-state">
+                    <span>💬</span>
+                    <p>Belum ada obrolan yang dipilih.<br>Silakan klik salah satu warga dari daftar di sebelah kiri
+                        untuk mulai memantau atau membalas.</p>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="admin-input" placeholder="Pilih warga dari sidebar untuk mulai mengetik..."
+                    disabled autocomplete="off">
+                <button id="send-btn" disabled>➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:3000');
+        const chatSessions = {};
+        let activeUserId = null;
+
+        const userListDiv = document.getElementById('user-list');
+        const chatBoxDiv = document.getElementById('chat-box');
+        const adminInput = document.getElementById('admin-input');
+        const sendBtn = document.getElementById('send-btn');
+        const activeUserTitle = document.getElementById('active-user-title');
+
+        // Fungsi Link Pintar (Mencegah Double-Link HTML)
+        function formatTextWithLink(text) {
+            if (!text) return '';
+            if (text.includes('<a href=') || text.includes("<a href='")) {
+                return text.replace(/\n/g, '<br>');
+            }
+            const urlRegex = /(https?:\/\/[^\s<]+)/g;
+            let formattedText = text.replace(urlRegex, function (url) {
+                return `<a href="${url}" target="_blank" style="color: #38bdf8; text-decoration: underline;">${url}</a>`;
+            });
+            return formattedText.replace(/\n/g, '<br>');
+        }
+
+        // Menerima Pesan Baru dari Socket
+        socket.on('message_to_admin', (data) => {
+            const { senderId, message, type } = data;
+
+            if (!chatSessions[senderId]) {
+                chatSessions[senderId] = [];
+                createUserListItem(senderId);
+            }
+
+            chatSessions[senderId].push({ sender: type === 'user' ? 'warga' : 'bot', text: message });
+
+            const previewEl = document.getElementById(`preview-${senderId}`);
+            if (previewEl) previewEl.innerHTML = formatTextWithLink(message);
+
+            if (type === 'user' && activeUserId !== senderId) {
+                const listItem = document.getElementById(`user-item-${senderId}`);
+                if (listItem) {
+                    listItem.classList.add('unread');
+                    userListDiv.prepend(listItem);
+                }
+            }
+
+            if (activeUserId === senderId) {
+                renderMessages(senderId);
+            }
+        });
+
+        // Menerima Peringatan Handover
+        socket.on('system_alert_admin', (data) => {
+            const match = data.message.match(/\((.*?)\)/);
+            if (match && match[1]) {
+                const targetId = match[1];
+                const listItem = document.getElementById(`user-item-${targetId}`);
+                if (listItem) {
+                    listItem.classList.add('needs-help');
+                    userListDiv.prepend(listItem);
+                }
+            }
+        });
+
+        function createUserListItem(senderId) {
+            const div = document.createElement('div');
+            div.className = 'user-item';
+            div.id = `user-item-${senderId}`;
+            div.onclick = () => selectUser(senderId);
+
+            div.innerHTML = `
+                <div class="user-info">
+                    <div class="user-info-header">
+                        <strong>👤 ${senderId}</strong>
+                        <span class="badge-unread">Baru</span>
+                    </div>
+                    <small id="preview-${senderId}">Memulai percakapan...</small>
+                </div>
+                <div class="badge-help">BUTUH BANTUAN</div>
+            `;
+            userListDiv.prepend(div);
+        }
+
+        function selectUser(senderId) {
+            activeUserId = senderId;
+            activeUserTitle.innerText = `Obrolan dengan: ${senderId}`;
+
+            adminInput.disabled = false;
+            sendBtn.disabled = false;
+            adminInput.placeholder = `Ketik balasan untuk ${senderId} (Ketik '/selesai' untuk menutup sesi)...`;
+            adminInput.focus();
+
+            document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
+            const activeItem = document.getElementById(`user-item-${senderId}`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+                activeItem.classList.remove('needs-help');
+                activeItem.classList.remove('unread');
+            }
+
+            renderMessages(senderId);
+        }
+
+        function renderMessages(senderId) {
+            chatBoxDiv.innerHTML = '';
+            const history = chatSessions[senderId] || [];
+
+            if (history.length === 0) {
+                chatBoxDiv.innerHTML = '<div class="empty-state"><span>💬</span><p>Belum ada riwayat pesan.</p></div>';
+                return;
+            }
+
+            history.forEach(chat => {
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('message-wrapper');
+
+                let labelHtml = '';
+                let msgClass = '';
+
+                if (chat.sender === 'warga') {
+                    wrapper.classList.add('wrapper-warga');
+                    labelHtml = '<div class="sender-label label-warga">👤 Warga</div>';
+                    msgClass = 'msg-warga';
+                } else if (chat.sender === 'bot') {
+                    wrapper.classList.add('wrapper-warga');
+                    labelHtml = '<div class="sender-label label-bot">🤖 Bot Rasa</div>';
+                    msgClass = 'msg-bot';
+                } else if (chat.sender === 'admin') {
+                    wrapper.classList.add('wrapper-admin');
+                    labelHtml = '<div class="sender-label label-admin">👨‍💼 Anda</div>';
+                    msgClass = 'msg-admin';
+                }
+
+                wrapper.innerHTML = `
+                    ${labelHtml}
+                    <div class="message ${msgClass}">${formatTextWithLink(chat.text)}</div>
+                `;
+                chatBoxDiv.appendChild(wrapper);
+            });
+
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatBoxDiv.scrollTop = chatBoxDiv.scrollHeight;
+        }
+
+        function sendAdminReply() {
+            if (!activeUserId) return;
+            const text = adminInput.value.trim();
+            if (text === '') return;
+
+            // Jika admin mengetik perintah selesai, jangan tampilkan di layar admin
+            if (text !== '/selesai') {
+                chatSessions[activeUserId].push({ sender: 'admin', text: text });
+                const previewEl = document.getElementById(`preview-${activeUserId}`);
+                if (previewEl) previewEl.innerText = `Anda: ${text}`;
+            }
+
+            renderMessages(activeUserId);
+            socket.emit('admin_reply', { targetUserId: activeUserId, message: text });
+
+            adminInput.value = '';
+            scrollToBottom();
+        }
+
+        sendBtn.addEventListener('click', sendAdminReply);
+        adminInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAdminReply();
+            }
+        });
+
+        // FUNGSI MEMUAT RIWAYAT DARI DATABASE POSTGRESQL SAAT REFRESH
+        async function loadAllHistory() {
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/history');
+                const logs = await response.json();
+
+                logs.forEach(log => {
+                    const sid = log.sender_id;
+                    if (!chatSessions[sid]) {
+                        chatSessions[sid] = [];
+                        createUserListItem(sid);
+                    }
+
+                    let senderType = log.sender_type === 'user' ? 'warga' : log.sender_type;
+                    chatSessions[sid].push({ sender: senderType, text: log.message });
+
+                    const previewEl = document.getElementById(`preview-${sid}`);
+                    if (previewEl) previewEl.innerHTML = formatTextWithLink(log.message);
+                });
+
+                document.querySelectorAll('.user-item').forEach(el => {
+                    el.classList.remove('unread');
+                    el.classList.remove('needs-help');
+                });
+
+            } catch (error) {
+                console.error('Gagal memuat riwayat admin:', error);
+            }
+        }
+
+        // Panggil saat web admin selesai dimuat
+        window.onload = loadAllHistory;
+
+    </script>
+</body>
+
+</html>

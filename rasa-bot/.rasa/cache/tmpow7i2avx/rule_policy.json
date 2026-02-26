@@ -1,0 +1,22 @@
+{
+  "lookup": {
+    "rules": {
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}]": "action_cari_website_bps",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}, {\"prev_action\": {\"action_name\": \"action_cari_website_bps\"}, \"user\": {\"intent\": \"cari_info_website\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"sapaan\"}}]": "utter_sapaan",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"sapaan\"}}, {\"prev_action\": {\"action_name\": \"utter_sapaan\"}, \"user\": {\"intent\": \"sapaan\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"minta_admin\"}}]": "utter_minta_admin",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"minta_admin\"}}, {\"prev_action\": {\"action_name\": \"utter_minta_admin\"}, \"user\": {\"intent\": \"minta_admin\"}}]": "action_listen"
+    },
+    "rule_only_slots": [],
+    "rule_only_loops": [],
+    "rules_for_loop_unhappy_path": {},
+    "rules_not_in_stories": [
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}, {\"prev_action\": {\"action_name\": \"action_cari_website_bps\"}, \"user\": {\"intent\": \"cari_info_website\"}}]",
+      "predicting default action with intent back",
+      "predicting default action with intent session_start",
+      "predicting default action with intent restart",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}]"
+    ]
+  }
+}
