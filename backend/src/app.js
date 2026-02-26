@@ -4,7 +4,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const axios = require('axios');
-const qrcode = require('qrcode-terminal');
 
 // 👇 PANGGIL KONEKSI DATABASE YANG SUDAH KITA BUAT DI AWAL 👇
 const db = require('./config/db');

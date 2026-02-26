@@ -10,3 +10,6 @@ __pycache__/
 
 # Mengabaikan file environment (tempat menyimpan password jika ada)
 .env
+
+.wwebjs_auth/
+.wwebjs_cache/
