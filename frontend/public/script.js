@@ -36,6 +36,30 @@ closeBtn.addEventListener('click', () => {
     chatContainer.classList.add('scale-0', 'opacity-0', 'pointer-events-none');
 });
 
+function formatWaktuChat(waktuMentah) {
+    // Mengubah waktu mentah dari database menjadi objek Date
+    const date = new Date(waktuMentah);
+
+    // 1. Mengambil format Hari dan Tanggal (Bahasa Indonesia)
+    // Contoh hasil: "Senin, 23 Februari 2026"
+    const hariTanggal = date.toLocaleDateString('id-ID', {
+        weekday: 'long',  // Menampilkan nama hari (Senin, Selasa, dll)
+        day: 'numeric',   // Angka tanggal (1-31)
+        month: 'long',    // Nama bulan (Januari, Februari, dll)
+        year: 'numeric'   // Tahun (2026)
+    });
+
+    // 2. Mengambil format Jam 24-Hour (00:00 - 23:59)
+    // Contoh hasil: "23:45"
+    const jam = date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false     // Kunci utama agar menggunakan format 24 jam!
+    }).replace('.', ':'); // Memastikan pemisahnya titik dua (:), bukan titik (.)
+
+    // 3. Menggabungkan semuanya
+    return `${hariTanggal} | ${jam}`;
+}
 // ==========================================
 // 3. FITUR FORMAT LINK
 // ==========================================
@@ -90,9 +114,15 @@ function removeTypingIndicator() {
 // ==========================================
 // 5. FITUR MENAMPILKAN PESAN KE LAYAR
 // ==========================================
-function appendMessage(sender, text) {
+function appendMessage(sender, text, timestamp = null) {
     const wrapper = document.createElement('div');
-    const timeNow = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    
+    // Logika Pintar: Jika ada timestamp dari database, gunakan itu. 
+    // Jika tidak ada (chat baru diketik), gunakan waktu detik ini juga.
+    const rawTime = timestamp ? timestamp : new Date();
+    
+    // Panggil fungsi pembuat format cantik yang kamu buat tadi
+    const timeNow = formatWaktuChat(rawTime);
 
     if (sender === 'user') {
         wrapper.className = 'message-wrapper wrapper-user flex flex-col gap-1 items-end self-end max-w-[85%]';
@@ -169,9 +199,12 @@ window.onload = async function() {
         const history = await response.json();
         
         history.forEach(chat => {
+            console.log("Data dari database:", chat);
             let type = chat.sender_type;
             if (type === 'warga') type = 'user'; 
-            appendMessage(type, chat.message);
+            
+            // 👇 PERUBAHANNYA DI SINI: Tambahkan chat.created_at
+            appendMessage(type, chat.message, chat.created_at);
 
             // Perbarui "ingatan" berdasarkan riwayat terakhir
             if (type === 'admin') currentResponder = 'admin';
@@ -180,4 +213,15 @@ window.onload = async function() {
     } catch (error) {
         console.error('Gagal memuat riwayat:', error);
     }
+};
+// ==========================================
+// 9. FUNGSI UNTUK TOMBOL DARI BOT
+// ==========================================
+window.sendBotButton = function(text) {
+    // Memunculkan pesan di layar warga
+    appendMessage('user', text);
+    showTypingIndicator(); 
+    
+    // Mengirim ke backend/bot
+    socket.emit('user_message', { senderId: mySenderId, message: text });
 };

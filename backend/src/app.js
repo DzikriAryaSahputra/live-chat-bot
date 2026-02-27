@@ -96,7 +96,7 @@ app.get('/api/chat/history/:senderId', async (req, res) => {
     try {
         const { senderId } = req.params;
         const result = await db.query(
-            'SELECT sender_type, message FROM chat_logs WHERE sender_id = $1 ORDER BY id ASC',
+            'SELECT sender_type, message, created_at FROM chat_logs WHERE sender_id = $1 ORDER BY id ASC',
             [senderId]
         );
         res.json(result.rows);
@@ -109,8 +109,8 @@ app.get('/api/chat/history/:senderId', async (req, res) => {
 // B. API untuk Dashboard Admin (Menarik SEMUA chat)
 app.get('/api/admin/history', async (req, res) => {
     try {
-        // Tarik semua data dari awal sampai akhir
-        const result = await db.query('SELECT sender_id, sender_type, message FROM chat_logs ORDER BY id ASC');
+        // 👇 TAMBAHKAN created_at DI SINI 👇
+        const result = await db.query('SELECT sender_id, sender_type, message, created_at FROM chat_logs ORDER BY id ASC');
         res.json(result.rows);
     } catch (err) {
         console.error('Error get history admin:', err);

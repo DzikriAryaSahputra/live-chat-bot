@@ -1,0 +1,28 @@
+{
+  "lookup": {
+    "rules": {
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"hubungi_admin\"}}]": "utter_pilihan_admin",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"hubungi_admin\"}}, {\"prev_action\": {\"action_name\": \"utter_pilihan_admin\"}, \"user\": {\"intent\": \"hubungi_admin\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}]": "action_cari_website_bps",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}, {\"prev_action\": {\"action_name\": \"action_cari_website_bps\"}, \"user\": {\"intent\": \"cari_info_website\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"sapaan\"}}]": "utter_sapaan",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"sapaan\"}}, {\"prev_action\": {\"action_name\": \"utter_sapaan\"}, \"user\": {\"intent\": \"sapaan\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"trigger_alihkan_admin\"}}]": "utter_alihkan_ke_petugas",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"trigger_alihkan_admin\"}}, {\"prev_action\": {\"action_name\": \"utter_alihkan_ke_petugas\"}, \"user\": {\"intent\": \"trigger_alihkan_admin\"}}]": "action_listen"
+    },
+    "rule_only_slots": [],
+    "rule_only_loops": [],
+    "rules_for_loop_unhappy_path": {},
+    "rules_not_in_stories": [
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}, {\"prev_action\": {\"action_name\": \"action_cari_website_bps\"}, \"user\": {\"intent\": \"cari_info_website\"}}]",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"cari_info_website\"}}]",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"trigger_alihkan_admin\"}}]",
+      "predicting default action with intent back",
+      "predicting default action with intent restart",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"hubungi_admin\"}}]",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"trigger_alihkan_admin\"}}, {\"prev_action\": {\"action_name\": \"utter_alihkan_ke_petugas\"}, \"user\": {\"intent\": \"trigger_alihkan_admin\"}}]",
+      "predicting default action with intent session_start",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"user\": {\"intent\": \"hubungi_admin\"}}, {\"prev_action\": {\"action_name\": \"utter_pilihan_admin\"}, \"user\": {\"intent\": \"hubungi_admin\"}}]"
+    ]
+  }
+}

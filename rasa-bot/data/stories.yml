@@ -14,13 +14,3 @@ stories:
   steps:
   - intent: tanya_sensus_ekonomi
   - action: utter_tanya_sensus_ekonomi
-
-- story: alur minta disambungkan ke petugas (Handover Trigger)
-  steps:
-  - intent: minta_admin
-  - action: utter_minta_admin
-
-- story: jawab sawit
-  steps:
-      - intent: sawit
-      - action: utter_jawab_sawit

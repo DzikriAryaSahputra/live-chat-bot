@@ -3,10 +3,10 @@ version: "3.1"
 intents:
   - sapaan
   - tanya_data_statistik
-  - minta_admin
   - cari_info_website
-  - sawit
   - tanya_sensus_ekonomi
+  - utter_alihkan_ke_petugas
+  - utter_pilihan_admin
 
 actions:
   - action_cari_website_bps
@@ -21,12 +21,14 @@ responses:
   utter_tanya_sensus_ekonomi:
   - text: "Sensus terakhir dilaksanakan pada tahun 2020. Dan untuk tahun ini akan ada sensus ekonomi 2026 (SE2026) yang merupakan sensus ekonomi ke-5 loh🤩. Untuk informasi lebih lanjut mengenai sensus ekonomi, Anda bisa melihat di website resmi BPS."
 
-  utter_minta_admin:
-  - text: "Baik, mohon tunggu sebentar ya. Sistem sedang meneruskan pesan Anda ke petugas kami. Admin akan segera membalas pesan Anda di sini."
+  utter_pilihan_admin:
+  - text: |
+      Baik, Silakan pilih bagaimana Anda ingin menghubungi petugas BPS kami😊:
+      <button onclick="window.sendBotButton('Tolong alihkan ke petugas')" style="background-color: #0ea5e9; color: white; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; cursor: pointer; border: none; font-weight: bold;">💬 Chat Langsung di Sini</button>
+      <a href="https://wa.me/6281286855764?text=Halo%20Admin%20BPS,%20saya%20butuh%20bantuan" target="_blank" style="background-color: #25D366; color: white; padding: 10px; border-radius: 6px; display: inline-block; width: 100%; text-align: center; text-decoration: none; box-sizing: border-box; font-weight: bold;">📱 Chat via WhatsApp</a>
 
-  utter_jawab_sawit:
-  - text: "Mungkin. Tapi yang lebih penting… kamu jangan sampai melupakan dirimu sendiri hanya karena mengingat dia. Kamu harus tetap kuat, tetap berdiri, dan terus berjalan maju. Jangan biarkan perasaan ditinggalkan itu membuatmu terpuruk. Kamu punya banyak hal yang bisa kamu capai dan banyak orang yang peduli padamu. Jadi, jangan pernah merasa sendirian, ya!"
-
+  utter_alihkan_ke_petugas:
+  - text: "Baik, mohon tunggu sebentar. Saya sedang meneruskan pesan Anda ke petugas..."
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

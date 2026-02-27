@@ -73,3 +73,16 @@ nlu:
   examples: |
     - Menurutmu dia masih ingat aku?
     - Menurutmu dia masih sayang sama aku?
+
+- intent: hubungi_admin
+  examples: |
+    - hubungi admin
+    - bicara dengan manusia
+    - saya mau chat dengan petugas
+    - tolong sambungkan ke admin
+    - live chat
+    - wa admin
+
+- intent: trigger_alihkan_admin
+  examples: |
+    - Tolong alihkan ke petugas
