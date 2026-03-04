@@ -10,10 +10,27 @@ if (!mySenderId) {
 }
 
 // Variabel "Ingatan" untuk mengecek siapa lawan bicara saat ini
-let currentResponder = 'bot'; 
+let currentResponder = 'bot';
 
 // Tangkap elemen-elemen DOM HTML
 const chatBox = document.getElementById('chat-box');
+// ==========================================
+// FUNGSI PENDETEKSI WAKTU (SAPAAN DINAMIS)
+// ==========================================
+function getGreeting() {
+    const hour = new Date().getHours();
+
+    // Logika waktu standar Indonesia
+    if (hour >= 4 && hour < 11) {
+        return '🌤️ Selamat Pagi';
+    } else if (hour >= 11 && hour < 15) {
+        return '☀️ Selamat Siang';
+    } else if (hour >= 15 && hour < 18) {
+        return '⛅ Selamat Sore';
+    } else {
+        return '🌙 Selamat Malam';
+    }
+}
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const chatContainer = document.querySelector('.chat-container');
@@ -69,29 +86,32 @@ function formatTextWithLink(text) {
         return text.replace(/\n/g, '<br>');
     }
     const urlRegex = /(https?:\/\/[^\s<]+)/g;
-    let formattedText = text.replace(urlRegex, function(url) {
+    let formattedText = text.replace(urlRegex, function (url) {
         return `<a href="${url}" target="_blank" style="color: #38bdf8; text-decoration: underline;">${url}</a>`;
     });
     return formattedText.replace(/\n/g, '<br>');
 }
-
 // ==========================================
 // 4. FITUR ANIMASI MENGETIK DINAMIS
 // ==========================================
 function showTypingIndicator() {
-    removeTypingIndicator(); 
-    
+    removeTypingIndicator();
+
     const wrapper = document.createElement('div');
     wrapper.id = 'typing-indicator';
     wrapper.className = 'message-wrapper wrapper-bot flex flex-col gap-1 items-start max-w-[85%] mb-2';
-    
-    // 👇 NAMA & IKON BERUBAH SESUAI LAWAN BICARA 👇
+
     let senderName = currentResponder === 'admin' ? 'Petugas BPS' : 'Asisten Virtual';
-    let senderIcon = currentResponder === 'admin' ? '👨‍💼' : '🤖';
+
+    // Logika Gambar Profil Animasi Mengetik
+    let senderFoto = currentResponder === 'admin'
+        ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-5 h-5 rounded-full object-cover border border-gray-200">'
+        : '<img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
 
     wrapper.innerHTML = `
         <div class="sender-label label-bot flex items-center gap-1 text-[10px] text-gray-500 ml-1 font-medium">
-            <span class="sender-icon text-sm">${senderIcon}</span> ${senderName}
+            ${senderFoto}
+            <span>${senderName}</span>
         </div>
         <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 w-16 flex items-center justify-center gap-1 h-[42px]">
             <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
@@ -99,7 +119,7 @@ function showTypingIndicator() {
             <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
         </div>
     `;
-    
+
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -116,13 +136,8 @@ function removeTypingIndicator() {
 // ==========================================
 function appendMessage(sender, text, timestamp = null) {
     const wrapper = document.createElement('div');
-    
-    // Logika Pintar: Jika ada timestamp dari database, gunakan itu. 
-    // Jika tidak ada (chat baru diketik), gunakan waktu detik ini juga.
     const rawTime = timestamp ? timestamp : new Date();
-    
-    // Panggil fungsi pembuat format cantik yang kamu buat tadi
-    const timeNow = formatWaktuChat(rawTime);
+    const timeNow = formatWaktuChat(rawTime); // Memanggil fungsi waktu yang kita buat sebelumnya
 
     if (sender === 'user') {
         wrapper.className = 'message-wrapper wrapper-user flex flex-col gap-1 items-end self-end max-w-[85%]';
@@ -135,11 +150,16 @@ function appendMessage(sender, text, timestamp = null) {
     } else {
         wrapper.className = 'message-wrapper wrapper-bot flex flex-col gap-1 items-start max-w-[85%]';
         let senderName = sender === 'admin' ? 'Petugas BPS' : 'Asisten Virtual';
-        let senderIcon = sender === 'admin' ? '👨‍💼' : '🤖';
+
+        // Logika Gambar Profil Balasan Pesan
+        let senderFoto = sender === 'admin'
+            ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-5 h-5 rounded-full object-cover border border-gray-200">'
+            : '<img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
 
         wrapper.innerHTML = `
             <div class="sender-label label-bot flex items-center gap-1 text-[10px] text-gray-500 ml-1 font-medium">
-                <span class="sender-icon text-sm">${senderIcon}</span> ${senderName}
+                ${senderFoto}
+                <span>${senderName}</span>
             </div>
             <div class="message bot-message bg-white text-gray-800 p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-sm leading-relaxed">
                 ${formatTextWithLink(text)}
@@ -151,7 +171,6 @@ function appendMessage(sender, text, timestamp = null) {
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
 // ==========================================
 // 6. MENGIRIM PESAN
 // ==========================================
@@ -159,8 +178,8 @@ function sendMessage() {
     const text = userInput.value.trim();
     if (text) {
         appendMessage('user', text);
-        showTypingIndicator(); 
-        
+        showTypingIndicator();
+
         socket.emit('user_message', { senderId: mySenderId, message: text });
         userInput.value = '';
     }
@@ -191,25 +210,37 @@ socket.on('admin_response', (data) => {
 });
 
 // ==========================================
-// 8. MEMUAT RIWAYAT (DENGAN INGATAN)
+// 8. MEMUAT RIWAYAT (DENGAN INGATAN & QUICK REPLIES)
 // ==========================================
-window.onload = async function() {
+window.onload = async function () {
     try {
         const response = await fetch(`http://localhost:3000/api/chat/history/${mySenderId}`);
         const history = await response.json();
-        
-        history.forEach(chat => {
-            console.log("Data dari database:", chat);
-            let type = chat.sender_type;
-            if (type === 'warga') type = 'user'; 
-            
-            // 👇 PERUBAHANNYA DI SINI: Tambahkan chat.created_at
-            appendMessage(type, chat.message, chat.created_at);
 
-            // Perbarui "ingatan" berdasarkan riwayat terakhir
-            if (type === 'admin') currentResponder = 'admin';
-            if (type === 'bot') currentResponder = 'bot';
-        });
+        if (history.length === 0) {
+            // JIKA KOSONG: Warga baru pertama kali buka chat
+            setTimeout(() => {
+                // 👇 Panggil fungsi deteksi waktu di sini 👇
+                const sapaan = getGreeting();
+
+                // Masukkan variabel sapaan ke dalam pesan bot
+                appendMessage('bot', `${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Ada yang bisa Asisten Virtual bantu hari ini?`);
+
+                // Munculkan tombol saran pertanyaan
+                showQuickReplies();
+            }, 500);
+        } else {
+            // JIKA ADA RIWAYAT: Muat chat lama seperti biasa
+            history.forEach(chat => {
+                let type = chat.sender_type;
+                if (type === 'warga') type = 'user';
+
+                appendMessage(type, chat.message, chat.created_at);
+
+                if (type === 'admin') currentResponder = 'admin';
+                if (type === 'bot') currentResponder = 'bot';
+            });
+        }
     } catch (error) {
         console.error('Gagal memuat riwayat:', error);
     }
@@ -217,11 +248,99 @@ window.onload = async function() {
 // ==========================================
 // 9. FUNGSI UNTUK TOMBOL DARI BOT
 // ==========================================
-window.sendBotButton = function(text) {
+window.sendBotButton = function (text) {
     // Memunculkan pesan di layar warga
     appendMessage('user', text);
-    showTypingIndicator(); 
-    
+    showTypingIndicator();
+
     // Mengirim ke backend/bot
     socket.emit('user_message', { senderId: mySenderId, message: text });
+};
+
+// ==========================================
+// 10. FITUR QUICK REPLIES (Saran Pertanyaan)
+// ==========================================
+function showQuickReplies() {
+    // 1. Buat bungkus (container) untuk tombol-tombolnya
+    const wrapper = document.createElement('div');
+    wrapper.id = 'quick-replies-container';
+    // Menggunakan class Tailwind agar rapi dan berjajar
+    wrapper.className = 'flex flex-wrap gap-2 mt-2 mb-4 ml-8 max-w-[80%]';
+
+    // 2. Daftar pertanyaan khas BPS (Bisa kamu ganti teksnya nanti)
+    const suggestions = [
+        "📊 Data Inflasi Jambi",
+        "👥 Jumlah Penduduk",
+        "👨‍💼 Hubungi Admin"
+    ];
+
+    // 3. Cetak tombol ke layar satu per satu
+    suggestions.forEach(text => {
+        const btn = document.createElement('button');
+        // Desain tombol (Outline border yang akan terisi warna saat di-hover)
+        btn.className = 'bg-white text-[var(--bps-blue)] border border-[var(--bps-blue)] text-xs px-3 py-1.5 rounded-full hover:bg-[var(--bps-blue)] hover:text-white transition-colors duration-200 cursor-pointer';
+        btn.innerText = text;
+
+        // 4. Aksi ketika tombol diklik
+        btn.onclick = () => {
+            window.sendBotButton(text); // Otomatis mengirim pesan
+            wrapper.remove(); // Hapus kumpulan tombol ini agar layar tidak penuh
+        };
+
+        wrapper.appendChild(btn);
+    });
+
+    chatBox.appendChild(wrapper);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ==========================================
+// 11. FITUR MODAL HAPUS RIWAYAT
+// ==========================================
+
+const deleteModal = document.getElementById('delete-modal');
+
+// 1. Fungsi Buka Modal
+window.openDeleteModal = function () {
+    deleteModal.classList.remove('hidden');
+    // Tambahkan animasi masuk (opsional)
+    deleteModal.querySelector('.relative').classList.add('animate-in', 'fade-in', 'zoom-in', 'duration-200');
+};
+
+// 2. Fungsi Tutup Modal
+window.closeDeleteModal = function () {
+    deleteModal.classList.add('hidden');
+};
+
+// 3. Fungsi Eksekusi Hapus (Setelah Klik "Ya, Hapus")
+window.confirmClearChat = async function () {
+    try {
+        // Tembak API Backend
+        const response = await fetch(`http://localhost:3000/api/chat/history/${mySenderId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            // Tutup Modal
+            closeDeleteModal();
+
+            // Bersihkan Layar Chat
+            chatBox.innerHTML = '';
+
+            // Notifikasi Visual Singkat (Opsional)
+            console.log("Riwayat berhasil dihapus.");
+
+            // Munculkan kembali sambutan bot & Quick Replies
+            // Di dalam fungsi confirmClearChat, ganti bagian setTimeout menjadi:
+            setTimeout(() => {
+                const sapaan = getGreeting();
+                appendMessage('bot', `Riwayat obrolan telah dibersihkan. ${sapaan}, ada yang bisa Asisten Virtual bantu lagi?`);
+                showQuickReplies();
+            }, 400);
+        }
+    } catch (error) {
+        console.error('Gagal menghapus riwayat:', error);
+        alert('Terjadi gangguan koneksi ke server.');
+        closeDeleteModal();
+    }
 };

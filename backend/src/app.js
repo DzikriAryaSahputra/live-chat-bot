@@ -117,4 +117,18 @@ app.get('/api/admin/history', async (req, res) => {
         res.status(500).json({ error: 'Gagal mengambil riwayat admin' });
     }
 });
+// ==========================================
+// API UNTUK MENGHAPUS RIWAYAT CHAT WARGA
+// ==========================================
+app.delete('/api/chat/history/:senderId', async (req, res) => {
+    try {
+        const { senderId } = req.params;
+        // Menghapus semua pesan di database yang cocok dengan ID Warga tersebut
+        await db.query('DELETE FROM chat_logs WHERE sender_id = $1', [senderId]);
+        res.json({ message: 'Riwayat obrolan berhasil dihapus!' });
+    } catch (err) {
+        console.error('Error delete history:', err);
+        res.status(500).json({ error: 'Gagal menghapus riwayat' });
+    }
+});
 server.listen(port, () => console.log(`🚀 Server Web & WebSocket berjalan di http://localhost:${port}`));
