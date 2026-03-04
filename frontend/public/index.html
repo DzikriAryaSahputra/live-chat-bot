@@ -2,95 +2,207 @@
 <html lang="id">
 
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>BPS Floating Chat Widget</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
-    <style type="text/tailwindcss">
-        :root {
-            --bps-blue: #19376D;
-            --bps-dark-blue: #003366;
-            --bps-orange: #E8A020;
-            --bps-light-blue: #E6F0F9;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            height: 100vh;
-            overflow: hidden;
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPS Floating Chat Widget</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+
+  <style>
+    :root {
+      --bps-blue: #19376D;
+      --bps-dark-blue: #003366;
+      --bps-orange: #E8A020;
+      --bps-light-blue: #E6F0F9;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+      min-height: max(884px, 100dvh);
+      overflow: hidden;
+    }
+  </style>
 </head>
 
 <body class="relative h-screen w-full">
-    <div class="p-8 hidden md:block opacity-30">
-        <h1 class="text-3xl font-bold text-[var(--bps-blue)]">Badan Pusat Statistik Kota Jambi</h1>
-        <p class="mt-4 text-gray-600">Website content placeholder...</p>
-    </div>
 
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans">
-        <div
-            class="chat-container w-[360px] h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden transition-all transform origin-bottom-right">
+  <!-- ===== NAVBAR ===== -->
+  <nav class="absolute top-0 w-full z-50 bg-[#1E3A5F] border-b border-primary border-opacity-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
 
-            <div
-                class="chat-header bg-gradient-to-r from-[var(--bps-blue)] to-[var(--bps-dark-blue)] p-4 text-white flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow-md">
-                        <img alt="Logo BPS" class="w-full h-full object-contain"
-                            src="img/pngwing.com.png" />
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-sm leading-tight">Layanan Informasi BPS Kota Jambi</h3>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                            <p class="text-xs text-blue-100 font-light">Online</p>
-                        </div>
-                    </div>
-                </div>
-                <button aria-label="Close"
-                    class="text-white/80 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">close</span>
-                </button>
-            </div>
-
-            <div class="chat-box flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3" id="chat-box">
-            </div>
-
-            <div class="chat-input-area p-3 bg-white border-t border-gray-100 shrink-0">
-                <div class="relative flex items-center gap-2">
-                    <input autocomplete="off"
-                        class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--bps-blue)] focus:border-transparent text-sm transition-all placeholder-gray-400"
-                        id="user-input" placeholder="Ketik pesan..." type="text" />
-                    <button
-                        class="absolute right-1.5 p-2 bg-[var(--bps-orange)] hover:bg-orange-600 text-white rounded-full shadow-sm flex items-center justify-center transition-transform active:scale-95"
-                        id="send-btn">
-                        <span class="material-symbols-outlined text-[18px] translate-x-0.5">send</span>
-                    </button>
-                </div>
-                <div class="text-center mt-2">
-                    <p class="text-[10px] text-gray-400">Didukung oleh AI BPS</p>
-                </div>
-            </div>
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-primary rounded flex items-center justify-center">
+            <img
+              class="rounded"
+              alt="BPS Logo"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbCeoTLGeGGeCJ0WIf0Et4GJlL4uRTIV30iDLRYdQCWDHNbjRbtHE5KuyQFIcH1tho7dQbbMWAunPzW2qI4L5MC1jFogweHcCOLew1fk7kbH5O7D39FmTZDUUXROffv2jcp_RZ7nXBgt17I-AZtRPivj07CzZJNWNA66X5mG-StK6_DqXwVqkB3jIy8tzZbdl1atSeh-9_gJXUChaB3hsjHdjRFCKwV5XUCKiTQ80Gz3cbfG_8yEbQORAKfUizc5N1pKxlSXDEMVp5"
+            />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs text-gray-300 tracking-wider">PORTAL LAYANAN</span>
+            <span class="text-lg font-bold text-white">BPS Kota Jambi</span>
+          </div>
         </div>
 
-        <button
-            class="w-14 h-14 rounded-full bg-[var(--bps-orange)] hover:bg-orange-600 shadow-lg hover:shadow-xl text-white flex items-center justify-center transition-all transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-4 focus:ring-orange-200 group">
-            <span
-                class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">chat_bubble</span>
-        </button>
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a class="text-gray-300 hover:text-white transition-colors" href="#">Indikator</a>
+          <a class="text-gray-300 hover:text-white transition-colors" href="#">Tentang BPS</a>
+          <a class="text-gray-300 hover:text-white transition-colors" href="#">Aplikasi</a>
+          <button class="bg-primary hover:bg-yellow-600 text-[#1E3A5F] font-semibold px-6 py-2 rounded transition-colors">
+            Kontak
+          </button>
+        </div>
+
+        <!-- Mobile Hamburger -->
+        <div class="md:hidden flex items-center">
+          <button class="text-gray-300 hover:text-white">
+            <span class="material-icons">menu</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO SECTION ===== -->
+  <main class="relative pt-20 pb-16 lg:pb-0 min-h-screen flex items-center bg-[#1E3A5F] overflow-hidden">
+
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0">
+      <img
+        class="w-full h-full object-cover opacity-30 mix-blend-overlay"
+        alt="BPS Building Background"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuxLsZShtHTyZiR-LpN4J_1p5FnCbisD9ILiIgpaWzAhlTzUdFizaX3gj7t87kto3pFhTAXMItl3zVSmZaem_ZHPWfI7TGqKso-iWOXPXxezXzEbzKA5ft_YVikVYVzPptu3uAsQob4G34essdsBlvRZlDqG_ZQiwQrUBQZZ6fPSloa5ClXSFfEw5yCywTharq7KfOcIc-ATZpXxiczzgyFxXMDlSC-LFUVrFXh6BrEX4HcO2TFitmBoCzTdzZcdnWxX0vIn621dgy"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#1E3A5F] via-[#1E3A5F]/90 to-transparent"></div>
     </div>
 
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
-    <script src="script.js"></script>
-</body>
+    <!-- Hero Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center pt-12 lg:pt-0">
 
+        <!-- Left: Text -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center space-x-2 bg-white/10 rounded-full px-4 py-1.5 border border-white/20">
+            <div class="w-2 h-2 rounded-full bg-primary"></div>
+            <span class="text-xs font-semibold text-primary tracking-widest uppercase">Portal Layanan &amp; Inovasi</span>
+          </div>
+
+          <h1 class="text-5xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight">
+            Data Statistik<br />
+            Kota <span class="text-primary">Jambi</span><br />
+            Terpercaya
+          </h1>
+
+          <p class="text-lg text-gray-300 max-w-xl leading-relaxed">
+            Badan Pusat Statistik Kota Jambi menyediakan data, layanan, dan aplikasi inovatif untuk
+            mendukung pembangunan daerah berbasis data yang akurat.
+          </p>
+
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-4">
+            <button class="bg-primary hover:bg-yellow-600 text-[#1E3A5F] font-semibold px-8 py-3 rounded-lg transition-colors flex items-center justify-center space-x-2">
+              <span>Lihat Aplikasi</span>
+              <span class="material-icons text-sm">north_east</span>
+            </button>
+            <button class="bg-transparent border border-white/30 hover:bg-white/10 text-white font-semibold px-8 py-3 rounded-lg transition-colors">
+              Profil BPS
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:pl-12">
+          <div class="glass-card rounded-2xl p-6 hover:bg-white/10 transition-colors">
+            <h3 class="text-4xl font-bold text-primary mb-2">11</h3>
+            <p class="text-sm text-gray-300">Kecamatan di Kota Jambi</p>
+          </div>
+          <div class="glass-card rounded-2xl p-6 hover:bg-white/10 transition-colors">
+            <h3 class="text-4xl font-bold text-primary mb-2">649<span class="text-lg text-primary/80 font-normal">ribu</span></h3>
+            <p class="text-sm text-gray-300">Penduduk Kota Jambi (2026)</p>
+          </div>
+          <div class="glass-card rounded-2xl p-6 hover:bg-white/10 transition-colors">
+            <h3 class="text-4xl font-bold text-primary mb-2">2<span class="text-2xl text-primary/80 font-normal">+</span></h3>
+            <p class="text-sm text-gray-300">Aplikasi Layanan Aktif</p>
+          </div>
+          <div class="glass-card rounded-2xl p-6 hover:bg-white/10 transition-colors">
+            <h3 class="text-4xl font-bold text-primary mb-2">5,13<span class="text-xl text-primary/80 font-normal">%</span></h3>
+            <p class="text-sm text-gray-300">Pertumbuhan Ekonomi (2025)</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== FLOATING CHAT WIDGET ===== -->
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans">
+
+    <!-- Chat Window -->
+    <div class="chat-container w-[360px] h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden transition-all transform origin-bottom-right">
+
+      <!-- Header -->
+      <div class="chat-header bg-gradient-to-r from-[var(--bps-blue)] to-[var(--bps-dark-blue)] p-4 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow-md">
+            <img class="w-full h-full object-contain" alt="Logo BPS" src="img/pngwing.com.png" />
+          </div>
+          <div>
+            <h3 class="font-bold text-sm leading-tight">Layanan Informasi BPS Kota Jambi</h3>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              <p class="text-xs text-blue-100 font-light">Online</p>
+            </div>
+          </div>
+        </div>
+        <button
+          aria-label="Close"
+          class="text-white/80 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors"
+        >
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Message Area -->
+      <div class="chat-box flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3" id="chat-box"></div>
+
+      <!-- Input Area -->
+      <div class="chat-input-area p-3 bg-white border-t border-gray-100 shrink-0">
+        <div class="relative flex items-center gap-2">
+          <input
+            id="user-input"
+            type="text"
+            autocomplete="off"
+            placeholder="Ketik pesan..."
+            class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--bps-blue)] focus:border-transparent text-sm transition-all placeholder-gray-400"
+          />
+          <button
+            id="send-btn"
+            class="absolute right-1.5 p-2 bg-[var(--bps-orange)] hover:bg-orange-600 text-white rounded-full shadow-sm flex items-center justify-center transition-transform active:scale-95"
+          >
+            <span class="material-symbols-outlined text-[18px] translate-x-0.5">send</span>
+          </button>
+        </div>
+        <p class="text-center text-[10px] text-gray-400 mt-2">Didukung oleh AI BPS</p>
+      </div>
+
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="w-14 h-14 rounded-full bg-[var(--bps-orange)] hover:bg-orange-600 shadow-lg hover:shadow-xl text-white flex items-center justify-center transition-all transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-4 focus:ring-orange-200 group">
+      <span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">chat_bubble</span>
+    </button>
+
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+
+</body>
 </html>

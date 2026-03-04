@@ -12,6 +12,7 @@ Aplikasi ini menggunakan arsitektur Microservices. Untuk menjalankannya, buka 3 
 - Buka terminal dan masuk ke folder: `cd rasa-bot`
 - Aktifkan environment: `venv\Scripts\activate`
 - Ketik: `rasa run --enable-api --cors "*"`
+rasa train --force
 
 ### Terminal 3: Menyalakan Tangan AI (Rasa Custom Actions)
 - Buka terminal dan masuk ke folder: `cd rasa-bot`

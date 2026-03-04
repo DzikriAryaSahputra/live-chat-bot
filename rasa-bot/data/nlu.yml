@@ -69,6 +69,13 @@ nlu:
     - saya mau lihat meta data statistik
     - saya mau lihat infografik statistik
     - saya mau lihat grafik statistik
+    - saya mau lihat website bps provinsi jambi
+    - website provinsi jambi dong
+    - website resmi utama bps
+    - website utama bps
+    - website pejabat pengelola informasi dokumentasi
+    - website ppid
+    - PPID
 - intent: sawit
   examples: |
     - Menurutmu dia masih ingat aku?

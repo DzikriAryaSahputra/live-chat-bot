@@ -1,15 +1,11 @@
-# Mengabaikan folder raksasa (akan di-install ulang di laptop)
+# Node.js
 node_modules/
-venv/
+
+# Python & Rasa
+rasa-bot/venv/
+rasa-bot/.rasa/
+rasa-bot/models/
 __pycache__/
 
-# Mengabaikan file database dan data sensitif
-*.sql
-*.sqlite
-*.db
-
-# Mengabaikan file environment (tempat menyimpan password jika ada)
+# Keamanan
 .env
-
-.wwebjs_auth/
-.wwebjs_cache/

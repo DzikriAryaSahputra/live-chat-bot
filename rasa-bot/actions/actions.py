@@ -57,6 +57,18 @@ class ActionCariWebsiteBPS(Action):
             kategori = "Metadata Statistik"
             link = "https://sirusa.web.bps.go.id/metadata/"
 
+        elif "ppid" in pesan_warga or "pejabat pengelola informasi dokumentasi" in pesan_warga:
+            kategori = "PPID"
+            link = "https://ppid.bps.go.id/?mfd=1571"
+
+        elif "bps provinsi jambi" in pesan_warga or "website bps provinsi" in pesan_warga:
+            kategori = "Website BPS Provinsi Jambi"
+            link = "https://jambi.bps.go.id/id"
+        
+        elif "bps resmi utama" in pesan_warga or "website resmi utama bps" in pesan_warga:
+            kategori = "Website Resmi BPS"
+            link = "https://www.bps.go.id/id"
+
         # --- JIKA TIDAK ADA KATA KUNCI YANG COCOK (Fallback) ---
         else:
             kategori = "Halaman Utama BPS Kota Jambi"
