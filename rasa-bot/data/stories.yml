@@ -14,3 +14,8 @@ stories:
   steps:
   - intent: tanya_sensus_ekonomi
   - action: utter_tanya_sensus_ekonomi
+
+- story: alur tanya profil bps
+  steps:
+  - intent: tanya_profil_bps
+  - action: utter_tanya_profil_bps

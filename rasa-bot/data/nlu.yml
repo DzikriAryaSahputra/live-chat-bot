@@ -14,6 +14,7 @@ nlu:
     - selamat siang
     - selamat sore
     - selamat malam
+
 - intent: tanya_data_statistik
   examples: |
     - kapan rilis data inflasi terbaru?
@@ -23,6 +24,7 @@ nlu:
     - mau cari data ekspor impor
     - saya mau cari data kependudukan
     - saya mau cari data statistik terbaru
+
 - intent: tanya_sensus_ekonomi
   examples: |
     - kapan sensus penduduk lagi?
@@ -32,23 +34,7 @@ nlu:
     - kapan sensus ekonomi 2026?
     - kapan SE2026?
     - sensus ekonomi
-- intent: minta_admin
-  examples: |
-    - saya mau bicara dengan petugas
-    - tolong sambungkan ke admin
-    - chat dengan manusia asli dong
-    - ada petugas yang bisa ditanya?
-    - saya mau tanya langsung ke petugas
-    - saya mau minta bantuan petugas
-    - saya mau minta admin
-    - saya mau minta tolong petugas
-    - saya mau minta bantuan admin
-    - saya mau minta bantuan manusia asli
-    - saya mau ngobrol langsung dengan petugas
-    - saya mau ngobrol langsung dengan admin
-    - saya mau ngobrol langsung dengan manusia asli
-    - ngomong dengan orang asli dong
-    - ngomong dengan petugas dong
+
 - intent: cari_info_website
   examples: |
     - minta link publikasi dong
@@ -76,10 +62,6 @@ nlu:
     - website pejabat pengelola informasi dokumentasi
     - website ppid
     - PPID
-- intent: sawit
-  examples: |
-    - Menurutmu dia masih ingat aku?
-    - Menurutmu dia masih sayang sama aku?
 
 - intent: hubungi_admin
   examples: |
@@ -93,3 +75,10 @@ nlu:
 - intent: trigger_alihkan_admin
   examples: |
     - Tolong alihkan ke petugas
+
+- intent: tanya_profil_bps
+  examples: |
+    - Profil bps kota jambi
+    - bagaimana profil bps kota jambi
+    - berikan saya profil bps jambi
+    - apa profil bps kota jambi?

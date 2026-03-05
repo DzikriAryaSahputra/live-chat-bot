@@ -106,7 +106,7 @@ function showTypingIndicator() {
     // Logika Gambar Profil Animasi Mengetik
     let senderFoto = currentResponder === 'admin'
         ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-5 h-5 rounded-full object-cover border border-gray-200">'
-        : '<img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
+        : '<img src="https://www.shutterstock.com/image-vector/chat-bot-icon-virtual-smart-600nw-2478937555.jpg" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
 
     wrapper.innerHTML = `
         <div class="sender-label label-bot flex items-center gap-1 text-[10px] text-gray-500 ml-1 font-medium">
@@ -154,7 +154,7 @@ function appendMessage(sender, text, timestamp = null) {
         // Logika Gambar Profil Balasan Pesan
         let senderFoto = sender === 'admin'
             ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-5 h-5 rounded-full object-cover border border-gray-200">'
-            : '<img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
+            : '<img src="https://www.shutterstock.com/image-vector/chat-bot-icon-virtual-smart-600nw-2478937555.jpg" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
 
         wrapper.innerHTML = `
             <div class="sender-label label-bot flex items-center gap-1 text-[10px] text-gray-500 ml-1 font-medium">

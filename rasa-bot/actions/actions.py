@@ -61,14 +61,21 @@ class ActionCariWebsiteBPS(Action):
             kategori = "PPID"
             link = "https://ppid.bps.go.id/?mfd=1571"
 
-        elif "bps provinsi jambi" in pesan_warga or "website bps provinsi" in pesan_warga:
+        elif "bps provinsi jambi" in pesan_warga or "website bps provinsi" in pesan_warga or "bps provinsi" in pesan_warga:
             kategori = "Website BPS Provinsi Jambi"
             link = "https://jambi.bps.go.id/id"
         
-        elif "bps resmi utama" in pesan_warga or "website resmi utama bps" in pesan_warga:
+        elif "bps resmi" in pesan_warga or "website resmi bps" in pesan_warga or "website utama bps" in pesan_warga or "bps utama" in pesan_warga:
             kategori = "Website Resmi BPS"
             link = "https://www.bps.go.id/id"
 
+        elif "layanan statistik" in pesan_warga or "layanan statistik bps" in pesan_warga or "layanan statistik bps jambi" in pesan_warga:
+            kategori = "Layanan Statistik"
+            link = "https://silastik.bps.go.id/v3/index.php/site/login/"
+
+        elif "website lapor" in pesan_warga or "aplikasi lapor" in pesan_warga:
+            kategori = "Aplikasi Lapor"
+            link = "https://lapor.go.id/"
         # --- JIKA TIDAK ADA KATA KUNCI YANG COCOK (Fallback) ---
         else:
             kategori = "Halaman Utama BPS Kota Jambi"
