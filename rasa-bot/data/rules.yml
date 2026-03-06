@@ -20,3 +20,8 @@ rules:
     steps:
       - intent: trigger_alihkan_admin
       - action: utter_alihkan_ke_petugas
+
+  - rule: Tanya Visi Misi BPS
+    steps:
+      - intent: tanya_visi_misi_bps
+      - action: utter_tanya_visi_misi_bps

@@ -19,3 +19,8 @@ stories:
   steps:
   - intent: tanya_profil_bps
   - action: utter_tanya_profil_bps
+
+- story: alur tanya visi misi bps
+  steps:
+  - intent: tanya_visi_misi_bps
+  - action: utter_tanya_visi_misi_bps

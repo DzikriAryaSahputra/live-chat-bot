@@ -76,6 +76,10 @@ class ActionCariWebsiteBPS(Action):
         elif "website lapor" in pesan_warga or "aplikasi lapor" in pesan_warga:
             kategori = "Aplikasi Lapor"
             link = "https://lapor.go.id/"
+        
+        elif "website portal" in pesan_warga or "aplikasi portal" in pesan_warga or "portal layanan" in pesan_warga:
+            kategori = "Portal BPS"
+            link = "https://statistik1571.my.id/"
         # --- JIKA TIDAK ADA KATA KUNCI YANG COCOK (Fallback) ---
         else:
             kategori = "Halaman Utama BPS Kota Jambi"

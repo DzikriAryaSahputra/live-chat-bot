@@ -78,7 +78,20 @@ nlu:
 
 - intent: tanya_profil_bps
   examples: |
-    - Profil bps kota jambi
-    - bagaimana profil bps kota jambi
-    - berikan saya profil bps jambi
-    - apa profil bps kota jambi?
+    - Profil bps
+    - bagaimana profil bps
+    - berikan saya profil bps 
+    - apa profil bps?
+
+- intent: tanya_visi_misi_bps
+  examples: |
+    - apa visi misi bps?
+    - apa visi bps?
+    - apa misi bps?
+    - tujuan utama instansi ini apa?
+    - jelaskan visi dan misi
+    - target dan tujuan bps
+    - visi misi
+    - visi misi bps
+    - visi lembaganya apa?
+    - misinya apa saja?
