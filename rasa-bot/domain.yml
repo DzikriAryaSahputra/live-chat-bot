@@ -10,6 +10,7 @@ intents:
   - tanya_profil_bps
   - tanya_visi_misi_bps
   - tanya_profil_ppid
+  - tanya_arti_logo
 
 actions:
   - action_cari_website_bps
@@ -28,7 +29,10 @@ responses:
   - text: "Berikut terkait informasi Visi Dan Misi BPS: <br><b>Visi BPS</b><br><i>Lembaga yang Independen, Tepercaya, dan Berperan Aktif dalam Mendukung Perumusan Kebijakan Berbasis Data Bersama Indonesia Maju Menuju Indonesia Emas 2045</i><br><br>Dalam visi yang baru tersebut BPS menetapkan visi yang berlandaskan prinsip independensi, kepercayaan publik, peran aktif, serta dukungan penuh terhadap kebijakan berbasis data. Sebagai lembaga yang menjunjung tinggi objektivitas dan tidak memihak, BPS memastikan seluruh proses statistik berjalan netral dan bebas dari intervensi, sehingga mampu mewujudkan Sistem Statistik Nasional yang andal.<br><br><b>Misi BPS</b><br>Misi BPS dirumuskan dengan memperhatikan fungsi dan kewenangan BPS. Selaras dengan arah kebijakan di dalam RPJPN 2025-2045, RPJMN 2025-2029, serta Visi Presiden dan Wakil Presiden 2024-2029 yaitu “Bersama Indonesia Maju Menuju Indonesia Emas 2045” dengan uraian sebagai berikut:<br><i><ul><li>• Menyediakan Data Statistik Berkualitas dan Insight untuk Perumusan Kebijakan dan Pengambilan Keputusan</li><li>• Menguatkan Kepemimpinan BPS dalam penyelenggaraan Sistem Statistik Nasional (SSN)</li><li>• Menguatkan kapasitas kelembagaan statistik yang efektif dan efisien</li></ul></i><br>Apakah informasi diatas membantu?😊"
 
   utter_tanya_profil_ppid:
-  - text: "<b>Profil Sinkat PPID</b><br>Keterbukaan Informasi menjadi hal yang sangat penting untuk mewujudkan Good Governance dalam mendorong tata kelola pemerintahan yang baik, transparan, partisipatif dan dapat dipertanggungjawabkan. Hal tersebut telah diatur oleh pemerintah dengan dikeluarkannya Undang-Undang (UU) Nomor 14 Tahun 2008 tentang Keterbukaan Informasi Publik. Dalam UU tersebut disebutkan bahwa setiap Badan Publik wajib untuk menyampaikan informasi secara terbuka kepada publik sebagai bentuk pertanggungjawaban kepada masyarakat.<br>Dalam rangka memberikan layanan informasi publik sebagaimana diamanatkan dalam UU Nomor 14/2008 tersebut, Badan Pusat Statistik (BPS) pada Tahun 2011 telah membentuk Pejabat Pengelola Informasi dan Dokumentasi (PPID)."
+  - text: "<b>Profil Singkat PPID</b><br>Keterbukaan Informasi menjadi hal yang sangat penting untuk mewujudkan Good Governance dalam mendorong tata kelola pemerintahan yang baik, transparan, partisipatif dan dapat dipertanggungjawabkan. Hal tersebut telah diatur oleh pemerintah dengan dikeluarkannya Undang-Undang (UU) Nomor 14 Tahun 2008 tentang Keterbukaan Informasi Publik. Dalam UU tersebut disebutkan bahwa setiap Badan Publik wajib untuk menyampaikan informasi secara terbuka kepada publik sebagai bentuk pertanggungjawaban kepada masyarakat.<br>Dalam rangka memberikan layanan informasi publik sebagaimana diamanatkan dalam UU Nomor 14/2008 tersebut, Badan Pusat Statistik (BPS) pada Tahun 2011 telah membentuk Pejabat Pengelola Informasi dan Dokumentasi (PPID)."
+  
+  utter_tanya_arti_logo:
+  - text: "<b>Arti Logo BPS</b><br>Logo pada Badan Pusat Statistik memiliki warna biru, hijau dan orange dan disetiap warna memiliki arti khusus, yaitu :<br><b>Biru</b><br><i>Melambangkan kegiatan sensus penduduk yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 0 (nol).</i><br><b>Hijau</b><br><i>Melambangkan kegiatan sensus pertanian yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 3 (tiga).</i><br><b>Orange</b><br><i>Melambangkan kegiatan sensus ekonomi yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 6 (enam).</i>"
   
   utter_tanya_sensus_ekonomi:
   - text: "Sensus terakhir dilaksanakan pada tahun 2020. Dan untuk tahun ini akan ada sensus ekonomi 2026 (SE2026) yang merupakan sensus ekonomi ke-5 loh🤩. Untuk informasi lebih lanjut mengenai sensus ekonomi, Anda bisa melihat di website resmi BPS."

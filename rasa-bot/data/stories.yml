@@ -25,7 +25,12 @@ stories:
   - intent: tanya_visi_misi_bps
   - action: utter_tanya_visi_misi_bps
 
-- story: alur tanya prfil ppid
+- story: alur tanya profil ppid
   steps:
   - intent: tanya_profil_ppid
   - action: utter_tanya_profil_ppid
+
+- story: alur tanya arti logo
+  steps:
+  - intent: tanya_arti_logo
+  - action: utter_tanya_arti_logo

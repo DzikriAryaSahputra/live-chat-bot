@@ -103,3 +103,12 @@ nlu:
     - apa perofil ppid?
     - Profil Singkat PPID
     - kirim profil ppid dong
+
+- intent: tanya_arti_logo
+  examples: |
+    - apa arti logo bps?
+    - arti logo bps
+    - apa saja arti dari warna logo bps?
+    - apa arti warna biru pada logo bps
+    - apa arti warna hijau pada logo bps
+    - apa arti warna orange pada logo bps
