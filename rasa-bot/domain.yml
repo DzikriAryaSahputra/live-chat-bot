@@ -9,6 +9,7 @@ intents:
   - trigger_alihkan_admin
   - tanya_profil_bps
   - tanya_visi_misi_bps
+  - tanya_profil_ppid
 
 actions:
   - action_cari_website_bps
@@ -26,6 +27,9 @@ responses:
   utter_tanya_visi_misi_bps:
   - text: "Berikut terkait informasi Visi Dan Misi BPS: <br><b>Visi BPS</b><br><i>Lembaga yang Independen, Tepercaya, dan Berperan Aktif dalam Mendukung Perumusan Kebijakan Berbasis Data Bersama Indonesia Maju Menuju Indonesia Emas 2045</i><br><br>Dalam visi yang baru tersebut BPS menetapkan visi yang berlandaskan prinsip independensi, kepercayaan publik, peran aktif, serta dukungan penuh terhadap kebijakan berbasis data. Sebagai lembaga yang menjunjung tinggi objektivitas dan tidak memihak, BPS memastikan seluruh proses statistik berjalan netral dan bebas dari intervensi, sehingga mampu mewujudkan Sistem Statistik Nasional yang andal.<br><br><b>Misi BPS</b><br>Misi BPS dirumuskan dengan memperhatikan fungsi dan kewenangan BPS. Selaras dengan arah kebijakan di dalam RPJPN 2025-2045, RPJMN 2025-2029, serta Visi Presiden dan Wakil Presiden 2024-2029 yaitu “Bersama Indonesia Maju Menuju Indonesia Emas 2045” dengan uraian sebagai berikut:<br><i><ul><li>• Menyediakan Data Statistik Berkualitas dan Insight untuk Perumusan Kebijakan dan Pengambilan Keputusan</li><li>• Menguatkan Kepemimpinan BPS dalam penyelenggaraan Sistem Statistik Nasional (SSN)</li><li>• Menguatkan kapasitas kelembagaan statistik yang efektif dan efisien</li></ul></i><br>Apakah informasi diatas membantu?😊"
 
+  utter_tanya_profil_ppid:
+  - text: "<b>Profil Sinkat PPID</b><br>Keterbukaan Informasi menjadi hal yang sangat penting untuk mewujudkan Good Governance dalam mendorong tata kelola pemerintahan yang baik, transparan, partisipatif dan dapat dipertanggungjawabkan. Hal tersebut telah diatur oleh pemerintah dengan dikeluarkannya Undang-Undang (UU) Nomor 14 Tahun 2008 tentang Keterbukaan Informasi Publik. Dalam UU tersebut disebutkan bahwa setiap Badan Publik wajib untuk menyampaikan informasi secara terbuka kepada publik sebagai bentuk pertanggungjawaban kepada masyarakat.<br>Dalam rangka memberikan layanan informasi publik sebagaimana diamanatkan dalam UU Nomor 14/2008 tersebut, Badan Pusat Statistik (BPS) pada Tahun 2011 telah membentuk Pejabat Pengelola Informasi dan Dokumentasi (PPID)."
+  
   utter_tanya_sensus_ekonomi:
   - text: "Sensus terakhir dilaksanakan pada tahun 2020. Dan untuk tahun ini akan ada sensus ekonomi 2026 (SE2026) yang merupakan sensus ekonomi ke-5 loh🤩. Untuk informasi lebih lanjut mengenai sensus ekonomi, Anda bisa melihat di website resmi BPS."
 
@@ -33,7 +37,7 @@ responses:
   - text: |
       Baik, Silakan pilih bagaimana Anda ingin menghubungi petugas BPS kami😊:<br><br>
       <button onclick="window.sendBotButton('Tolong alihkan ke petugas')" style="background-color: #0ea5e9; color: white; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; cursor: pointer; border: none; font-weight: bold;">💬 Chat Langsung di Sini</button>
-      <a href="https://wa.me/6281286855764?text=Halo%20Admin%20BPS,%20saya%20butuh%20bantuan" target="_blank" style="background-color: #25D366; color: white; padding: 10px; border-radius: 6px; display: inline-block; width: 100%; text-align: center; text-decoration: none; box-sizing: border-box; font-weight: bold;">📱 Chat via WhatsApp</a>
+      <a href="https://wa.me/6282188880571?text=Halo%20Admin%20BPS,%20saya%20butuh%20bantuan" target="_blank" style="background-color: #25D366; color: white; padding: 10px; border-radius: 6px; display: inline-block; width: 100%; text-align: center; text-decoration: none; box-sizing: border-box; font-weight: bold;">📱 Chat via WhatsApp</a>
 
   utter_alihkan_ke_petugas:
   - text: "Baik, mohon tunggu sebentar. Saya sedang meneruskan pesan Anda ke petugas..."

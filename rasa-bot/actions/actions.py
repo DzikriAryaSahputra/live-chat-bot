@@ -80,6 +80,14 @@ class ActionCariWebsiteBPS(Action):
         elif "website portal" in pesan_warga or "aplikasi portal" in pesan_warga or "portal layanan" in pesan_warga:
             kategori = "Portal BPS"
             link = "https://statistik1571.my.id/"
+
+        elif "website berita" in pesan_warga or "siaran pers" in pesan_warga or "berita dan siaran pers" in pesan_warga:
+            kategori = "Website Berita Pers"
+            link = "https://jambikota.bps.go.id/id/news"
+        
+        elif "website Layanan BPS" in pesan_warga or "ppid layanan" in pesan_warga or "layanan bps" in pesan_warga:
+            kategori = "Website Layanan BPS"
+            link = "https://ppid.bps.go.id/app/konten/1571/Layanan-BPS.html?_gl=1*ksab1h*_ga*NzMzNzQ4NzA0LjE3NzE0MDEwMTg.*_ga_XXTTVXWHDB*czE3NzMyODQ3OTkkbzEwJGcxJHQxNzczMjg3MjA2JGozNSRsMCRoMA.."
         # --- JIKA TIDAK ADA KATA KUNCI YANG COCOK (Fallback) ---
         else:
             kategori = "Halaman Utama BPS Kota Jambi"

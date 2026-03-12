@@ -24,3 +24,8 @@ stories:
   steps:
   - intent: tanya_visi_misi_bps
   - action: utter_tanya_visi_misi_bps
+
+- story: alur tanya prfil ppid
+  steps:
+  - intent: tanya_profil_ppid
+  - action: utter_tanya_profil_ppid

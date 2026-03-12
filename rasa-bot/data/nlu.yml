@@ -95,3 +95,11 @@ nlu:
     - visi misi bps
     - visi lembaganya apa?
     - misinya apa saja?
+
+- intent: tanya_profil_ppid
+  examples: |
+    - profil ppid
+    - profil PPID bps
+    - apa perofil ppid?
+    - Profil Singkat PPID
+    - kirim profil ppid dong
