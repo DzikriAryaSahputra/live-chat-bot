@@ -1,5 +1,4 @@
-version: "3.1"
-
+version: '3.1'
 intents:
   - sapaan
   - tanya_data_statistik
@@ -11,41 +10,111 @@ intents:
   - tanya_visi_misi_bps
   - tanya_profil_ppid
   - tanya_arti_logo
-
+  - tanya_jumlah_penduduk
+  - tanya_jumlah_umkm
+  - tanya_anggota_bps
 actions:
   - action_cari_website_bps
-
 responses:
   utter_sapaan:
-  - text: "Halo!😊 Saya Asisten Virtual BPS. Ada data atau informasi statistik yang bisa saya bantu carikan hari ini?"
-  
+    - text: >-
+        Halo!😊 Saya Asisten Virtual BPS. Ada data atau informasi statistik yang
+        bisa saya bantu carikan hari ini?
   utter_tanya_data_statistik:
-  - text: "Untuk data statistik terbaru seperti inflasi, kependudukan, atau berita resmi statistik, Anda bisa melihat publikasi langsung di website resmi BPS. Ada indikator spesifik yang sedang Anda cari?"
-  
+    - text: >-
+        Untuk data statistik terbaru seperti inflasi, kependudukan, atau berita
+        resmi statistik, Anda bisa melihat publikasi langsung di website resmi
+        BPS. Ada indikator spesifik yang sedang Anda cari?
   utter_tanya_profil_bps:
-  - text: "Berikut adalah <b>Profil BPS Kota Jambi</b>:<br>Badan Pusat Statistik (BPS) Kota Jambi adalah instansi vertikal BPS yang bertugas melaksanakan kegiatan statistik di wilayah Kota Jambi. BPS Kota Jambi bertanggung jawab langsung kepada BPS Provinsi Jambi dan Kepala BPS Republik Indonesia.<br><br> BPS Kota Jambi menyelenggarakan sensus, survei, pengolahan data statistik, serta mendiseminasikan data dan informasi statistik kepada seluruh lapisan masyarakat, akademisi, dunia usaha, dan pemerintah daerah.<br><br> <i><ul><li>1. Menyelenggarakan kegiatan sensus dan survei di wilayah Kota Jambi</li><li>2. Mengolah dan mempublikasikan data statistik daerah</li><li>3. Melayani kebutuhan data pengguna secara profesional</li><li>4. Membina koordinasi statistik sektoral di Kota Jambi</li></ul></i><br>Apakah informasi diatas membantu?😊"
-
+    - text: >-
+        Berikut adalah <b>Profil BPS Kota Jambi</b>:<br>Badan Pusat Statistik
+        (BPS) Kota Jambi adalah instansi vertikal BPS yang bertugas melaksanakan
+        kegiatan statistik di wilayah Kota Jambi. BPS Kota Jambi bertanggung
+        jawab langsung kepada BPS Provinsi Jambi dan Kepala BPS Republik
+        Indonesia.<br><br> BPS Kota Jambi menyelenggarakan sensus, survei,
+        pengolahan data statistik, serta mendiseminasikan data dan informasi
+        statistik kepada seluruh lapisan masyarakat, akademisi, dunia usaha, dan
+        pemerintah daerah.<br><br> <i><ul><li>1. Menyelenggarakan kegiatan
+        sensus dan survei di wilayah Kota Jambi</li><li>2. Mengolah dan
+        mempublikasikan data statistik daerah</li><li>3. Melayani kebutuhan data
+        pengguna secara profesional</li><li>4. Membina koordinasi statistik
+        sektoral di Kota Jambi</li></ul></i><br>Apakah informasi diatas
+        membantu?😊
   utter_tanya_visi_misi_bps:
-  - text: "Berikut terkait informasi Visi Dan Misi BPS: <br><b>Visi BPS</b><br><i>Lembaga yang Independen, Tepercaya, dan Berperan Aktif dalam Mendukung Perumusan Kebijakan Berbasis Data Bersama Indonesia Maju Menuju Indonesia Emas 2045</i><br><br>Dalam visi yang baru tersebut BPS menetapkan visi yang berlandaskan prinsip independensi, kepercayaan publik, peran aktif, serta dukungan penuh terhadap kebijakan berbasis data. Sebagai lembaga yang menjunjung tinggi objektivitas dan tidak memihak, BPS memastikan seluruh proses statistik berjalan netral dan bebas dari intervensi, sehingga mampu mewujudkan Sistem Statistik Nasional yang andal.<br><br><b>Misi BPS</b><br>Misi BPS dirumuskan dengan memperhatikan fungsi dan kewenangan BPS. Selaras dengan arah kebijakan di dalam RPJPN 2025-2045, RPJMN 2025-2029, serta Visi Presiden dan Wakil Presiden 2024-2029 yaitu “Bersama Indonesia Maju Menuju Indonesia Emas 2045” dengan uraian sebagai berikut:<br><i><ul><li>• Menyediakan Data Statistik Berkualitas dan Insight untuk Perumusan Kebijakan dan Pengambilan Keputusan</li><li>• Menguatkan Kepemimpinan BPS dalam penyelenggaraan Sistem Statistik Nasional (SSN)</li><li>• Menguatkan kapasitas kelembagaan statistik yang efektif dan efisien</li></ul></i><br>Apakah informasi diatas membantu?😊"
-
+    - text: >-
+        Berikut terkait informasi Visi Dan Misi BPS: <br><b>Visi
+        BPS</b><br><i>Lembaga yang Independen, Tepercaya, dan Berperan Aktif
+        dalam Mendukung Perumusan Kebijakan Berbasis Data Bersama Indonesia Maju
+        Menuju Indonesia Emas 2045</i><br><br>Dalam visi yang baru tersebut BPS
+        menetapkan visi yang berlandaskan prinsip independensi, kepercayaan
+        publik, peran aktif, serta dukungan penuh terhadap kebijakan berbasis
+        data. Sebagai lembaga yang menjunjung tinggi objektivitas dan tidak
+        memihak, BPS memastikan seluruh proses statistik berjalan netral dan
+        bebas dari intervensi, sehingga mampu mewujudkan Sistem Statistik
+        Nasional yang andal.<br><br><b>Misi BPS</b><br>Misi BPS dirumuskan
+        dengan memperhatikan fungsi dan kewenangan BPS. Selaras dengan arah
+        kebijakan di dalam RPJPN 2025-2045, RPJMN 2025-2029, serta Visi Presiden
+        dan Wakil Presiden 2024-2029 yaitu “Bersama Indonesia Maju Menuju
+        Indonesia Emas 2045” dengan uraian sebagai berikut:<br><i><ul><li>•
+        Menyediakan Data Statistik Berkualitas dan Insight untuk Perumusan
+        Kebijakan dan Pengambilan Keputusan</li><li>• Menguatkan Kepemimpinan
+        BPS dalam penyelenggaraan Sistem Statistik Nasional (SSN)</li><li>•
+        Menguatkan kapasitas kelembagaan statistik yang efektif dan
+        efisien</li></ul></i><br>Apakah informasi diatas membantu?😊
   utter_tanya_profil_ppid:
-  - text: "<b>Profil Singkat PPID</b><br>Keterbukaan Informasi menjadi hal yang sangat penting untuk mewujudkan Good Governance dalam mendorong tata kelola pemerintahan yang baik, transparan, partisipatif dan dapat dipertanggungjawabkan. Hal tersebut telah diatur oleh pemerintah dengan dikeluarkannya Undang-Undang (UU) Nomor 14 Tahun 2008 tentang Keterbukaan Informasi Publik. Dalam UU tersebut disebutkan bahwa setiap Badan Publik wajib untuk menyampaikan informasi secara terbuka kepada publik sebagai bentuk pertanggungjawaban kepada masyarakat.<br>Dalam rangka memberikan layanan informasi publik sebagaimana diamanatkan dalam UU Nomor 14/2008 tersebut, Badan Pusat Statistik (BPS) pada Tahun 2011 telah membentuk Pejabat Pengelola Informasi dan Dokumentasi (PPID)."
-  
+    - text: >-
+        <b>Profil Singkat PPID</b><br>Keterbukaan Informasi menjadi hal yang
+        sangat penting untuk mewujudkan Good Governance dalam mendorong tata
+        kelola pemerintahan yang baik, transparan, partisipatif dan dapat
+        dipertanggungjawabkan. Hal tersebut telah diatur oleh pemerintah dengan
+        dikeluarkannya Undang-Undang (UU) Nomor 14 Tahun 2008 tentang
+        Keterbukaan Informasi Publik. Dalam UU tersebut disebutkan bahwa setiap
+        Badan Publik wajib untuk menyampaikan informasi secara terbuka kepada
+        publik sebagai bentuk pertanggungjawaban kepada masyarakat.<br>Dalam
+        rangka memberikan layanan informasi publik sebagaimana diamanatkan dalam
+        UU Nomor 14/2008 tersebut, Badan Pusat Statistik (BPS) pada Tahun 2011
+        telah membentuk Pejabat Pengelola Informasi dan Dokumentasi (PPID).
   utter_tanya_arti_logo:
-  - text: "<b>Arti Logo BPS</b><br>Logo pada Badan Pusat Statistik memiliki warna biru, hijau dan orange dan disetiap warna memiliki arti khusus, yaitu :<br><b>Biru</b><br><i>Melambangkan kegiatan sensus penduduk yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 0 (nol).</i><br><b>Hijau</b><br><i>Melambangkan kegiatan sensus pertanian yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 3 (tiga).</i><br><b>Orange</b><br><i>Melambangkan kegiatan sensus ekonomi yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 6 (enam).</i>"
-  
+    - text: >-
+        <b>Arti Logo BPS</b><br>Logo pada Badan Pusat Statistik memiliki warna
+        biru, hijau dan orange dan disetiap warna memiliki arti khusus, yaitu
+        :<br><b>Biru</b><br><i>Melambangkan kegiatan sensus penduduk yang
+        dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 0
+        (nol).</i><br><b>Hijau</b><br><i>Melambangkan kegiatan sensus pertanian
+        yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran
+        angka 3 (tiga).</i><br><b>Orange</b><br><i>Melambangkan kegiatan sensus
+        ekonomi yang dilakukan sepuluh tahun sekali pada setiap tahun yang
+        berakhiran angka 6 (enam).</i>
   utter_tanya_sensus_ekonomi:
-  - text: "Sensus terakhir dilaksanakan pada tahun 2020. Dan untuk tahun ini akan ada sensus ekonomi 2026 (SE2026) yang merupakan sensus ekonomi ke-5 loh🤩. Untuk informasi lebih lanjut mengenai sensus ekonomi, Anda bisa melihat di website resmi BPS."
-
+    - text: >-
+        Sensus terakhir dilaksanakan pada tahun 2020. Dan untuk tahun ini akan
+        ada sensus ekonomi 2026 (SE2026) yang merupakan sensus ekonomi ke-5
+        loh🤩. Untuk informasi lebih lanjut mengenai sensus ekonomi, Anda bisa
+        melihat di website resmi BPS.
   utter_pilihan_admin:
-  - text: |
-      Baik, Silakan pilih bagaimana Anda ingin menghubungi petugas BPS kami😊:<br><br>
-      <button onclick="window.sendBotButton('Tolong alihkan ke petugas')" style="background-color: #0ea5e9; color: white; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; cursor: pointer; border: none; font-weight: bold;">💬 Chat Langsung di Sini</button>
-      <a href="https://wa.me/6282188880571?text=Halo%20Admin%20BPS,%20saya%20butuh%20bantuan" target="_blank" style="background-color: #25D366; color: white; padding: 10px; border-radius: 6px; display: inline-block; width: 100%; text-align: center; text-decoration: none; box-sizing: border-box; font-weight: bold;">📱 Chat via WhatsApp</a>
+    - text: >
+        Baik, Silakan pilih bagaimana Anda ingin menghubungi petugas BPS
+        kami😊:<br><br>
 
+        <button onclick="window.sendBotButton('Tolong alihkan ke petugas')"
+        style="background-color: #0ea5e9; color: white; padding: 10px;
+        border-radius: 6px; width: 100%; margin-bottom: 8px; cursor: pointer;
+        border: none; font-weight: bold;">💬 Chat Langsung di Sini</button>
+
+        <a
+        href="https://wa.me/6282188880571?text=Halo%20Admin%20BPS,%20saya%20butuh%20bantuan"
+        target="_blank" style="background-color: #25D366; color: white; padding:
+        10px; border-radius: 6px; display: inline-block; width: 100%;
+        text-align: center; text-decoration: none; box-sizing: border-box;
+        font-weight: bold;">📱 Chat via WhatsApp</a>
   utter_alihkan_ke_petugas:
-  - text: "Baik, mohon tunggu sebentar. Saya sedang meneruskan pesan Anda ke petugas..."
-
+    - text: >-
+        Baik, mohon tunggu sebentar. Saya sedang meneruskan pesan Anda ke
+        petugas...
+  utter_tanya_jumlah_umkm:
+    - text: ada sekitar 25000unit
+  utter_tanya_anggota_bps:
+    - text: 'anggota ada '
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
