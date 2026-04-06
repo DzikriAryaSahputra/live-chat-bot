@@ -20,7 +20,3 @@ rules:
     steps:
       - intent: tanya_visi_misi_bps
       - action: utter_tanya_visi_misi_bps
-  - rule: Rule otomatis untuk tanya_jumlah_umkm
-    steps:
-      - intent: tanya_jumlah_umkm
-      - action: utter_tanya_jumlah_umkm

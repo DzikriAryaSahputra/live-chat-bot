@@ -103,7 +103,3 @@ nlu:
       - apa arti warna biru pada logo bps
       - apa arti warna hijau pada logo bps
       - apa arti warna orange pada logo bps
-  - intent: tanya_jumlah_umkm
-    examples: |
-      - jumlah umkm
-      - umkm jambi
