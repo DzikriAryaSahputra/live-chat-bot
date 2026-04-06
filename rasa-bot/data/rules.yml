@@ -1,38 +1,26 @@
-version: "3.1"
-
+version: '3.1'
 rules:
   - rule: Respon sapaan kapan saja
     steps:
       - intent: sapaan
       - action: utter_sapaan
-    
   - rule: Arahkan ke link BPS Kota Jambi saat diminta
     steps:
       - intent: cari_info_website
       - action: action_cari_website_bps
-  
   - rule: Tampilkan opsi saat minta admin
     steps:
       - intent: hubungi_admin
       - action: utter_pilihan_admin
-
   - rule: Eksekusi peralihan ke admin
     steps:
       - intent: trigger_alihkan_admin
       - action: utter_alihkan_ke_petugas
-
   - rule: Tanya Visi Misi BPS
     steps:
       - intent: tanya_visi_misi_bps
       - action: utter_tanya_visi_misi_bps
-
   - rule: Rule otomatis untuk tanya_jumlah_umkm
     steps:
       - intent: tanya_jumlah_umkm
       - action: utter_tanya_jumlah_umkm
-
-
-  - rule: Rule otomatis untuk tanya_anggota_bps
-    steps:
-      - intent: tanya_anggota_bps
-      - action: utter_tanya_anggota_bps

@@ -1,123 +1,109 @@
-version: "3.1"
+version: '3.1'
 nlu:
-- intent: sapaan
-  examples: |
-    - halo
-    - selamat pagi
-    - permisi admin
-    - hai bps
-    - halo bps
-    - halo asisten virtual
-    - halo asisten bps
-    - halo asisten virtual bps
-    - siang
-    - selamat siang
-    - selamat sore
-    - selamat malam
-
-- intent: tanya_data_statistik
-  examples: |
-    - kapan rilis data inflasi terbaru?
-    - rilis berita resmi statistik kapan?
-    - tolong info data inflasi di Jambi bulan ini dong
-    - berapa angka kemiskinan terbaru di Jambi?
-    - mau cari data ekspor impor
-    - saya mau cari data kependudukan
-    - saya mau cari data statistik terbaru
-
-- intent: tanya_sensus_ekonomi
-  examples: |
-    - kapan sensus penduduk lagi?
-    - kapan sensus ekonomi lagi?
-    - kapan sensus ekonomi?
-    - sensus ekonomi kapan?
-    - kapan sensus ekonomi 2026?
-    - kapan SE2026?
-    - sensus ekonomi
-
-- intent: cari_info_website
-  examples: |
-    - minta link publikasi dong
-    - mau lihat data tabel statistik jambi kota
-    - berita resmi statistik rilis dimana?
-    - adakah buku atau publikasi terbaru?
-    - mau baca berita kegiatan bps kota jambi
-    - saya penasaran dengan kegiatan bps     
-    - info kegiatan bps apa saja
-    - ada kabar atau berita terbaru?
-    - cari data inflasi di tabel
-    - minta link website resmi
-    - minta infografik dong
-    - minta grafik dong
-    - minta data sensus 2020 dong
-    - minta meta data statistik dong
-    - saya mau lihat data sensus 2020
-    - saya mau lihat meta data statistik
-    - saya mau lihat infografik statistik
-    - saya mau lihat grafik statistik
-    - saya mau lihat website bps provinsi jambi
-    - website provinsi jambi dong
-    - website resmi utama bps
-    - website utama bps
-    - website pejabat pengelola informasi dokumentasi
-    - website ppid
-    - PPID
-
-- intent: hubungi_admin
-  examples: |
-    - hubungi admin
-    - bicara dengan manusia
-    - saya mau chat dengan petugas
-    - tolong sambungkan ke admin
-    - live chat
-    - wa admin
-
-- intent: trigger_alihkan_admin
-  examples: |
-    - Tolong alihkan ke petugas
-
-- intent: tanya_profil_bps
-  examples: |
-    - Profil bps
-    - bagaimana profil bps
-    - berikan saya profil bps 
-    - apa profil bps?
-
-- intent: tanya_visi_misi_bps
-  examples: |
-    - apa visi misi bps?
-    - apa visi bps?
-    - apa misi bps?
-    - tujuan utama instansi ini apa?
-    - jelaskan visi dan misi
-    - target dan tujuan bps
-    - visi misi
-    - visi misi bps
-    - visi lembaganya apa?
-    - misinya apa saja?
-
-- intent: tanya_profil_ppid
-  examples: |
-    - profil ppid
-    - profil PPID bps
-    - apa perofil ppid?
-    - Profil Singkat PPID
-    - kirim profil ppid dong
-
-- intent: tanya_arti_logo
-  examples: |
-    - apa arti logo bps?
-    - arti logo bps
-    - apa saja arti dari warna logo bps?
-    - apa arti warna biru pada logo bps
-    - apa arti warna hijau pada logo bps
-    - apa arti warna orange pada logo bps
-
-- intent: tanya_jumlah_umkm
-  examples: |
-    - berapa jumlah umkm jambi?
-
-
-- intent: tanya_anggota_bps
-  examples: |
-    - anggota bps
+  - intent: sapaan
+    examples: |
+      - halo
+      - selamat pagi
+      - permisi admin
+      - hai bps
+      - halo bps
+      - halo asisten virtual
+      - halo asisten bps
+      - halo asisten virtual bps
+      - siang
+      - selamat siang
+      - selamat sore
+      - selamat malam
+  - intent: tanya_data_statistik
+    examples: |
+      - kapan rilis data inflasi terbaru?
+      - rilis berita resmi statistik kapan?
+      - tolong info data inflasi di Jambi bulan ini dong
+      - berapa angka kemiskinan terbaru di Jambi?
+      - mau cari data ekspor impor
+      - saya mau cari data kependudukan
+      - saya mau cari data statistik terbaru
+  - intent: tanya_sensus_ekonomi
+    examples: |
+      - kapan sensus penduduk lagi?
+      - kapan sensus ekonomi lagi?
+      - kapan sensus ekonomi?
+      - sensus ekonomi kapan?
+      - kapan sensus ekonomi 2026?
+      - kapan SE2026?
+      - sensus ekonomi
+  - intent: cari_info_website
+    examples: |
+      - minta link publikasi dong
+      - mau lihat data tabel statistik jambi kota
+      - berita resmi statistik rilis dimana?
+      - adakah buku atau publikasi terbaru?
+      - mau baca berita kegiatan bps kota jambi
+      - saya penasaran dengan kegiatan bps     
+      - info kegiatan bps apa saja
+      - ada kabar atau berita terbaru?
+      - cari data inflasi di tabel
+      - minta link website resmi
+      - minta infografik dong
+      - minta grafik dong
+      - minta data sensus 2020 dong
+      - minta meta data statistik dong
+      - saya mau lihat data sensus 2020
+      - saya mau lihat meta data statistik
+      - saya mau lihat infografik statistik
+      - saya mau lihat grafik statistik
+      - saya mau lihat website bps provinsi jambi
+      - website provinsi jambi dong
+      - website resmi utama bps
+      - website utama bps
+      - website pejabat pengelola informasi dokumentasi
+      - website ppid
+      - PPID
+  - intent: hubungi_admin
+    examples: |
+      - hubungi admin
+      - bicara dengan manusia
+      - saya mau chat dengan petugas
+      - tolong sambungkan ke admin
+      - live chat
+      - wa admin
+  - intent: trigger_alihkan_admin
+    examples: |
+      - Tolong alihkan ke petugas
+  - intent: tanya_profil_bps
+    examples: |
+      - Profil bps
+      - bagaimana profil bps
+      - berikan saya profil bps 
+      - apa profil bps?
+  - intent: tanya_visi_misi_bps
+    examples: |
+      - apa visi misi bps?
+      - apa visi bps?
+      - apa misi bps?
+      - tujuan utama instansi ini apa?
+      - jelaskan visi dan misi
+      - target dan tujuan bps
+      - visi misi
+      - visi misi bps
+      - visi lembaganya apa?
+      - misinya apa saja?
+  - intent: tanya_profil_ppid
+    examples: |
+      - profil ppid
+      - profil PPID bps
+      - apa perofil ppid?
+      - Profil Singkat PPID
+      - kirim profil ppid dong
+  - intent: tanya_arti_logo
+    examples: |
+      - apa arti logo bps?
+      - arti logo bps
+      - apa saja arti dari warna logo bps?
+      - apa arti warna biru pada logo bps
+      - apa arti warna hijau pada logo bps
+      - apa arti warna orange pada logo bps
+  - intent: tanya_jumlah_umkm
+    examples: |
+      - jumlah umkm
+      - umkm jambi

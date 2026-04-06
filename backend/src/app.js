@@ -11,6 +11,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const { spawn } = require('child_process');
 
+// Koneksi Database
 const db = require('./config/db');
 
 const app = express();
@@ -88,7 +89,7 @@ io.on('connection', (socket) => {
     });
 
     // ==========================================
-    // FITUR CMS: LIVE TRAINING VIA SOCKET
+    // FITUR CMS: TAMBAH DATA & LIVE TRAINING 
     // ==========================================
     socket.on('train_bot', async (data) => {
         const { intentName, examples, botResponse } = data;
@@ -100,77 +101,77 @@ io.on('connection', (socket) => {
         const safeIntentName = intentName.trim().toLowerCase().replace(/\s+/g, '_');
 
         try {
-            socket.emit('train_log', `🛠️ Menyuntikkan ilmu baru: [${safeIntentName}]\n`);
+            if (safeIntentName !== 'skip_write') {
+                socket.emit('train_log', `🛠️ Menyuntikkan ilmu baru: [${safeIntentName}]\n`);
 
-            // 1. Menulis nlu.yml (PRESISI: 0 spasi, 2 spasi, 4 spasi)
-            const nluPath = path.join(RASA_DIR, 'data/nlu.yml');
-            const formattedExamples = examples.split(/,|\n/).map(e => `    - ${e.trim()}`).filter(e => e !== '    - ' && e.length > 0).join('\n');
-            const newNluEntry = `\n- intent: ${safeIntentName}\n  examples: |\n${formattedExamples}\n`;
-            fs.appendFileSync(nluPath, newNluEntry);
+                // 1. UPDATE NLU (OBJECT MANIPULATION)
+                const nluPath = path.join(RASA_DIR, 'data/nlu.yml');
+                let nluData = yaml.load(fs.readFileSync(nluPath, 'utf8')) || { version: "3.1", nlu: [] };
+                if (!nluData.nlu) nluData.nlu = [];
+                
+                nluData.nlu = nluData.nlu.filter(item => item.intent !== safeIntentName);
+                
+                // 👇 Pembersih Anti-Dobel Dash (Strip) 👇
+                const formattedExamples = examples
+                    .split(/,|\n/)
+                    .map(e => e.replace(/^-\s*/, '').trim()) 
+                    .filter(e => e.length > 0)
+                    .map(e => `- ${e}`)
+                    .join('\n') + '\n';
+                
+                nluData.nlu.push({ intent: safeIntentName, examples: formattedExamples });
+                fs.writeFileSync(nluPath, yaml.dump(nluData, { lineWidth: -1 }));
 
-            // 2. Menulis rules.yml (PRESISI SUPER KETAT: 2 spasi, 4 spasi, 6 SPASI)
-            const rulesPath = path.join(RASA_DIR, 'data/rules.yml');
-            const newRuleEntry = `\n  - rule: Rule otomatis untuk ${safeIntentName}\n    steps:\n      - intent: ${safeIntentName}\n      - action: utter_${safeIntentName}\n`;
-            fs.appendFileSync(rulesPath, newRuleEntry);
+                // 2. UPDATE RULES (OBJECT MANIPULATION)
+                const rulesPath = path.join(RASA_DIR, 'data/rules.yml');
+                let rulesData = yaml.load(fs.readFileSync(rulesPath, 'utf8')) || { version: "3.1", rules: [] };
+                if (!rulesData.rules) rulesData.rules = [];
+                
+                rulesData.rules = rulesData.rules.filter(r => !(r.steps && r.steps.length > 0 && r.steps[0].intent === safeIntentName));
+                rulesData.rules.push({
+                    rule: `Rule otomatis untuk ${safeIntentName}`,
+                    steps: [{ intent: safeIntentName }, { action: `utter_${safeIntentName}` }]
+                });
+                fs.writeFileSync(rulesPath, yaml.dump(rulesData, { lineWidth: -1 }));
 
-            // 3. Menulis domain.yml
-            const domainPath = path.join(RASA_DIR, 'domain.yml');
-            const domainFile = fs.readFileSync(domainPath, 'utf8');
-            let domainData = yaml.load(domainFile);
+                // 3. UPDATE DOMAIN (OBJECT MANIPULATION)
+                const domainPath = path.join(RASA_DIR, 'domain.yml');
+                let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8')) || { version: "3.1", intents: [], responses: {} };
+                if (!domainData.intents) domainData.intents = [];
+                if (!domainData.intents.includes(safeIntentName)) domainData.intents.push(safeIntentName);
+                if (!domainData.responses) domainData.responses = {};
+                domainData.responses[`utter_${safeIntentName}`] = [{ text: botResponse }];
+                fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 }));
 
-            if (!domainData.intents) domainData.intents = [];
-            if (!domainData.intents.includes(safeIntentName)) domainData.intents.push(safeIntentName);
+                socket.emit('train_log', '✅ File YAML berhasil diperbarui.\n');
+            } else {
+                socket.emit('train_log', '⏩ Menyimpan sinkronisasi perubahan data...\n');
+            }
 
-            if (!domainData.responses) domainData.responses = {};
-            domainData.responses[`utter_${safeIntentName}`] = [{ text: botResponse }];
+            socket.emit('train_log', '⏳ Memulai proses Rasa Train (Bulletproof Python Mode)...\n-----------------------------------\n');
 
-            fs.writeFileSync(domainPath, yaml.dump(domainData));
-            socket.emit('train_log', '✅ File YAML berhasil diperbarui.\n⏳ Memulai proses Rasa Train (Bulletproof Python Mode)...\n-----------------------------------\n');
-
-            // 4. Eksekusi Terminal DENGAN PYTHON LANGSUNG (Bulletproof Mode)
+            // 4. EKSEKUSI TERMINAL
             const isWin = process.platform === "win32";
-            
-            // Trik Jitu: Panggil python.exe di dalam venv secara langsung!
             const pythonPath = isWin ? 'venv\\Scripts\\python.exe' : 'venv/bin/python';
-            
-            // Kita suruh Python yang menjalankan modul rasa beserta perintah paksa (--force)
             const args = ['-m', 'rasa', 'train', '--force'];
-            
-            // Perhatikan: shell: true dihapus agar proses terbaca langsung dengan stabil
             const trainProcess = spawn(pythonPath, args, { cwd: RASA_DIR });
 
-            trainProcess.stdout.on('data', (chunk) => {
-                socket.emit('train_log', chunk.toString()); 
-            });
-
-            trainProcess.stderr.on('data', (chunk) => {
-                // Di Python/Rasa, log loading bar (epochs) sering kali masuk lewat stderr
-                socket.emit('train_log', chunk.toString()); 
-            });
-
-            trainProcess.on('error', (error) => {
-                 socket.emit('train_error', `❌ Gagal menjalankan mesin Python: ${error.message}`);
-            });
+            trainProcess.stdout.on('data', chunk => socket.emit('train_log', chunk.toString()));
+            trainProcess.stderr.on('data', chunk => socket.emit('train_log', chunk.toString()));
+            trainProcess.on('error', error => socket.emit('train_error', `❌ Gagal menjalankan mesin: ${error.message}`));
 
             trainProcess.on('close', async (code) => {
-                if (code !== 0) {
-                    return socket.emit('train_error', `\n❌ Proses terhenti paksa dengan kode error ${code}`);
-                }
-
-                socket.emit('train_log', '\n-----------------------------------\n✅ Training Selesai 100%!\n🔄 Melakukan Hot-Reload ke Bot AI...\n');
-
+                if (code !== 0) return socket.emit('train_error', `\n❌ Proses terhenti dengan kode error ${code}`);
+                socket.emit('train_log', '\n-----------------------------------\n✅ Training Selesai!\n🔄 Melakukan Hot-Reload AI...\n');
                 try {
                     await axios.put('http://localhost:5005/model', { model_file: "models" });
-                    socket.emit('train_log', '🚀 AI Bot sudah menggunakan otak baru!\n');
                     socket.emit('train_success', 'Bot berhasil dilatih dan semakin pintar!');
                 } catch (apiError) {
-                    socket.emit('train_log', '⚠️ Training sukses, tapi Rasa API gagal reload. Coba restart Rasa.\n');
                     socket.emit('train_success', 'Training sukses! Namun bot perlu di-restart manual.');
                 }
             });
-
         } catch (err) {
-            console.error(err);
+            console.error('Error penulisan YAML:', err);
             socket.emit('train_error', 'Terjadi kesalahan sistem saat memodifikasi file YAML.');
         }
     });
@@ -178,7 +179,99 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => console.log(`🔌 User terputus: ${socket.id}`));
 });
 
-// REST API History
+// ==========================================
+// REST API ROUTES (READ, UPDATE, DELETE KNOWLEDGE)
+// ==========================================
+app.get('/api/bot/intents', (req, res) => {
+    try {
+        const nluPath = path.join(RASA_DIR, 'data/nlu.yml');
+        const domainPath = path.join(RASA_DIR, 'domain.yml');
+        const nluData = yaml.load(fs.readFileSync(nluPath, 'utf8'));
+        const domainData = yaml.load(fs.readFileSync(domainPath, 'utf8'));
+        let knowledgeBase = [];
+
+        if (nluData && nluData.nlu) {
+            nluData.nlu.forEach(item => {
+                if (item.intent) {
+                    let responseText = '-';
+                    const utterName = `utter_${item.intent}`;
+                    if (domainData && domainData.responses && domainData.responses[utterName]) {
+                        responseText = domainData.responses[utterName][0].text;
+                    }
+                    knowledgeBase.push({ intent: item.intent, examples: item.examples ? item.examples.trim() : '', response: responseText });
+                }
+            });
+        }
+        res.json(knowledgeBase);
+    } catch (error) { res.status(500).json({ error: 'Gagal mengambil data file YAML' }); }
+});
+
+app.put('/api/bot/intents', (req, res) => {
+    const { intentName, examples, botResponse } = req.body;
+    if (!intentName || !examples || !botResponse) return res.status(400).json({ error: 'Data tidak boleh kosong!' });
+
+    try {
+        // 1. UPDATE NLU VIA OBJECT
+        const nluPath = path.join(RASA_DIR, 'data/nlu.yml');
+        let nluData = yaml.load(fs.readFileSync(nluPath, 'utf8')) || { version: "3.1", nlu: [] };
+        if (!nluData.nlu) nluData.nlu = [];
+        
+        nluData.nlu = nluData.nlu.filter(item => item.intent !== intentName);
+        
+        // 👇 Pembersih Anti-Dobel Dash (Strip) 👇
+        const formattedExamples = examples
+            .split(/,|\n/)
+            .map(e => e.replace(/^-\s*/, '').trim())
+            .filter(e => e.length > 0)
+            .map(e => `- ${e}`)
+            .join('\n') + '\n';
+            
+        nluData.nlu.push({ intent: intentName, examples: formattedExamples });
+        fs.writeFileSync(nluPath, yaml.dump(nluData, { lineWidth: -1 }));
+
+        // 2. UPDATE DOMAIN VIA OBJECT
+        const domainPath = path.join(RASA_DIR, 'domain.yml');
+        let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8'));
+        if (domainData) {
+            if (!domainData.responses) domainData.responses = {};
+            domainData.responses[`utter_${intentName}`] = [{ text: botResponse }];
+            fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 }));
+        }
+
+        res.json({ message: `Topik '${intentName}' berhasil diperbarui!` });
+    } catch (error) { res.status(500).json({ error: 'Gagal memperbarui file YAML' }); }
+});
+
+app.delete('/api/bot/intents/:intentName', (req, res) => {
+    const intentName = req.params.intentName;
+    try {
+        const nluPath = path.join(RASA_DIR, 'data/nlu.yml');
+        let nluData = yaml.load(fs.readFileSync(nluPath, 'utf8'));
+        if(nluData && nluData.nlu) {
+            nluData.nlu = nluData.nlu.filter(item => item.intent !== intentName);
+            fs.writeFileSync(nluPath, yaml.dump(nluData, { lineWidth: -1 }));
+        }
+
+        const rulesPath = path.join(RASA_DIR, 'data/rules.yml');
+        let rulesData = yaml.load(fs.readFileSync(rulesPath, 'utf8'));
+        if(rulesData && rulesData.rules) {
+            rulesData.rules = rulesData.rules.filter(r => !(r.steps && r.steps.length > 0 && r.steps[0].intent === intentName));
+            fs.writeFileSync(rulesPath, yaml.dump(rulesData, { lineWidth: -1 }));
+        }
+
+        const domainPath = path.join(RASA_DIR, 'domain.yml');
+        let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8'));
+        if (domainData) {
+            if (domainData.intents) domainData.intents = domainData.intents.filter(i => i !== intentName);
+            if (domainData.responses && domainData.responses[`utter_${intentName}`]) delete domainData.responses[`utter_${intentName}`];
+            fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 }));
+        }
+
+        res.json({ message: `Topik '${intentName}' dihapus.` });
+    } catch (error) { res.status(500).json({ error: 'Gagal menghapus file YAML' }); }
+});
+
+// REST API History Obrolan
 app.get('/api/chat/history/:senderId', async (req, res) => {
     try {
         const { senderId } = req.params;
