@@ -103,7 +103,14 @@ nlu:
       - apa arti warna biru pada logo bps
       - apa arti warna hijau pada logo bps
       - apa arti warna orange pada logo bps
-  - intent: tanya_jumlah_umkm
+  - intent: tanya_tabel_dinamis
     examples: |
-      - jumlah umkm
-      - umkm jambi
+      - tabel dinamis
+      - berikan saya tabel dinamis
+      - website tabel dinamis
+      - arahkan saya tabel dinamis
+  - intent: tanya_jam_operasional
+    examples: |
+      - jam berapa buka
+      - jam operasional
+      - jam buka

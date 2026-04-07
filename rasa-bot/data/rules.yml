@@ -20,7 +20,11 @@ rules:
     steps:
       - intent: tanya_visi_misi_bps
       - action: utter_tanya_visi_misi_bps
-  - rule: Rule otomatis untuk tanya_jumlah_umkm
+  - rule: Rule otomatis untuk tanya_jam_operasional
     steps:
-      - intent: tanya_jumlah_umkm
-      - action: utter_tanya_jumlah_umkm
+      - intent: tanya_jam_operasional
+      - action: utter_tanya_jam_operasional
+  - rule: Rule otomatis untuk tanya_tabel_dinamis
+    steps:
+      - intent: tanya_tabel_dinamis
+      - action: utter_tanya_tabel_dinamis

@@ -11,8 +11,9 @@ intents:
   - tanya_profil_ppid
   - tanya_arti_logo
   - tanya_jumlah_penduduk
-  - tanya_jumlah_umkm
   - skip_write
+  - tanya_jam_operasional
+  - tanya_tabel_dinamis
 actions:
   - action_cari_website_bps
 responses:
@@ -37,8 +38,10 @@ responses:
         <a href="https://wa.me/6282188880571?text=Halo%20Admin%20BPS,%20saya%20butuh%20bantuan" target="_blank" style="background-color: #25D366; color: white; padding: 10px; border-radius: 6px; display: inline-block; width: 100%; text-align: center; text-decoration: none; box-sizing: border-box; font-weight: bold;">📱 Chat via WhatsApp</a>
   utter_alihkan_ke_petugas:
     - text: Baik, mohon tunggu sebentar. Saya sedang meneruskan pesan Anda ke petugas...
-  utter_tanya_jumlah_umkm:
-    - text: <b>Jumlah UMKM</b><br>Ada 10 juta<br><i>UMKM</i>
+  utter_tanya_jam_operasional:
+    - text: BPS buka dari hari Senin - Jumat Jam <b>08:00 - 16.00</b>
+  utter_tanya_tabel_dinamis:
+    - text: <b>Tabel Dinamis</b><br>Berikut Informasi Terkait <a href="https://jambikota.bps.go.id/id/query-builder" target="_blank">Tabel Dinamis</a> Apakah Ada Yang Ingin Ditanyakan Lagi?:)
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
