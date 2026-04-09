@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>BPS Monitor - Peringatan Sistem</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                "primary": "#f97316",
+                "surface": "#f8f6f6",
+                "on-surface": "#0f172a",
+                "on-surface-variant": "#64748b",
+            },
+            fontFamily: { "body": ["Plus Jakarta Sans", "sans-serif"] }
+          },
+        },
+      }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8f6f6; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); }
+        .bento-glow { background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 70%); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center overflow-hidden">
+    
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-slate-300/20 blur-[100px]"></div>
+        <div class="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[100px]" id="bg-glow"></div>
+    </div>
+
+    <main class="relative z-10 w-full max-w-lg px-4 flex flex-col items-center">
+        <div class="mb-8 flex items-center space-x-2 opacity-70">
+            <span class="material-symbols-outlined text-primary text-xl">monitoring</span>
+            <span class="font-extrabold tracking-widest text-sm uppercase text-on-surface-variant">BPS Security Core</span>
+        </div>
+
+        <div class="w-full glass-panel border border-slate-200 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden bento-glow text-center transform transition-all duration-500 hover:scale-[1.01]">
+            
+            <div id="error-icon-container" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-4 ring-white transition-colors duration-300">
+                <span id="error-icon" class="material-symbols-outlined text-6xl">help</span>
+            </div>
+
+            <h1 id="error-code" class="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-slate-800 to-slate-500 tracking-tighter mb-2">
+                000
+            </h1>
+            
+            <h2 id="error-title" class="text-2xl font-bold text-slate-800 mb-3">Memuat Status...</h2>
+            <p id="error-message" class="text-sm text-slate-500 mb-8 leading-relaxed max-w-sm mx-auto">
+                Silakan tunggu, sistem sedang mendiagnosis masalah yang terjadi pada sesi Anda.
+            </p>
+
+            <button onclick="goBack()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 active:scale-95">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                <span id="btn-text">Kembali ke Jalur Aman</span>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Ambil kode dari URL (misal: error.html?code=403)
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code') || '404'; // Default 404 kalau kosong
+
+            // 2. Kamus Data Error (Bisa ditambah sesuai kebutuhan)
+            const errorDictionary = {
+                '403': {
+                    icon: 'lock',
+                    iconColor: 'text-red-500',
+                    bgContainer: 'bg-red-100',
+                    bgGlow: 'bg-red-500/10',
+                    title: 'Akses Ditolak!',
+                    desc: 'Anda mencoba masuk ke zona terlarang tanpa Tiket (Token) yang sah. Silakan login melalui gerbang utama.'
+                },
+                '404': {
+                    icon: 'radar',
+                    iconColor: 'text-orange-500',
+                    bgContainer: 'bg-orange-100',
+                    bgGlow: 'bg-orange-500/10',
+                    title: 'Keluar dari Radar',
+                    desc: 'Waduh! Halaman yang Anda tuju sepertinya sudah dipindahkan, dihapus, atau memang tidak pernah ada.'
+                },
+                '500': {
+                    icon: 'dns',
+                    iconColor: 'text-purple-500',
+                    bgContainer: 'bg-purple-100',
+                    bgGlow: 'bg-purple-500/10',
+                    title: 'Server Kelelahan',
+                    desc: 'Mohon maaf, mesin server sedang mengalami gangguan internal. Tim IT BPS akan segera menyelesaikannya.'
+                }
+            };
+
+            // 3. Terapkan Data ke Layar
+            const data = errorDictionary[code] || errorDictionary['404'];
+
+            document.getElementById('error-code').innerText = code;
+            document.getElementById('error-title').innerText = data.title;
+            document.getElementById('error-message').innerText = data.desc;
+            
+            const iconEl = document.getElementById('error-icon');
+            iconEl.innerText = data.icon;
+            iconEl.className = `material-symbols-outlined text-5xl ${data.iconColor}`;
+            
+            document.getElementById('error-icon-container').className = `w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-4 ring-white transition-colors duration-300 ${data.bgContainer}`;
+            document.getElementById('bg-glow').className = `absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] rounded-full blur-[100px] ${data.bgGlow}`;
+        });
+
+        // 4. Logika Tombol "Kembali"
+        function goBack() {
+            // Jika dia punya token, arahkan ke Dashboard. Jika tidak, arahkan ke Login.
+            const token = localStorage.getItem('bps_admin_token');
+            if (token) {
+                window.location.href = '../protected/admin.html';
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>
