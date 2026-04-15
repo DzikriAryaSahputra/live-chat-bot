@@ -114,7 +114,3 @@ nlu:
       - jam berapa buka
       - jam operasional
       - jam buka
-  - intent: tanya_jumlah_umkm
-    examples: |
-      - berapa jumlah umkm
-      - umkm

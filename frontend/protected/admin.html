@@ -302,12 +302,13 @@
         </div>
     </div>
 
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io('http://localhost:3000', { auth: { token: adminToken } });
+        const socket = io({ auth: { token: adminToken } });
         
         let activeSenderId = null; let activeUsersList = []; let unreadCounts = {}; let needsHelpSet = new Set();
-        let currentKnowledgeBase = []; let isEditMode = false; let isDataChanged = false;
+        let currentKnowledgeBase = []; let isEditMode = false; 
+        let isDataChanged = localStorage.getItem('bps_needs_training') === 'true';
 
         // 🔊 Audio Notifikasi
         const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'); 
@@ -342,6 +343,7 @@
                 btnChat.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-300";
                 
                 fetchKnowledgeBase(); 
+                if (isDataChanged) document.getElementById('train-warning-alert').classList.replace('hidden', 'flex');
             }
         }
 
@@ -413,7 +415,7 @@
         // ==========================================
         async function fetchKnowledgeBase() {
             const tbody = document.getElementById('knowledge-table-body'); tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">Mengambil data AI...</td></tr>`;
-            try { const response = await fetch('/api/bot/intents'); currentKnowledgeBase = await response.json(); renderKnowledgeTable(currentKnowledgeBase); } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="text-center text-red-500">Gagal terhubung.</td></tr>`; }
+            try { const response = await fetch('/api/bot/intents', { headers: { 'Authorization': `Bearer ${adminToken}` } }); currentKnowledgeBase = await response.json(); renderKnowledgeTable(currentKnowledgeBase); } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="text-center text-red-500">Gagal terhubung.</td></tr>`; }
         }
 
         function renderKnowledgeTable(dataArray) {
@@ -445,7 +447,7 @@
             openConfirmModal('Hapus Topik AI', `Yakin menghapus topik <b>[${intentName}]</b> secara permanen?`, async () => {
                 try {
                     const r = await fetch(`/api/bot/intents/${intentName}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } }); 
-                    if (r.ok) { isDataChanged = true; document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`); } 
+                    if (r.ok) { isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`); } 
                     else { const res = await r.json(); showToastAlert('❌ Gagal', res.error); if(r.status===403) logoutAdmin(); }
                 } catch (e) { showToastAlert('❌ Error', 'Jaringan terputus.'); }
             });
@@ -496,14 +498,14 @@
         async function submitTrainData(e) {
             e.preventDefault(); const intentName = document.getElementById('train-intent').value, examples = document.getElementById('train-examples').value, botResponse = mdToHtml(document.getElementById('train-response').value);
             if (isEditMode) {
-                try { const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) }); if(r.ok) { isDataChanged = true; document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); closeTrainModal(); showToastAlert('✅ Diperbarui', 'Ilmu tersimpan.'); } else { const err = await r.json(); showToastAlert('❌ Gagal', err.error); } } catch (e) { showToastAlert('❌ Error', 'Jaringan bermasalah.'); }
+                try { const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) }); if(r.ok) { isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); closeTrainModal(); showToastAlert('✅ Diperbarui', 'Ilmu tersimpan.'); } else { const err = await r.json(); showToastAlert('❌ Gagal', err.error); } } catch (e) { showToastAlert('❌ Error', 'Jaringan bermasalah.'); }
             } else {
                 if(!intentName && !isDataChanged) return showToastAlert('⚠️ Peringatan', 'Data kosong!');
                 startSmartLoading(); socket.emit('train_bot', intentName ? { intentName, examples, botResponse } : { intentName: "SKIP_WRITE", examples: "-", botResponse: "-" });
             }
         }
 
-        socket.on('train_success', (msg) => { stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg); isDataChanged = false; document.getElementById('train-warning-alert').classList.replace('flex', 'hidden'); fetchKnowledgeBase(); setTimeout(() => closeTrainModal(), 2500); });
+        socket.on('train_success', (msg) => { stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg); isDataChanged = false; localStorage.removeItem('bps_needs_training'); document.getElementById('train-warning-alert').classList.replace('flex', 'hidden'); fetchKnowledgeBase(); setTimeout(() => closeTrainModal(), 2500); });
         socket.on('train_error', (msg) => { stopSmartLoading(false, "Gagal Melatih Model AI"); showToastAlert('❌ Gagal', msg); document.getElementById('train-cancel-btn').disabled = false; });
 
         // ==========================================
@@ -525,7 +527,7 @@
         
         async function selectUser(id) {
             activeSenderId = id; document.getElementById('active-user-title').innerText = id; document.getElementById('header-avatar').innerText = id.substring(0,2).toUpperCase(); unreadCounts[id] = 0; renderUserList(); const chatBox = document.getElementById('chat-box'); chatBox.innerHTML = '';
-            try { const r = await fetch(`/api/chat/history/${id}`); const h = await r.json(); if(h.length===0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>'; else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at)); } catch (e) {}
+            try { const r = await fetch(`/api/chat/history/${id}`, { headers: { 'Authorization': `Bearer ${adminToken}` } }); const h = await r.json(); if(h.length===0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>'; else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at)); } catch (e) {}
         }
 
         socket.on('receive_message', (d) => {

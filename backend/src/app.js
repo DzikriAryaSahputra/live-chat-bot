@@ -251,7 +251,7 @@ function authenticateJWT(req, res, next) {
     } else { res.status(401).json({ error: 'Akses ditolak.' }); }
 }
 
-app.get('/api/bot/intents', (req, res) => {
+app.get('/api/bot/intents', authenticateJWT, (req, res) => {
     try {
         const nluData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'data/nlu.yml'), 'utf8'));
         const domainData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'domain.yml'), 'utf8'));

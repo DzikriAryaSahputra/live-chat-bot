@@ -1,11 +1,12 @@
 // ==========================================
 // 1. KONEKSI SOCKET & SENDER ID
 // ==========================================
-const socket = io('http://localhost:3000');
+const socket = io();
 
 let mySenderId = localStorage.getItem('bps_sender_id');
 if (!mySenderId) {
-    mySenderId = 'warga_' + Math.floor(Math.random() * 10000);
+    // Gunakan kombinasi angka acak dan timestamp agar tidak bisa sembarangan ditebak orang lain (unguesabble)
+    mySenderId = 'warga_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
     localStorage.setItem('bps_sender_id', mySenderId);
 }
 
@@ -166,7 +167,7 @@ socket.on('admin_response', (data) => {
 // ==========================================
 window.onload = async function () {
     try {
-        const response = await fetch(`http://localhost:3000/api/chat/history/${mySenderId}`);
+        const response = await fetch(`/api/chat/history/${mySenderId}`);
         const history = await response.json();
 
         if (history.length === 0) {

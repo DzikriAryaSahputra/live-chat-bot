@@ -28,7 +28,3 @@ rules:
     steps:
       - intent: tanya_tabel_dinamis
       - action: utter_tanya_tabel_dinamis
-  - rule: Rule untuk tanya_jumlah_umkm
-    steps:
-      - intent: tanya_jumlah_umkm
-      - action: utter_tanya_jumlah_umkm
