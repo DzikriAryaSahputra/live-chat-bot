@@ -14,6 +14,7 @@ intents:
   - skip_write
   - tanya_jam_operasional
   - tanya_tabel_dinamis
+  - tanya_jumlah_umkm
 actions:
   - action_cari_website_bps
 responses:
@@ -42,6 +43,8 @@ responses:
     - text: BPS buka dari hari Senin - Jumat Jam <b>08:00 - 16.00</b>
   utter_tanya_tabel_dinamis:
     - text: <b>Tabel Dinamis</b><br>Berikut Informasi Terkait <a href="https://jambikota.bps.go.id/id/query-builder" target="_blank">Tabel Dinamis</a> Apakah Ada Yang Ingin Ditanyakan Lagi?:)
+  utter_tanya_jumlah_umkm:
+    - text: jumlah <b>100</b> <i>umkm</i> <a href="https://github.com/DzikriAryaSahputra?tab=repositories" target="_blank">Github</a>
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

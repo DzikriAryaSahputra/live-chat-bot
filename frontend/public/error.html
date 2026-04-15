@@ -121,9 +121,9 @@
             // Jika dia punya token, arahkan ke Dashboard. Jika tidak, arahkan ke Login.
             const token = localStorage.getItem('bps_admin_token');
             if (token) {
-                window.location.href = '../protected/admin.html';
+                window.location.href = '/admin';
             } else {
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             }
         }
     </script>

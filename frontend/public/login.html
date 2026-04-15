@@ -163,7 +163,7 @@
                     btn.innerHTML = '<span class="material-symbols-outlined text-lg">check_circle</span><span>Akses Diberikan!</span>';
                     
                     setTimeout(() => {
-                        window.location.href = '../protected/admin.html';
+                        window.location.href = '/admin';
                     }, 1000);
                 } else {
                     errorText.innerText = data.error || 'Autentikasi gagal!';
@@ -182,7 +182,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const existingToken = localStorage.getItem('bps_admin_token');
             if (existingToken) {
-                window.location.href = '../protected/admin.html';
+                window.location.href = '/admin';
             }
         });
     </script>
