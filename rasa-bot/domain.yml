@@ -14,11 +14,12 @@ intents:
   - skip_write
   - tanya_jam_operasional
   - tanya_tabel_dinamis
+  - tanya_jumlah_umkm
 actions:
   - action_cari_website_bps
 responses:
   utter_sapaan:
-    - text: Halo!😊 Saya Asisten Virtual BPS. Ada data atau informasi statistik yang bisa saya bantu carikan hari ini?
+    - text: Halo!😊 Saya SISCA. Ada data atau informasi statistik yang bisa saya bantu carikan hari ini?
   utter_tanya_data_statistik:
     - text: Untuk data statistik terbaru seperti inflasi, kependudukan, atau berita resmi statistik, Anda bisa melihat publikasi langsung di website resmi BPS. Ada indikator spesifik yang sedang Anda cari?
   utter_tanya_profil_bps:
@@ -39,9 +40,11 @@ responses:
   utter_alihkan_ke_petugas:
     - text: Baik, mohon tunggu sebentar. Saya sedang meneruskan pesan Anda ke petugas...
   utter_tanya_jam_operasional:
-    - text: BPS kota jambi buka dari hari Senin - Jumat Jam <b>08:00 - 16.00</b> WIB
+    - text: BPS kota jambi buka dari hari Senin - Jumat Jam <b>07:30 - 16.00</b> WIB
   utter_tanya_tabel_dinamis:
     - text: <b>Tabel Dinamis</b><br>Berikut Informasi Terkait <a href="https://jambikota.bps.go.id/id/query-builder" target="_blank">Tabel Dinamis</a> Apakah Ada Yang Ingin Ditanyakan Lagi?:)
+  utter_tanya_jumlah_umkm:
+    - text: Berdasarkan data BPS Provinsi Jambi tahun 2023, jumlah UMKM di Kota Jambi mencapai <b>46.912</b> usaha, yang terdiri dari Usaha Mikro, Kecil, dan Menengah. UMKM sektor kuliner mendominasi, dengan jumlah pelaku mencapai <b>18.587</b> usaha. Jumlah ini terus tumbuh, didukung oleh peningkatan digitalisasi usaha.<br>Dapat anda baca melalui link berikut:<br><a href="https://jambi.bps.go.id/id/statistics-table/2/MjEzMSMy/jumlah-usaha-mikro-kecil-dan-menengah.html" target="_blank">BPS UMKM JAMBI</a>
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

@@ -1,19 +1,5 @@
 version: '3.1'
 nlu:
-  - intent: sapaan
-    examples: |
-      - halo
-      - selamat pagi
-      - permisi admin
-      - hai bps
-      - halo bps
-      - halo asisten virtual
-      - halo asisten bps
-      - halo asisten virtual bps
-      - siang
-      - selamat siang
-      - selamat sore
-      - selamat malam
   - intent: tanya_data_statistik
     examples: |
       - kapan rilis data inflasi terbaru?
@@ -114,3 +100,22 @@ nlu:
       - jam berapa buka
       - jam operasional
       - jam buka
+  - intent: tanya_jumlah_umkm
+    examples: |
+      - berapa jumlah umkm di jambi?
+      - jumlah umkm jambi
+      - umkm jambi
+  - intent: sapaan
+    examples: |
+      - halo
+      - selamat pagi
+      - permisi admin
+      - hai bps
+      - halo bps
+      - halo asisten virtual
+      - halo asisten bps
+      - halo asisten virtual bps
+      - siang
+      - selamat siang
+      - selamat sore
+      - selamat malam

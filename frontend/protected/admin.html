@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html class="h-full" lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>BPS Live Chat Monitor - Admin Dashboard</title>
-    
+
     <script>
         const adminToken = localStorage.getItem('bps_admin_token');
         if (!adminToken) window.location.replace('/error?code=403');
     </script>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -33,26 +36,70 @@
         }
     </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        #chat-box a, #knowledge-table-body a, #live-preview-box a { color: #3b82f6; text-decoration: none; font-weight: 600; transition: all 0.2s; pointer-events: auto; }
-        #chat-box a:hover, #knowledge-table-body a:hover, #live-preview-box a:hover { color: #1d4ed8; text-decoration: underline; }
-        
-        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        #chat-box a,
+        #knowledge-table-body a,
+        #live-preview-box a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+
+        #chat-box a:hover,
+        #knowledge-table-body a:hover,
+        #live-preview-box a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-full overflow-hidden relative">
-    
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-full overflow-hidden relative">
+
     <div id="toast-container" class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <div class="flex h-full w-full overflow-hidden">
-        <main class="flex-shrink-0 bg-white dark:bg-slate-custom border-r border-slate-200 dark:border-slate-800 flex flex-col w-72 lg:w-80 z-20 shadow-xl">
+        <main
+            class="flex-shrink-0 bg-white dark:bg-slate-custom border-r border-slate-200 dark:border-slate-800 flex flex-col w-72 lg:w-80 z-20 shadow-xl">
             <div class="p-6 pb-4 flex items-center gap-3">
                 <div class="bg-primary p-2 rounded-xl flex items-center justify-center shadow-md">
                     <span class="material-symbols-outlined text-white">monitoring</span>
@@ -62,13 +109,15 @@
                     <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-widest">CMS Dashboard</p>
                 </div>
             </div>
-            
+
             <div class="px-6 pb-4 border-b border-slate-200 dark:border-slate-800">
                 <div class="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 relative">
-                    <button onclick="switchTab('chat')" id="tab-btn-chat" class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300">
+                    <button onclick="switchTab('chat')" id="tab-btn-chat"
+                        class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300">
                         <span class="material-symbols-outlined text-[16px]">forum</span> Live Chat
                     </button>
-                    <button onclick="switchTab('knowledge')" id="tab-btn-knowledge" class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-300">
+                    <button onclick="switchTab('knowledge')" id="tab-btn-knowledge"
+                        class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-300">
                         <span class="material-symbols-outlined text-[16px]">menu_book</span> Database Ilmu
                     </button>
                 </div>
@@ -78,22 +127,79 @@
                 <div class="p-6 pb-2">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-sm font-bold uppercase text-slate-500 tracking-wider">Antrean Warga</h2>
-                        <span id="active-count" class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full">0 ACTIVE</span>
+                        <span id="active-count"
+                            class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full">0
+                            ACTIVE</span>
                     </div>
                     <div class="relative mb-2">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
-                        <input id="search-user-input" oninput="renderUserList()" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-500" placeholder="Cari ID Warga..." type="text" />
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+                        <input id="search-user-input" oninput="renderUserList()"
+                            class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-500"
+                            placeholder="Cari ID Warga..." type="text" />
                     </div>
                 </div>
                 <div class="flex-1 overflow-y-auto custom-scrollbar" id="user-list">
                     <div class="p-8 text-center text-slate-400 text-sm">Menunggu koneksi...</div>
                 </div>
             </div>
-            
+
+            <div id="sidebar-guide-area"
+                class="flex flex-col flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-800/20 hidden fade-in py-6 px-5 border-t border-slate-200 dark:border-slate-800">
+                <h2
+                    class="text-[13px] font-bold uppercase text-slate-500 tracking-wider mb-5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
+                    <span class="material-symbols-outlined text-[18px]">menu_book</span> Buku Panduan
+                </h2>
+
+                <div class="space-y-4">
+                    <div
+                        class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs text-primary mb-2 flex items-center gap-1"><span
+                                class="material-symbols-outlined text-[14px]">forum</span> Live Chat</h3>
+                        <ul
+                            class="text-[11px] text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 leading-relaxed">
+                            <li>Warga minta bantuan ditandai 🚨</li>
+                            <li>Ketikan dari Anda berlabel <b>ADMIN</b>.</li>
+                            <li>Ketik perintah <code
+                                    class="bg-slate-100 dark:bg-slate-700 px-1 rounded text-red-500">/selesai</code>
+                                untuk kembalikan kontrol ke Bot AI.</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs text-bot-cyan mb-2 flex items-center gap-1"><span
+                                class="material-symbols-outlined text-[14px]">database</span> Tambah/Edit Topik</h3>
+                        <ul
+                            class="text-[11px] text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 leading-relaxed">
+                            <li><b>Topik:</b> Huruf kecil, dilarang spasi (harus_pakai_garis_bawah).</li>
+                            <li><b>Pertanyaan:</b> Wajib minimal 3-5 kalimat variasi pertanyaan (Enter).</li>
+                            <li><b>Jawaban:</b> Bisa diformat Markdown.</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs text-green-500 mb-2 flex items-center gap-1"><span
+                                class="material-symbols-outlined text-[14px]">model_training</span> Pelatihan Ulang</h3>
+                        <ul
+                            class="text-[11px] text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 leading-relaxed">
+                            <li>Jika muncul <span
+                                    class="bg-yellow-100 text-yellow-700 px-1 rounded font-bold">Peringatan
+                                    Kuning</span>, sistem belum sinkron.</li>
+                            <li>Klik Latih Ulang Bot, jangan tutup halaman sampai sukses.</li>
+                            <li>Bot akan Hot-Reload (update) tanpa jeda mati.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <div class="mt-auto p-4 border-t border-slate-200 dark:border-slate-800">
-                <div class="p-3 bg-slate-100 dark:bg-slate-800/50 rounded-xl flex justify-between items-center hover:bg-slate-200 transition-colors">
+                <div
+                    class="p-3 bg-slate-100 dark:bg-slate-800/50 rounded-xl flex justify-between items-center hover:bg-slate-200 transition-colors">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-admin-blue text-white flex items-center justify-center shadow-sm">
+                        <div
+                            class="w-9 h-9 rounded-full bg-admin-blue text-white flex items-center justify-center shadow-sm">
                             <span class="material-symbols-outlined text-sm">support_agent</span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -110,22 +216,30 @@
             </div>
         </main>
 
-        <section id="page-chat" class="flex-1 flex flex-col bg-slate-50 dark:bg-navy-deep relative overflow-hidden fade-in">
-            <header class="h-20 bg-white/80 dark:bg-slate-custom/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-10 shadow-sm">
+        <section id="page-chat"
+            class="flex-1 flex flex-col bg-slate-50 dark:bg-navy-deep relative overflow-hidden fade-in">
+            <header
+                class="h-20 bg-white/80 dark:bg-slate-custom/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-10 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div class="relative">
-                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold overflow-hidden shadow-inner" id="header-avatar">?</div>
-                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold overflow-hidden shadow-inner"
+                            id="header-avatar">?</div>
+                        <div
+                            class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full">
+                        </div>
                     </div>
                     <div>
                         <h2 class="font-bold text-base" id="active-user-title">Pilih Obrolan</h2>
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                            <span class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">Status: Terhubung</span>
+                            <span class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">Status:
+                                Terhubung</span>
                         </div>
                     </div>
                 </div>
-                <button onclick="deleteChatHistory()" class="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Hapus Riwayat Chat Permanen">
+                <button onclick="deleteChatHistory()"
+                    class="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    title="Hapus Riwayat Chat Permanen">
                     <span class="material-symbols-outlined">delete_sweep</span>
                 </button>
             </header>
@@ -133,60 +247,85 @@
             <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col custom-scrollbar" id="chat-box">
                 <div class="m-auto text-center flex flex-col items-center opacity-50">
                     <span class="material-symbols-outlined text-6xl mb-2 text-slate-400">forum</span>
-                    <p class="text-slate-500 font-medium">Pilih warga dari daftar di sebelah kiri untuk mulai mengobrol.</p>
+                    <p class="text-slate-500 font-medium">Pilih warga dari daftar di sebelah kiri untuk mulai mengobrol.
+                    </p>
                 </div>
             </div>
 
             <div class="p-6 bg-transparent">
-                <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 p-2 flex items-center gap-2">
-                    <input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-4 focus:outline-none" id="admin-input" placeholder="Ketik pesan... (Ketik /selesai untuk kembalikan ke bot)" type="text" autocomplete="off" />
-                    <button class="bg-primary text-white p-2.5 rounded-xl hover:bg-orange-600 transition-all active:scale-95" id="send-btn">
+                <div
+                    class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 p-2 flex items-center gap-2">
+                    <input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-4 focus:outline-none"
+                        id="admin-input" placeholder="Ketik pesan... (Ketik /selesai untuk kembalikan ke bot)"
+                        type="text" autocomplete="off" />
+                    <button
+                        class="bg-primary text-white p-2.5 rounded-xl hover:bg-orange-600 transition-all active:scale-95"
+                        id="send-btn">
                         <span class="material-symbols-outlined">send</span>
                     </button>
                 </div>
             </div>
         </section>
 
-        <section id="page-knowledge" class="flex-1 flex flex-col bg-slate-50 dark:bg-navy-deep relative overflow-hidden hidden fade-in">
-            <header class="h-20 bg-white/80 dark:bg-slate-custom/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-10 shrink-0">
+        <section id="page-knowledge"
+            class="flex-1 flex flex-col bg-slate-50 dark:bg-navy-deep relative overflow-hidden hidden fade-in">
+            <header
+                class="h-20 bg-white/80 dark:bg-slate-custom/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-10 shrink-0">
                 <div>
-                    <h2 class="font-bold text-lg flex items-center gap-2"><span class="material-symbols-outlined text-primary">database</span> Database Ilmu Bot</h2>
-                    <p class="text-xs text-slate-500 font-medium">Kelola topik dan jawaban yang sudah dipelajari Asisten Virtual.</p>
+                    <h2 class="font-bold text-lg flex items-center gap-2"><span
+                            class="material-symbols-outlined text-primary">database</span> Database Ilmu Bot</h2>
+                    <p class="text-xs text-slate-500 font-medium">Kelola topik dan jawaban yang sudah dipelajari Asisten
+                        Virtual.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="fetchKnowledgeBase()" class="p-2 text-slate-500 hover:text-primary rounded-lg transition-all" title="Segarkan Data"><span class="material-symbols-outlined">refresh</span></button>
-                    <button onclick="openTrainModal(true)" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md active:scale-95 transition-all">
-                        <span class="material-symbols-outlined text-bot-cyan text-[18px]">add_circle</span> Tambah Ilmu Baru
+                    <button onclick="fetchKnowledgeBase()"
+                        class="p-2 text-slate-500 hover:text-primary rounded-lg transition-all"
+                        title="Segarkan Data"><span class="material-symbols-outlined">refresh</span></button>
+                    <button onclick="openTrainModal(true)"
+                        class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-bot-cyan text-[18px]">add_circle</span> Tambah Ilmu
+                        Baru
                     </button>
                 </div>
             </header>
 
             <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-                <div id="train-warning-alert" class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 shadow-sm hidden items-center justify-between">
+                <div id="train-warning-alert"
+                    class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 shadow-sm hidden items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="bg-yellow-100 p-2 rounded-lg text-yellow-600"><span class="material-symbols-outlined animate-pulse">warning</span></div>
+                        <div class="bg-yellow-100 p-2 rounded-lg text-yellow-600"><span
+                                class="material-symbols-outlined animate-pulse">warning</span></div>
                         <div>
                             <h4 class="text-sm font-bold text-yellow-800">Perubahan Data Terdeteksi!</h4>
-                            <p class="text-xs text-yellow-700">Terdapat data ilmu yang dihapus/diperbarui. Bot belum mengetahui perubahan ini.</p>
+                            <p class="text-xs text-yellow-700">Terdapat data ilmu yang dihapus/diperbarui. Bot belum
+                                mengetahui perubahan ini.</p>
                         </div>
                     </div>
-                    <button onclick="openTrainModal(true)" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm"><span class="material-symbols-outlined text-[18px]">model_training</span> Latih Ulang Bot</button>
+                    <button onclick="openTrainModal(true)"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm"><span
+                            class="material-symbols-outlined text-[18px]">model_training</span> Latih Ulang Bot</button>
                 </div>
 
                 <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="relative flex-1 max-w-lg">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
-                        <input id="search-intent-input" oninput="filterKnowledge()" type="text" placeholder="Cari topik, pertanyaan, atau jawaban..." class="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 outline-none shadow-sm" />
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+                        <input id="search-intent-input" oninput="filterKnowledge()" type="text"
+                            placeholder="Cari topik, pertanyaan, atau jawaban..."
+                            class="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 outline-none shadow-sm" />
                     </div>
-                    <div class="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-sm">
-                        <span class="text-xs font-bold text-slate-600">Total Topik: <span id="total-knowledge-count" class="text-primary ml-1 text-sm">0</span></span>
+                    <div
+                        class="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-sm">
+                        <span class="text-xs font-bold text-slate-600">Total Topik: <span id="total-knowledge-count"
+                                class="text-primary ml-1 text-sm">0</span></span>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                            <tr
+                                class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
                                 <th class="p-4 font-bold w-1/4">Nama Topik</th>
                                 <th class="p-4 font-bold w-1/3">Contoh Pertanyaan</th>
                                 <th class="p-4 font-bold">Jawaban Bot</th>
@@ -194,7 +333,9 @@
                             </tr>
                         </thead>
                         <tbody id="knowledge-table-body" class="text-sm divide-y divide-slate-100">
-                            <tr><td colspan="4" class="p-8 text-center text-slate-400">Memuat data...</td></tr>
+                            <tr>
+                                <td colspan="4" class="p-8 text-center text-slate-400">Memuat data...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -202,30 +343,41 @@
         </section>
     </div>
 
-    <div id="train-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden items-center justify-center opacity-0 transition-opacity duration-300 p-4 md:p-8">
-        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-full" id="train-modal-box">
+    <div id="train-modal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden items-center justify-center opacity-0 transition-opacity duration-300 p-4 md:p-8">
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-full"
+            id="train-modal-box">
             <div class="bg-slate-800 p-5 md:p-6 flex justify-between items-center text-white shrink-0">
                 <h2 class="text-lg font-bold flex items-center gap-2">
                     <span class="material-symbols-outlined text-bot-cyan" id="modal-icon">model_training</span>
                     <span id="modal-title-text">Suntik Ilmu Baru & Latih AI</span>
                 </h2>
-                <button onclick="closeTrainModal()" class="text-slate-400 hover:text-white transition-colors" id="close-modal-x"><span class="material-symbols-outlined">close</span></button>
+                <button onclick="closeTrainModal()" class="text-slate-400 hover:text-white transition-colors"
+                    id="close-modal-x"><span class="material-symbols-outlined">close</span></button>
             </div>
 
-            <form id="train-form" onsubmit="submitTrainData(event)" class="p-5 md:p-6 space-y-4 overflow-y-auto custom-scrollbar">
+            <form id="train-form" onsubmit="submitTrainData(event)"
+                class="p-5 md:p-6 space-y-4 overflow-y-auto custom-scrollbar">
                 <div id="form-inputs">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        
+
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-bold mb-1">Nama Topik (Intent)</label>
-                                <input type="text" id="train-intent" placeholder="Contoh: tanya_inflasi_jambi" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors" />
-                                <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">info</span> Gunakan huruf kecil dan tanpa spasi (pakai garis_bawah).</p>
+                                <input type="text" id="train-intent" placeholder="Contoh: tanya_inflasi_jambi"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors" />
+                                <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[12px]">info</span> Gunakan huruf kecil
+                                    dan tanpa spasi (pakai garis_bawah).</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold mb-1">Contoh Pertanyaan Warga</label>
-                                <textarea id="train-examples" rows="4" placeholder="berapa nilai inflasi jambi?&#10;info data inflasi bulan ini dong" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors custom-scrollbar"></textarea>
-                                <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">keyboard_return</span> Tekan Enter untuk variasi pertanyaan baru.</p>
+                                <textarea id="train-examples" rows="4"
+                                    placeholder="berapa nilai inflasi jambi?&#10;info data inflasi bulan ini dong"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors custom-scrollbar"></textarea>
+                                <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[12px]">keyboard_return</span> Tekan Enter
+                                    untuk variasi pertanyaan baru.</p>
                             </div>
                         </div>
 
@@ -233,71 +385,116 @@
                             <div>
                                 <div class="flex items-center justify-between mb-1">
                                     <label class="block text-sm font-bold">Jawaban Bot</label>
-                                    <div class="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-lg p-1">
-                                        <button type="button" onclick="insertMarkdown('**', '**')" class="flex items-center justify-center p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors" title="Huruf Tebal"><span class="material-symbols-outlined text-[16px]">format_bold</span></button>
-                                        <button type="button" onclick="insertMarkdown('*', '*')" class="flex items-center justify-center p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors" title="Huruf Miring"><span class="material-symbols-outlined text-[16px]">format_italic</span></button>
+                                    <div
+                                        class="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-lg p-1">
+                                        <button type="button" onclick="insertMarkdown('**', '**')"
+                                            class="flex items-center justify-center p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors"
+                                            title="Huruf Tebal"><span
+                                                class="material-symbols-outlined text-[16px]">format_bold</span></button>
+                                        <button type="button" onclick="insertMarkdown('*', '*')"
+                                            class="flex items-center justify-center p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors"
+                                            title="Huruf Miring"><span
+                                                class="material-symbols-outlined text-[16px]">format_italic</span></button>
                                         <div class="w-px h-4 bg-slate-300 mx-1"></div>
-                                        <button type="button" onclick="openLinkModal()" class="flex items-center justify-center p-1 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Sisipkan Tautan"><span class="material-symbols-outlined text-[16px]">link</span></button>
+                                        <button type="button" onclick="openLinkModal()"
+                                            class="flex items-center justify-center p-1 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                            title="Sisipkan Tautan"><span
+                                                class="material-symbols-outlined text-[16px]">link</span></button>
                                     </div>
                                 </div>
-                                <textarea id="train-response" oninput="updatePreview()" rows="4" placeholder="Ketik balasan resmi dari bot di sini..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors custom-scrollbar leading-relaxed"></textarea>
+                                <textarea id="train-response" oninput="updatePreview()" rows="4"
+                                    placeholder="Ketik balasan resmi dari bot di sini..."
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors custom-scrollbar leading-relaxed"></textarea>
                             </div>
-                            <div class="flex-1 min-h-[100px] bg-slate-100 rounded-lg p-3 border border-slate-200 overflow-y-auto custom-scrollbar">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase mb-2 block">Live Preview (Tampilan Warga)</span>
-                                <div id="live-preview-box" class="bg-bot-cyan/10 border border-bot-cyan/30 p-3.5 rounded-2xl text-sm break-words"><span class="text-slate-400 italic">Pratinjau jawaban akan muncul di sini...</span></div>
+                            <div
+                                class="flex-1 min-h-[100px] bg-slate-100 rounded-lg p-3 border border-slate-200 overflow-y-auto custom-scrollbar">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase mb-2 block">Live Preview
+                                    (Tampilan Warga)</span>
+                                <div id="live-preview-box"
+                                    class="bg-bot-cyan/10 border border-bot-cyan/30 p-3.5 rounded-2xl text-sm break-words">
+                                    <span class="text-slate-400 italic">Pratinjau jawaban akan muncul di sini...</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="smart-loading-container" class="hidden flex-col items-center justify-center py-8 bg-slate-50 rounded-xl border border-slate-200">
+                <div id="smart-loading-container"
+                    class="hidden flex-col items-center justify-center py-8 bg-slate-50 rounded-xl border border-slate-200">
                     <div class="relative w-20 h-20 mb-5">
                         <div class="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
-                        <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin" id="spinner-circle"></div>
-                        <span id="spinner-icon" class="absolute inset-0 flex items-center justify-center material-symbols-outlined text-primary text-3xl animate-pulse">psychology</span>
+                        <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"
+                            id="spinner-circle"></div>
+                        <span id="spinner-icon"
+                            class="absolute inset-0 flex items-center justify-center material-symbols-outlined text-primary text-3xl animate-pulse">psychology</span>
                     </div>
                     <h3 class="text-base font-bold text-slate-800 mb-2">Mengajari AI Bot...</h3>
-                    <p id="loading-text" class="text-sm font-medium text-slate-500 mb-5 text-center px-4">Inisialisasi sistem...</p>
+                    <p id="loading-text" class="text-sm font-medium text-slate-500 mb-5 text-center px-4">Inisialisasi
+                        sistem...</p>
                     <div class="w-64 h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div id="loading-progress" class="h-full bg-primary rounded-full w-0 transition-all duration-[2000ms] ease-out"></div>
+                        <div id="loading-progress"
+                            class="h-full bg-primary rounded-full w-0 transition-all duration-[2000ms] ease-out"></div>
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-4 shrink-0">
-                    <button type="button" onclick="closeTrainModal()" id="train-cancel-btn" class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Batal</button>
-                    <button type="submit" id="train-submit-btn" class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-all active:scale-95">Simpan & Latih Bot</button>
+                    <button type="button" onclick="closeTrainModal()" id="train-cancel-btn"
+                        class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Batal</button>
+                    <button type="submit" id="train-submit-btn"
+                        class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-all active:scale-95">Simpan
+                        & Latih Bot</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="link-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="link-modal-box">
+    <div id="link-modal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
+            id="link-modal-box">
             <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
-                <h3 class="text-base font-bold flex items-center gap-2"><span class="material-symbols-outlined text-bot-cyan">link</span>Sisipkan Tautan</h3>
-                <button type="button" onclick="closeLinkModal()" class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+                <h3 class="text-base font-bold flex items-center gap-2"><span
+                        class="material-symbols-outlined text-bot-cyan">link</span>Sisipkan Tautan</h3>
+                <button type="button" onclick="closeLinkModal()" class="text-slate-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
             </div>
             <div class="p-5 space-y-4">
-                <div><label class="block text-xs font-bold mb-1">Teks Tampilan</label><input type="text" id="link-text-input" placeholder="Klik di sini" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none" /></div>
-                <div><label class="block text-xs font-bold mb-1">URL Tujuan</label><input type="url" id="link-url-input" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none" /></div>
+                <div><label class="block text-xs font-bold mb-1">Teks Tampilan</label><input type="text"
+                        id="link-text-input" placeholder="Klik di sini"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none" />
+                </div>
+                <div><label class="block text-xs font-bold mb-1">URL Tujuan</label><input type="url" id="link-url-input"
+                        placeholder="https://..."
+                        class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none" />
+                </div>
             </div>
             <div class="bg-slate-50 px-5 py-3 flex justify-end gap-2 border-t">
-                <button type="button" onclick="closeLinkModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Batal</button>
-                <button type="button" onclick="insertLinkToEditor()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">Sisipkan</button>
+                <button type="button" onclick="closeLinkModal()"
+                    class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Batal</button>
+                <button type="button" onclick="insertLinkToEditor()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">Sisipkan</button>
             </div>
         </div>
     </div>
 
-    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="confirm-modal-box">
+    <div id="confirm-modal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
+            id="confirm-modal-box">
             <div class="p-6 text-center">
-                <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4 mx-auto"><span class="material-symbols-outlined text-4xl">warning</span></div>
+                <div
+                    class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <span class="material-symbols-outlined text-4xl">warning</span>
+                </div>
                 <h3 class="text-lg font-bold mb-2" id="confirm-title">Konfirmasi</h3>
                 <p class="text-sm text-slate-500" id="confirm-message">Yakin?</p>
             </div>
             <div class="bg-slate-50 px-6 py-4 flex justify-center gap-3 border-t">
-                <button onclick="closeConfirmModal()" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
-                <button id="confirm-action-btn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">Ya, Lanjutkan</button>
+                <button onclick="closeConfirmModal()"
+                    class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
+                <button id="confirm-action-btn"
+                    class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">Ya,
+                    Lanjutkan</button>
             </div>
         </div>
     </div>
@@ -305,13 +502,13 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io({ auth: { token: adminToken } });
-        
+
         let activeSenderId = null; let activeUsersList = []; let unreadCounts = {}; let needsHelpSet = new Set();
-        let currentKnowledgeBase = []; let isEditMode = false; 
+        let currentKnowledgeBase = []; let isEditMode = false;
         let isDataChanged = localStorage.getItem('bps_needs_training') === 'true';
 
         // 🔊 Audio Notifikasi
-        const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'); 
+        const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
         const alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
         const PROTECTED_INTENTS = ['greet', 'goodbye', 'affirm', 'deny', 'mood_great', 'cari_info_website', 'trigger_alihkan_admin', 'hubungi_admin', 'teruskan_admin', 'tanya_admin'];
@@ -320,81 +517,83 @@
         // 🛠️ UTILITIES & COMPONENTS
         // ==========================================
         function logoutAdmin() { openConfirmModal('Keluar', 'Yakin ingin keluar dari Dashboard?', () => { localStorage.removeItem('bps_admin_token'); window.location.replace('/login'); }); }
-        
+
         // 👇 PERBAIKAN ANIMASI SWITCH TAB 👇
         function switchTab(tab) {
             const btnChat = document.getElementById('tab-btn-chat');
             const btnKnowledge = document.getElementById('tab-btn-knowledge');
-            
-            if (tab === 'chat') { 
-                document.getElementById('page-chat').classList.remove('hidden'); 
-                document.getElementById('page-knowledge').classList.add('hidden'); 
-                document.getElementById('sidebar-chat-area').classList.remove('hidden'); 
-                
+
+            if (tab === 'chat') {
+                document.getElementById('page-chat').classList.remove('hidden');
+                document.getElementById('page-knowledge').classList.add('hidden');
+                document.getElementById('sidebar-chat-area').classList.remove('hidden');
+                document.getElementById('sidebar-guide-area').classList.add('hidden');
+
                 btnChat.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300";
                 btnKnowledge.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-300";
-            } 
-            else { 
-                document.getElementById('page-chat').classList.add('hidden'); 
-                document.getElementById('page-knowledge').classList.remove('hidden'); 
-                document.getElementById('sidebar-chat-area').classList.add('hidden'); 
-                
+            }
+            else {
+                document.getElementById('page-chat').classList.add('hidden');
+                document.getElementById('page-knowledge').classList.remove('hidden');
+                document.getElementById('sidebar-chat-area').classList.add('hidden');
+                document.getElementById('sidebar-guide-area').classList.remove('hidden');
+
                 btnKnowledge.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300";
                 btnChat.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-300";
-                
-                fetchKnowledgeBase(); 
+
+                fetchKnowledgeBase();
                 if (isDataChanged) document.getElementById('train-warning-alert').classList.replace('hidden', 'flex');
             }
         }
 
         // Pengolah Markdown ke HTML
-        function mdToHtml(text) { 
-            let html = text || ''; 
-            html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); 
-            html = html.replace(/\*(.*?)\*/g, '<i>$1</i>'); 
-            html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>'); 
-            return html.replace(/\n/g, '<br>'); 
+        function mdToHtml(text) {
+            let html = text || '';
+            html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
+            html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+            return html.replace(/\n/g, '<br>');
         }
-        function htmlToMd(html) { 
-            let text = html || ''; 
-            text = text.replace(/<br\s*\/?>/gi, '\n'); 
-            text = text.replace(/<b>(.*?)<\/b>/gi, '**$1**'); 
-            text = text.replace(/<i>(.*?)<\/i>/gi, '*$1*'); 
-            text = text.replace(/<a\s+[^>]*href=["'](.*?)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)'); 
-            return text; 
+        function htmlToMd(html) {
+            let text = html || '';
+            text = text.replace(/<br\s*\/?>/gi, '\n');
+            text = text.replace(/<b>(.*?)<\/b>/gi, '**$1**');
+            text = text.replace(/<i>(.*?)<\/i>/gi, '*$1*');
+            text = text.replace(/<a\s+[^>]*href=["'](.*?)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+            return text;
         }
         function updatePreview() { const val = document.getElementById('train-response').value; document.getElementById('live-preview-box').innerHTML = val.trim() ? mdToHtml(val) : '<span class="text-slate-400 italic">Pratinjau jawaban akan muncul di sini...</span>'; }
 
         // 👇 PERBAIKAN KURSOR TOOLBAR MARKDOWN 👇
-        function insertMarkdown(prefix, suffix) { 
-            const textarea = document.getElementById('train-response'); 
-            const startPos = textarea.selectionStart; 
-            const endPos = textarea.selectionEnd; 
-            const selectedText = textarea.value.substring(startPos, endPos); 
-            
+        function insertMarkdown(prefix, suffix) {
+            const textarea = document.getElementById('train-response');
+            const startPos = textarea.selectionStart;
+            const endPos = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(startPos, endPos);
+
             // Masukkan teks
-            textarea.value = textarea.value.substring(0, startPos) + prefix + selectedText + suffix + textarea.value.substring(endPos); 
-            textarea.focus(); 
-            
+            textarea.value = textarea.value.substring(0, startPos) + prefix + selectedText + suffix + textarea.value.substring(endPos);
+            textarea.focus();
+
             // Posisikan kursor secara akurat (tepat di tengah-tengah bintang jika teks kosong)
             const newCursorPos = startPos + prefix.length + selectedText.length;
             textarea.setSelectionRange(newCursorPos, newCursorPos);
-            
-            updatePreview(); 
+
+            updatePreview();
         }
-        
+
         let savedSelectionStart = 0, savedSelectionEnd = 0;
         function openLinkModal() { const textarea = document.getElementById('train-response'); savedSelectionStart = textarea.selectionStart; savedSelectionEnd = textarea.selectionEnd; document.getElementById('link-text-input').value = textarea.value.substring(savedSelectionStart, savedSelectionEnd); document.getElementById('link-url-input').value = 'https://'; const modal = document.getElementById('link-modal'); modal.classList.replace('hidden', 'flex'); setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('link-modal-box').classList.replace('scale-95', 'scale-100'); }, 10); }
         function closeLinkModal() { const modal = document.getElementById('link-modal'); modal.classList.add('opacity-0'); document.getElementById('link-modal-box').classList.replace('scale-100', 'scale-95'); setTimeout(() => { modal.classList.replace('flex', 'hidden'); }, 300); }
-        function insertLinkToEditor() { 
-            const text = document.getElementById('link-text-input').value.trim() || 'Klik di sini'; 
-            const url = document.getElementById('link-url-input').value.trim(); 
-            if (url === '' || url === 'https://') return; 
-            const textarea = document.getElementById('train-response'); 
-            const linkMd = `[${text}](${url})`; 
-            textarea.value = textarea.value.substring(0, savedSelectionStart) + linkMd + textarea.value.substring(savedSelectionEnd); 
-            closeLinkModal(); 
-            updatePreview(); 
+        function insertLinkToEditor() {
+            const text = document.getElementById('link-text-input').value.trim() || 'Klik di sini';
+            const url = document.getElementById('link-url-input').value.trim();
+            if (url === '' || url === 'https://') return;
+            const textarea = document.getElementById('train-response');
+            const linkMd = `[${text}](${url})`;
+            textarea.value = textarea.value.substring(0, savedSelectionStart) + linkMd + textarea.value.substring(savedSelectionEnd);
+            closeLinkModal();
+            updatePreview();
         }
 
         function showToastAlert(title, message) {
@@ -419,7 +618,7 @@
         }
 
         function renderKnowledgeTable(dataArray) {
-            const tbody = document.getElementById('knowledge-table-body'); document.getElementById('total-knowledge-count').innerText = dataArray.length; tbody.innerHTML = ''; 
+            const tbody = document.getElementById('knowledge-table-body'); document.getElementById('total-knowledge-count').innerText = dataArray.length; tbody.innerHTML = '';
             if (dataArray.length === 0) return tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">Tidak ada data.</td></tr>`;
             dataArray.forEach(item => {
                 const isSystem = PROTECTED_INTENTS.includes(item.intent);
@@ -433,22 +632,22 @@
                 tr.innerHTML = `<td class="p-4 align-top w-1/4"><span class="inline-block px-2.5 py-1 bg-bot-cyan/10 text-bot-cyan text-xs font-bold rounded-lg break-all">${item.intent}</span></td>
                                 <td class="p-4 align-top w-1/3"><div class="whitespace-pre-line text-xs text-slate-600 max-h-24 overflow-y-auto custom-scrollbar pr-2">${item.examples || '-'}</div></td>
                                 <td class="p-4 align-top"><div class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm text-xs whitespace-pre-line text-slate-700 max-h-24 overflow-y-auto custom-scrollbar">${parsedResponse}</div></td>
-                                <td class="p-4 align-top text-center w-24">${btns}</td>`; 
+                                <td class="p-4 align-top text-center w-24">${btns}</td>`;
                 tbody.appendChild(tr);
             });
         }
 
         function filterKnowledge() {
             const q = document.getElementById('search-intent-input').value.toLowerCase();
-            renderKnowledgeTable(currentKnowledgeBase.filter(i => (i.intent||'').toLowerCase().includes(q) || (i.examples||'').toLowerCase().includes(q) || (i.response||'').toLowerCase().includes(q)));
+            renderKnowledgeTable(currentKnowledgeBase.filter(i => (i.intent || '').toLowerCase().includes(q) || (i.examples || '').toLowerCase().includes(q) || (i.response || '').toLowerCase().includes(q)));
         }
 
         function deleteIntent(intentName) {
             openConfirmModal('Hapus Topik AI', `Yakin menghapus topik <b>[${intentName}]</b> secara permanen?`, async () => {
                 try {
-                    const r = await fetch(`/api/bot/intents/${intentName}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } }); 
-                    if (r.ok) { isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`); } 
-                    else { const res = await r.json(); showToastAlert('❌ Gagal', res.error); if(r.status===403) logoutAdmin(); }
+                    const r = await fetch(`/api/bot/intents/${intentName}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+                    if (r.ok) { isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`); }
+                    else { const res = await r.json(); showToastAlert('❌ Gagal', res.error); if (r.status === 403) logoutAdmin(); }
                 } catch (e) { showToastAlert('❌ Error', 'Jaringan terputus.'); }
             });
         }
@@ -459,7 +658,7 @@
             document.getElementById('modal-icon').innerText = 'edit_note'; document.getElementById('modal-title-text').innerText = 'Edit Ilmu AI';
             const intentInput = document.getElementById('train-intent'); intentInput.value = item.intent; intentInput.readOnly = true; intentInput.className = "w-full bg-slate-200 border-none rounded-lg p-2.5 text-sm text-slate-500 cursor-not-allowed";
             document.getElementById('train-examples').value = item.examples.split('\n').map(l => l.replace(/^-\s*/, '').trim()).filter(l => l.length > 0).join('\n');
-            document.getElementById('train-response').value = htmlToMd(item.response); updatePreview(); 
+            document.getElementById('train-response').value = htmlToMd(item.response); updatePreview();
         }
 
         // ==========================================
@@ -473,20 +672,20 @@
             document.getElementById('spinner-circle').className = "absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"; document.getElementById('spinner-icon').innerText = 'psychology';
             const textEl = document.getElementById('loading-text'); const progressEl = document.getElementById('loading-progress');
             textEl.className = "text-sm font-medium text-slate-500 mb-5 text-center px-4"; textEl.innerText = botPhrases[0]; progressEl.style.width = '10%'; progressEl.className = "h-full bg-primary rounded-full w-0 transition-all duration-[2000ms] ease-out";
-            let i = 0; loadingInterval = setInterval(() => { i = (i + 1) % botPhrases.length; textEl.innerText = botPhrases[i]; let w = parseFloat(progressEl.style.width)||10; if(w<90) progressEl.style.width = (w + 4) + '%'; }, 3000);
+            let i = 0; loadingInterval = setInterval(() => { i = (i + 1) % botPhrases.length; textEl.innerText = botPhrases[i]; let w = parseFloat(progressEl.style.width) || 10; if (w < 90) progressEl.style.width = (w + 4) + '%'; }, 3000);
         }
 
         function stopSmartLoading(isSuccess, message) {
             clearInterval(loadingInterval);
             const p = document.getElementById('loading-progress'), c = document.getElementById('spinner-circle'), t = document.getElementById('loading-text');
             p.style.width = '100%'; c.classList.remove('animate-spin');
-            if (isSuccess) { p.classList.replace('bg-primary', 'bg-green-500'); document.getElementById('spinner-icon').innerText = 'check_circle'; t.innerText = message; t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; } 
+            if (isSuccess) { p.classList.replace('bg-primary', 'bg-green-500'); document.getElementById('spinner-icon').innerText = 'check_circle'; t.innerText = message; t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; }
             else { p.classList.replace('bg-primary', 'bg-red-500'); document.getElementById('spinner-icon').innerText = 'error'; t.innerText = message; t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; }
         }
 
         function openTrainModal(isAdd = true) {
             const modal = document.getElementById('train-modal'); modal.classList.replace('hidden', 'flex'); setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('train-modal-box').classList.replace('scale-95', 'scale-100'); }, 10);
-            if(isAdd) { isEditMode = false; document.getElementById('train-form').reset(); document.getElementById('modal-icon').innerText = 'model_training'; document.getElementById('modal-title-text').innerText = 'Suntik Ilmu Baru & Latih AI'; document.getElementById('train-intent').readOnly = false; document.getElementById('train-intent').className = "w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors"; updatePreview(); } 
+            if (isAdd) { isEditMode = false; document.getElementById('train-form').reset(); document.getElementById('modal-icon').innerText = 'model_training'; document.getElementById('modal-title-text').innerText = 'Suntik Ilmu Baru & Latih AI'; document.getElementById('train-intent').readOnly = false; document.getElementById('train-intent').className = "w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors"; updatePreview(); }
             else { isEditMode = true; }
         }
 
@@ -498,9 +697,9 @@
         async function submitTrainData(e) {
             e.preventDefault(); const intentName = document.getElementById('train-intent').value, examples = document.getElementById('train-examples').value, botResponse = mdToHtml(document.getElementById('train-response').value);
             if (isEditMode) {
-                try { const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) }); if(r.ok) { isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); closeTrainModal(); showToastAlert('✅ Diperbarui', 'Ilmu tersimpan.'); } else { const err = await r.json(); showToastAlert('❌ Gagal', err.error); } } catch (e) { showToastAlert('❌ Error', 'Jaringan bermasalah.'); }
+                try { const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) }); if (r.ok) { isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); closeTrainModal(); showToastAlert('✅ Diperbarui', 'Ilmu tersimpan.'); } else { const err = await r.json(); showToastAlert('❌ Gagal', err.error); } } catch (e) { showToastAlert('❌ Error', 'Jaringan bermasalah.'); }
             } else {
-                if(!intentName && !isDataChanged) return showToastAlert('⚠️ Peringatan', 'Data kosong!');
+                if (!intentName && !isDataChanged) return showToastAlert('⚠️ Peringatan', 'Data kosong!');
                 startSmartLoading(); socket.emit('train_bot', intentName ? { intentName, examples, botResponse } : { intentName: "SKIP_WRITE", examples: "-", botResponse: "-" });
             }
         }
@@ -521,42 +720,43 @@
                 let cls = active ? 'border-l-primary bg-primary/5' : 'border-l-transparent'; if (help && !active) cls = 'border-l-red-500 bg-red-50';
                 const div = document.createElement('div'); div.className = `p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors border-l-4 ${cls}`;
                 div.onclick = () => { switchTab('chat'); selectUser(id); };
-                div.innerHTML = `<div class="flex items-start gap-3"><div class="w-10 h-10 rounded-full ${help?'bg-red-200 text-red-700':'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold shrink-0">${id.substring(0,2).toUpperCase()}</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold truncate">${id}</h3><p class="text-[10px] ${unread||help?'text-slate-800 font-bold':'text-slate-500'} italic">${help?'🚨 Butuh bantuan!':(unread?'Pesan baru!':'Klik untuk obrolan')}</p></div></div>`; userListEl.appendChild(div);
+                div.innerHTML = `<div class="flex items-start gap-3"><div class="w-10 h-10 rounded-full ${help ? 'bg-red-200 text-red-700' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold shrink-0">${id.substring(0, 2).toUpperCase()}</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold truncate">${id}</h3><p class="text-[10px] ${unread || help ? 'text-slate-800 font-bold' : 'text-slate-500'} italic">${help ? '🚨 Butuh bantuan!' : (unread ? 'Pesan baru!' : 'Klik untuk obrolan')}</p></div></div>`; userListEl.appendChild(div);
             });
         }
-        
+
         async function selectUser(id) {
-            activeSenderId = id; document.getElementById('active-user-title').innerText = id; document.getElementById('header-avatar').innerText = id.substring(0,2).toUpperCase(); unreadCounts[id] = 0; renderUserList(); const chatBox = document.getElementById('chat-box'); chatBox.innerHTML = '';
-            try { const r = await fetch(`/api/chat/history/${id}`, { headers: { 'Authorization': `Bearer ${adminToken}` } }); const h = await r.json(); if(h.length===0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>'; else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at)); } catch (e) {}
+            activeSenderId = id; document.getElementById('active-user-title').innerText = id; document.getElementById('header-avatar').innerText = id.substring(0, 2).toUpperCase(); unreadCounts[id] = 0; renderUserList(); const chatBox = document.getElementById('chat-box'); chatBox.innerHTML = '';
+            try { const r = await fetch(`/api/chat/history/${id}`, { headers: { 'Authorization': `Bearer ${adminToken}` } }); const h = await r.json(); if (h.length === 0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>'; else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at)); } catch (e) { }
         }
 
         socket.on('receive_message', (d) => {
             if (d.senderType === 'bot' && d.message.includes('meneruskan pesan')) { needsHelpSet.add(d.senderId); showToastAlert('🚨 Darurat!', `Warga <b>${d.senderId}</b> butuh bantuan.`); alertSound.play(); renderUserList(); }
-            if (activeSenderId === d.senderId) { const cb = document.getElementById('chat-box'); if(cb.innerHTML.includes('Belum ada')) cb.innerHTML = ''; appendMessage(d.senderType==='warga'?'user':d.senderType, d.message, new Date()); } 
-            else if (d.senderType === 'warga') { unreadCounts[d.senderId] = (unreadCounts[d.senderId] || 0) + 1; if(!needsHelpSet.has(d.senderId)) notifSound.play(); renderUserList(); }
+            if (activeSenderId === d.senderId) { const cb = document.getElementById('chat-box'); if (cb.innerHTML.includes('Belum ada')) cb.innerHTML = ''; appendMessage(d.senderType === 'warga' ? 'user' : d.senderType, d.message, new Date()); }
+            else if (d.senderType === 'warga') { unreadCounts[d.senderId] = (unreadCounts[d.senderId] || 0) + 1; if (!needsHelpSet.has(d.senderId)) notifSound.play(); renderUserList(); }
         });
 
         function appendMessage(sender, text, time) {
             const timeStr = (time ? new Date(time) : new Date()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); const div = document.createElement('div'); const cb = document.getElementById('chat-box');
             const parsedText = mdToHtml(text);
-            if (sender === 'user' || sender === 'warga') { div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-slate-500">WARGA</span><span class="text-[10px] text-slate-400">${timeStr}</span></div><div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-200 whitespace-pre-line">${parsedText}</div>`; } 
-            else if (sender === 'bot') { div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-bot-cyan flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">smart_toy</span> BOT</span><span class="text-[10px] text-slate-400">${timeStr}</span></div><div class="bg-bot-cyan/10 border border-bot-cyan/30 p-3.5 rounded-2xl rounded-tl-none text-sm whitespace-pre-line">${parsedText}</div>`; } 
+            if (sender === 'user' || sender === 'warga') { div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-slate-500">WARGA</span><span class="text-[10px] text-slate-400">${timeStr}</span></div><div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-200 whitespace-pre-line">${parsedText}</div>`; }
+            else if (sender === 'bot') { div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-bot-cyan flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">smart_toy</span> BOT</span><span class="text-[10px] text-slate-400">${timeStr}</span></div><div class="bg-bot-cyan/10 border border-bot-cyan/30 p-3.5 rounded-2xl rounded-tl-none text-sm whitespace-pre-line">${parsedText}</div>`; }
             else { div.className = 'flex flex-col items-end self-end max-w-[85%] mb-4 ml-auto fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pr-1"><span class="text-[10px] text-slate-400">${timeStr}</span><span class="text-[10px] font-bold text-admin-blue">ADMIN</span></div><div class="bg-admin-blue text-white p-3.5 rounded-2xl rounded-tr-none shadow-md text-sm whitespace-pre-line">${parsedText}</div>`; }
             cb.appendChild(div); cb.scrollTop = cb.scrollHeight;
         }
 
         function deleteChatHistory() {
             if (!activeSenderId) return showToastAlert('⚠️ Maaf', "Pilih warga dulu!");
-            openConfirmModal('Hapus Riwayat', `Hapus chat dengan <b>${activeSenderId}</b> permanen?`, async () => { try { if ((await fetch(`/api/chat/history/${activeSenderId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } })).ok) { document.getElementById('chat-box').innerHTML = `<div class="m-auto text-green-500 text-sm">Terhapus!</div>`; delete unreadCounts[activeSenderId]; needsHelpSet.delete(activeSenderId); renderUserList(); } } catch (e) {} });
+            openConfirmModal('Hapus Riwayat', `Hapus chat dengan <b>${activeSenderId}</b> permanen?`, async () => { try { if ((await fetch(`/api/chat/history/${activeSenderId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } })).ok) { document.getElementById('chat-box').innerHTML = `<div class="m-auto text-green-500 text-sm">Terhapus!</div>`; delete unreadCounts[activeSenderId]; needsHelpSet.delete(activeSenderId); renderUserList(); } } catch (e) { } });
         }
 
         function sendMessage() {
-            const inp = document.getElementById('admin-input'); const text = inp.value.trim(); if (!activeSenderId || !text) return; 
-            socket.emit('admin_message', { targetSenderId: activeSenderId, message: text }); 
-            if (text !== '/selesai') appendMessage('admin', text, new Date()); else { needsHelpSet.delete(activeSenderId); renderUserList(); } 
+            const inp = document.getElementById('admin-input'); const text = inp.value.trim(); if (!activeSenderId || !text) return;
+            socket.emit('admin_message', { targetSenderId: activeSenderId, message: text });
+            if (text !== '/selesai') appendMessage('admin', text, new Date()); else { needsHelpSet.delete(activeSenderId); renderUserList(); }
             inp.value = '';
         }
         document.getElementById('send-btn').addEventListener('click', sendMessage); document.getElementById('admin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
     </script>
 </body>
+
 </html>

@@ -26,7 +26,7 @@ app.use(express.json());
 // ==========================================
 // 📂 KONFIGURASI PATH FOLDER (backend/src/app.js)
 // ==========================================
-const RASA_DIR = path.join(__dirname, '../../rasa-bot'); 
+const RASA_DIR = path.join(__dirname, '../../rasa-bot');
 const PUBLIC_DIR = path.join(__dirname, '../../frontend/public');
 const PROTECTED_DIR = path.join(__dirname, '../../frontend/protected');
 
@@ -37,7 +37,7 @@ app.use(express.static(PUBLIC_DIR));
 // 🛤️ FRONTEND ROUTING (URL CANTIK)
 // ==========================================
 app.get('/', (req, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, 'chatwidget.html')); 
+    res.sendFile(path.join(PUBLIC_DIR, 'chatwidget.html'));
 });
 
 app.get('/login', (req, res) => {
@@ -73,7 +73,7 @@ async function broadcastUserList() {
     try {
         const users = await db.query('SELECT DISTINCT sender_id FROM chat_logs ORDER BY sender_id ASC');
         const userList = users.rows.map(row => row.sender_id);
-        io.emit('user_list', userList); 
+        io.emit('user_list', userList);
     } catch (err) {
         console.error('Gagal mengambil daftar user:', err.message);
     }
@@ -84,15 +84,15 @@ let activeSessions = {};
 // Middleware Socket.io: Verifikasi Token Admin
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
-    socket.data.isAdmin = false; 
+    socket.data.isAdmin = false;
     if (token) {
         jwt.verify(token, JWT_SECRET, (err, decoded) => {
             if (!err && decoded.role === 'admin') {
-                socket.data.isAdmin = true; 
+                socket.data.isAdmin = true;
             }
         });
     }
-    next(); 
+    next();
 });
 
 io.on('connection', (socket) => {
@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
         const { senderId, message } = data;
         socket.join(senderId);
 
-        try { await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'warga', message]); } catch (err) {}
+        try { await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'warga', message]); } catch (err) { }
 
         io.emit('receive_message', { senderId: senderId, message: message, senderType: 'warga' });
         broadcastUserList();
@@ -131,14 +131,14 @@ io.on('connection', (socket) => {
     socket.on('admin_message', async (data) => {
         if (!socket.data.isAdmin) return;
         const { targetSenderId, message } = data;
-        
+
         if (message.trim() === '/selesai') {
-            delete activeSessions[targetSenderId]; 
+            delete activeSessions[targetSenderId];
             io.to(targetSenderId).emit('bot_response', { message: '✅ Sesi dengan petugas telah berakhir.' });
-            return; 
+            return;
         }
-        
-        try { await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [targetSenderId, 'admin', message]); } catch (err) {}
+
+        try { await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [targetSenderId, 'admin', message]); } catch (err) { }
         io.to(targetSenderId).emit('admin_response', { message });
     });
 
@@ -146,12 +146,12 @@ io.on('connection', (socket) => {
     socket.on('user_clear_chat', async (data) => {
         const { senderId } = data;
         if (!senderId) return;
-        try { 
-            await db.query('DELETE FROM chat_logs WHERE sender_id = $1', [senderId]); 
+        try {
+            await db.query('DELETE FROM chat_logs WHERE sender_id = $1', [senderId]);
             if (activeSessions[senderId]) {
                 delete activeSessions[senderId];
             }
-            broadcastUserList(); 
+            broadcastUserList();
         } catch (err) { console.error('Gagal hapus chat warga:', err); }
     });
 
@@ -190,16 +190,16 @@ io.on('connection', (socket) => {
             const isWin = process.platform === "win32";
             const pythonCmd = isWin ? 'venv\\Scripts\\python.exe' : 'venv/bin/python';
 
-            const trainProcess = spawn(pythonCmd, ['-m', 'rasa', 'train', '--force'], { 
+            const trainProcess = spawn(pythonCmd, ['-m', 'rasa', 'train', '--force'], {
                 cwd: RASA_DIR,
-                shell: true 
+                shell: true
             });
 
             // Log HANYA dicetak di Terminal VS Code, tidak lagi dikirim ke UI Dashboard
             trainProcess.stdout.on('data', chunk => {
                 console.log(`[RASA LOG]: ${chunk.toString()}`);
             });
-            
+
             // Mengubah pelabelan ERROR menjadi PROCESS agar log biasa tidak terlihat menakutkan
             trainProcess.stderr.on('data', chunk => {
                 console.log(`[RASA PROCESS]: ${chunk.toString()}`);
@@ -210,15 +210,43 @@ io.on('connection', (socket) => {
                     return socket.emit('train_error', 'Gagal melatih AI. Cek terminal server.');
                 }
 
+                let latestModelPath = "models"; // Default fallback
+
+                // 👇 PEMBERSIH MODEL OTOMATIS (Mencegah Penumpukan Sampah Model) 👇
+                try {
+                    const modelsDir = path.join(RASA_DIR, 'models');
+                    if (fs.existsSync(modelsDir)) {
+                        const files = fs.readdirSync(modelsDir)
+                            .filter(f => f.endsWith('.tar.gz'))
+                            .map(f => ({ name: f, fullPath: path.join(modelsDir, f), time: fs.statSync(path.join(modelsDir, f)).mtime.getTime() }))
+                            .sort((a, b) => b.time - a.time); // Urutkan dari terbaru ke terlama
+
+                        // Menangkap file model paling baru untuk digunakan di Hot Reload
+                        if (files.length > 0) {
+                            latestModelPath = files[0].fullPath;
+                        }
+
+                        // Jika ada lebih dari 3 file, hapus sisanya (index 3 dst)
+                        if (files.length > 3) {
+                            for (let i = 3; i < files.length; i++) {
+                                fs.unlinkSync(files[i].fullPath);
+                            }
+                            console.log(`🧹 [CLEANUP] Menghapus ${files.length - 3} file model lama agar disk tidak penuh.`);
+                        }
+                    }
+                } catch (cleanErr) {
+                    console.error("⚠️ [CLEANUP] Gagal menghapus model lama:", cleanErr.message);
+                }
+
                 // 👇 LANGSUNG KIRIM SINYAL SUKSES KE LAYAR ADMIN (Mencegah Loading Lama) 👇
                 socket.emit('train_success', 'AI berhasil diverifikasi dan disinkronisasi!');
 
                 // 👇 PROSES HOT-RELOAD BERJALAN DI BACKGROUND 👇
                 try {
-                    await axios.put('http://localhost:5005/model', { model_file: "models" }, { timeout: 10000 });
-                    console.log("✅ [RASA API] Model AI berhasil dimuat ulang (Hot-Reload) secara otomatis.");
+                    await axios.put('http://localhost:5005/model', { model_file: latestModelPath }, { timeout: 10000 });
+                    console.log("✅ [RASA API] Model AI berhasil dimuat ulang (Hot-Reload) secara otomatis menggunakan file: " + path.basename(latestModelPath));
                 } catch (e) {
-                    console.log("⚠️ [RASA API] Gagal Hot-Reload otomatis. Bot mungkin perlu direstart manual.");
+                    console.log("⚠️ [RASA API] Gagal Hot-Reload otomatis. Bot mungkin perlu direstart manual. Error: " + e.message);
                 }
             });
         } catch (err) { socket.emit('train_error', 'Gagal memproses file sistem.'); }
@@ -242,7 +270,7 @@ app.post('/api/login', (req, res) => {
 function authenticateJWT(req, res, next) {
     const authHeader = req.headers.authorization;
     if (authHeader) {
-        const token = authHeader.split(' ')[1]; 
+        const token = authHeader.split(' ')[1];
         jwt.verify(token, JWT_SECRET, (err, user) => {
             if (err) return res.status(403).json({ error: 'Sesi berakhir.' });
             req.user = user;
@@ -257,10 +285,10 @@ app.get('/api/bot/intents', authenticateJWT, (req, res) => {
         const domainData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'domain.yml'), 'utf8'));
         let knowledgeBase = nluData.nlu.map(item => {
             const utterName = `utter_${item.intent}`;
-            return { 
-                intent: item.intent, 
-                examples: item.examples.trim(), 
-                response: (domainData.responses[utterName] ? domainData.responses[utterName][0].text : '-') 
+            return {
+                intent: item.intent,
+                examples: item.examples.trim(),
+                response: (domainData.responses[utterName] ? domainData.responses[utterName][0].text : '-')
             };
         });
         res.json(knowledgeBase);
@@ -272,7 +300,7 @@ app.put('/api/bot/intents', authenticateJWT, (req, res) => {
     if (PROTECTED_INTENTS.includes(intentName)) {
         return res.status(403).json({ error: 'Topik ini dilindungi sistem!' });
     }
-    
+
     try {
         const nluPath = path.join(RASA_DIR, 'data/nlu.yml'); let nluData = yaml.load(fs.readFileSync(nluPath, 'utf8')) || { version: "3.1", nlu: [] };
         if (!nluData.nlu) nluData.nlu = []; nluData.nlu = nluData.nlu.filter(item => item.intent !== intentName);
@@ -282,7 +310,7 @@ app.put('/api/bot/intents', authenticateJWT, (req, res) => {
 
         const domainPath = path.join(RASA_DIR, 'domain.yml'); let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8'));
         if (domainData) { if (!domainData.responses) domainData.responses = {}; domainData.responses[`utter_${intentName}`] = [{ text: botResponse }]; fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 })); }
-        
+
         res.json({ message: 'Ilmu diperbarui!' });
     } catch (error) { res.status(500).json({ error: 'Gagal memperbarui file YAML' }); }
 });
@@ -292,17 +320,17 @@ app.delete('/api/bot/intents/:intentName', authenticateJWT, (req, res) => {
     if (PROTECTED_INTENTS.includes(intentName)) {
         return res.status(403).json({ error: 'Topik ini tidak boleh dihapus!' });
     }
-    
+
     try {
         const nluPath = path.join(RASA_DIR, 'data/nlu.yml'); let nluData = yaml.load(fs.readFileSync(nluPath, 'utf8'));
-        if(nluData && nluData.nlu) { nluData.nlu = nluData.nlu.filter(item => item.intent !== intentName); fs.writeFileSync(nluPath, yaml.dump(nluData, { lineWidth: -1 })); }
+        if (nluData && nluData.nlu) { nluData.nlu = nluData.nlu.filter(item => item.intent !== intentName); fs.writeFileSync(nluPath, yaml.dump(nluData, { lineWidth: -1 })); }
 
         const rulesPath = path.join(RASA_DIR, 'data/rules.yml'); let rulesData = yaml.load(fs.readFileSync(rulesPath, 'utf8'));
-        if(rulesData && rulesData.rules) { rulesData.rules = rulesData.rules.filter(r => !(r.steps && r.steps.length > 0 && r.steps[0].intent === intentName)); fs.writeFileSync(rulesPath, yaml.dump(rulesData, { lineWidth: -1 })); }
+        if (rulesData && rulesData.rules) { rulesData.rules = rulesData.rules.filter(r => !(r.steps && r.steps.length > 0 && r.steps[0].intent === intentName)); fs.writeFileSync(rulesPath, yaml.dump(rulesData, { lineWidth: -1 })); }
 
         const domainPath = path.join(RASA_DIR, 'domain.yml'); let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8'));
         if (domainData) { if (domainData.intents) domainData.intents = domainData.intents.filter(i => i !== intentName); if (domainData.responses && domainData.responses[`utter_${intentName}`]) delete domainData.responses[`utter_${intentName}`]; fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 })); }
-        
+
         res.json({ message: 'Ilmu dihapus!' });
     } catch (error) { res.status(500).json({ error: 'Gagal menghapus file YAML' }); }
 });

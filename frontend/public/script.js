@@ -35,17 +35,26 @@ function getGreeting() {
 // ==========================================
 // 2. FITUR BUKA-TUTUP WIDGET CHAT
 // ==========================================
+// Fungsi Komunikasi ke Web Utama (Minta perbesar/kecil)
+function notifyParentWindow(state) {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage(state, '*'); 
+    }
+}
+
 chatContainer.classList.add('scale-0', 'opacity-0', 'pointer-events-none', 'duration-300');
 
 openBtn.addEventListener('click', () => {
     chatContainer.classList.remove('scale-0', 'opacity-0', 'pointer-events-none');
     chatContainer.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
     userInput.focus();
+    notifyParentWindow('CHAT_OPENED'); // Minta iframe dibesarkan
 });
 
 closeBtn.addEventListener('click', () => {
     chatContainer.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
     chatContainer.classList.add('scale-0', 'opacity-0', 'pointer-events-none');
+    notifyParentWindow('CHAT_CLOSED'); // Minta iframe dikecilkan
 });
 
 function formatWaktuChat(waktuMentah) {
@@ -78,10 +87,10 @@ function showTypingIndicator() {
     wrapper.id = 'typing-indicator';
     wrapper.className = 'message-wrapper wrapper-bot flex flex-col gap-1 items-start max-w-[85%] mb-2';
 
-    let senderName = currentResponder === 'admin' ? 'Petugas BPS' : 'Asisten Virtual';
+    let senderName = currentResponder === 'admin' ? 'Petugas BPS' : 'SISCA (Bot Asisten Virtual)';
     let senderFoto = currentResponder === 'admin'
         ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-5 h-5 rounded-full object-cover border border-gray-200">'
-        : '<img src="https://www.shutterstock.com/image-vector/chat-bot-icon-virtual-smart-600nw-2478937555.jpg" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
+        : `<img src="img/SISCA_BOT.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" alt="Bot" class="w-5 h-5 rounded-full object-cover shadow-sm">`;
 
     wrapper.innerHTML = `
         <div class="sender-label label-bot flex items-center gap-1 text-[10px] text-gray-500 ml-1 font-medium">${senderFoto}<span>${senderName}</span></div>
@@ -116,10 +125,10 @@ function appendMessage(sender, text, timestamp = null) {
         `;
     } else {
         wrapper.className = 'message-wrapper wrapper-bot flex flex-col gap-1 items-start max-w-[85%]';
-        let senderName = sender === 'admin' ? 'Petugas BPS' : 'Asisten Virtual';
+        let senderName = sender === 'admin' ? 'Petugas BPS' : 'SISCA (Bot Asisten Virtual)';
         let senderFoto = sender === 'admin'
             ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-5 h-5 rounded-full object-cover border border-gray-200">'
-            : '<img src="https://www.shutterstock.com/image-vector/chat-bot-icon-virtual-smart-600nw-2478937555.jpg" alt="Bot" class="w-5 h-5 rounded-full object-cover border border-gray-200">';
+            : `<img src="img/SISCA_BOT.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" alt="Bot" class="w-5 h-5 rounded-full object-cover shadow-sm">`;
 
         wrapper.innerHTML = `
             <div class="sender-label label-bot flex items-center gap-1 text-[10px] text-gray-500 ml-1 font-medium">${senderFoto}<span>${senderName}</span></div>
@@ -173,7 +182,7 @@ window.onload = async function () {
         if (history.length === 0) {
             setTimeout(() => {
                 const sapaan = getGreeting();
-                appendMessage('bot', `${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Ada yang bisa Asisten Virtual bantu hari ini?`);
+                appendMessage('bot', `${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Ada yang bisa SISCA bantu hari ini?`);
                 showQuickReplies();
             }, 500);
         } else {

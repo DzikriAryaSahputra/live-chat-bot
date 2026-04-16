@@ -9,3 +9,6 @@ __pycache__/
 
 # Keamanan
 .env
+
+# Testing File (Lokal Saja)
+test_iframe.html
