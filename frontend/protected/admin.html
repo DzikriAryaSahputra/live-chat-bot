@@ -252,15 +252,33 @@
                 </div>
             </div>
 
-            <div class="p-6 bg-transparent">
+            <div class="p-6 bg-transparent flex flex-col gap-3">
+                <!-- Sugesti Respons Cepat (Quick Replies) -->
+                <div class="max-w-4xl mx-auto w-full flex gap-2 overflow-x-auto custom-scrollbar pb-2">
+                    <button type="button" onclick="insertAndSend('Halo! Ada yang bisa kami bantu terkait data BPS?')"
+                        class="shrink-0 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-primary hover:text-white hover:border-primary rounded-full text-xs font-semibold whitespace-nowrap transition-colors shadow-sm">👋
+                        Bantuan Data</button>
+                    <button type="button"
+                        onclick="insertAndSend('Silakan tunggu sebentar, kami sedang mengecek ketersediaan data tersebut.')"
+                        class="shrink-0 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-primary hover:text-white hover:border-primary rounded-full text-xs font-semibold whitespace-nowrap transition-colors shadow-sm">⏳
+                        Tunggu Sebentar</button>
+                    <button type="button"
+                        onclick="insertAndSend('Bisa tolong dijelaskan lebih detail spesifikasi data yang dicari?')"
+                        class="shrink-0 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-primary hover:text-white hover:border-primary rounded-full text-xs font-semibold whitespace-nowrap transition-colors shadow-sm">🔎
+                        Minta Detail</button>
+                    <button type="button" onclick="insertAndSend('/selesai')"
+                        class="shrink-0 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-full text-xs font-bold whitespace-nowrap transition-colors border border-red-200 hover:border-transparent shadow-sm">🛑
+                        Akhiri Chat (/selesai)</button>
+                </div>
+
                 <div
-                    class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 p-2 flex items-center gap-2">
+                    class="max-w-4xl mx-auto w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-2 flex items-center gap-2">
                     <input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-4 focus:outline-none"
-                        id="admin-input" placeholder="Ketik pesan... (Ketik /selesai untuk kembalikan ke bot)"
-                        type="text" autocomplete="off" />
+                        id="admin-input" placeholder="Ketik pesan... (Atau klik saran di atas)" type="text"
+                        autocomplete="off" />
                     <button
                         class="bg-primary text-white p-2.5 rounded-xl hover:bg-orange-600 transition-all active:scale-95"
-                        id="send-btn">
+                        id="send-btn" title="Kirim (Enter)">
                         <span class="material-symbols-outlined">send</span>
                     </button>
                 </div>
@@ -720,7 +738,13 @@
                 let cls = active ? 'border-l-primary bg-primary/5' : 'border-l-transparent'; if (help && !active) cls = 'border-l-red-500 bg-red-50';
                 const div = document.createElement('div'); div.className = `p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors border-l-4 ${cls}`;
                 div.onclick = () => { switchTab('chat'); selectUser(id); };
-                div.innerHTML = `<div class="flex items-start gap-3"><div class="w-10 h-10 rounded-full ${help ? 'bg-red-200 text-red-700' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold shrink-0">${id.substring(0, 2).toUpperCase()}</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold truncate">${id}</h3><p class="text-[10px] ${unread || help ? 'text-slate-800 font-bold' : 'text-slate-500'} italic">${help ? '🚨 Butuh bantuan!' : (unread ? 'Pesan baru!' : 'Klik untuk obrolan')}</p></div></div>`; userListEl.appendChild(div);
+
+                const unreadBadge = unread > 0 ? `<div class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-bounce shadow-[0_0_8px_rgba(249,115,22,0.6)] flex items-center gap-1"><span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>${unread} Baru</div>` : '';
+                const statusText = help ? '🚨 Butuh bantuan!' : (unread ? '💬 Ada pesan baru!' : 'Klik untuk obrolan');
+                const statusColor = help || unread ? 'text-slate-800 font-bold' : 'text-slate-500';
+
+                div.innerHTML = `<div class="flex items-center justify-between gap-2"><div class="flex items-start gap-3 min-w-0"><div class="w-10 h-10 rounded-full ${help ? 'bg-red-200 text-red-700' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold shrink-0 shadow-inner">${id.substring(0, 2).toUpperCase()}</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold truncate">${id}</h3><p class="text-[10px] ${statusColor} italic truncate">${statusText}</p></div></div>${unreadBadge}</div>`;
+                userListEl.appendChild(div);
             });
         }
 
@@ -755,6 +779,13 @@
             if (text !== '/selesai') appendMessage('admin', text, new Date()); else { needsHelpSet.delete(activeSenderId); renderUserList(); }
             inp.value = '';
         }
+
+        // Fitur klik saran balas cepat (Quick Replies)
+        function insertAndSend(text) {
+            document.getElementById('admin-input').value = text;
+            sendMessage();
+        }
+
         document.getElementById('send-btn').addEventListener('click', sendMessage); document.getElementById('admin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
     </script>
 </body>
