@@ -273,7 +273,13 @@
 
                 <div
                     class="max-w-4xl mx-auto w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-2 flex items-center gap-2">
-                    <input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-4 focus:outline-none"
+                    
+                    <!-- NEW: Tombol Modul Link untuk Chat -->
+                    <button type="button" onclick="openLinkModal('admin-input')" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all shrink-0" title="Sisipkan Tautan Khusus">
+                        <span class="material-symbols-outlined">link</span>
+                    </button>
+
+                    <input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-2 focus:outline-none"
                         id="admin-input" placeholder="Ketik pesan... (Atau klik saran di atas)" type="text"
                         autocomplete="off" />
                     <button
@@ -495,6 +501,37 @@
         </div>
     </div>
 
+    <!-- MODAL ALIAS NAMA CUSTOM -->
+    <div id="alias-modal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
+            id="alias-modal-box">
+            <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
+                <h3 class="text-base font-bold flex items-center gap-2"><span
+                        class="material-symbols-outlined text-primary">edit_square</span>Ubah Nama Warga</h3>
+                <button type="button" onclick="closeAliasModal()" class="text-slate-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold mb-1">Nama Panggilan Baru</label>
+                    <input type="text" id="alias-name-input" placeholder="Misal: Budi Jambi"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50" />
+                    <p class="text-[10px] text-slate-500 mt-2 leading-relaxed">
+                        <span class="font-bold text-red-500">Info:</span> Kosongkan kolom teks lalu klik 'Simpan' untuk menghapus alias dan mengembalikan nama warga ke ID Acak bawaan mesin.
+                    </p>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 flex justify-end gap-2 border-t">
+                <button type="button" onclick="closeAliasModal()"
+                    class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Batal</button>
+                <button type="button" onclick="confirmEditAlias()"
+                    class="bg-primary hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+
     <div id="confirm-modal"
         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
@@ -569,7 +606,8 @@
             let html = text || '';
             html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
             html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
-            html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+            html = html.replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-500 underline font-semibold">$1</a>');
+            html = html.replace(/(?<!href="|href=")(https?:\/\/[^\s<()]+)/g, '<a href="$1" target="_blank" class="text-blue-500 underline">$1</a>');
             return html.replace(/\n/g, '<br>');
         }
         function htmlToMd(html) {
@@ -600,18 +638,19 @@
             updatePreview();
         }
 
-        let savedSelectionStart = 0, savedSelectionEnd = 0;
-        function openLinkModal() { const textarea = document.getElementById('train-response'); savedSelectionStart = textarea.selectionStart; savedSelectionEnd = textarea.selectionEnd; document.getElementById('link-text-input').value = textarea.value.substring(savedSelectionStart, savedSelectionEnd); document.getElementById('link-url-input').value = 'https://'; const modal = document.getElementById('link-modal'); modal.classList.replace('hidden', 'flex'); setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('link-modal-box').classList.replace('scale-95', 'scale-100'); }, 10); }
+        let savedSelectionStart = 0, savedSelectionEnd = 0, activeLinkTarget = 'train-response';
+        function openLinkModal(targetId = 'train-response') { activeLinkTarget = targetId; const textarea = document.getElementById(activeLinkTarget); savedSelectionStart = textarea.selectionStart; savedSelectionEnd = textarea.selectionEnd; document.getElementById('link-text-input').value = textarea.value.substring(savedSelectionStart, savedSelectionEnd); document.getElementById('link-url-input').value = 'https://'; const modal = document.getElementById('link-modal'); modal.classList.replace('hidden', 'flex'); setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('link-modal-box').classList.replace('scale-95', 'scale-100'); }, 10); }
         function closeLinkModal() { const modal = document.getElementById('link-modal'); modal.classList.add('opacity-0'); document.getElementById('link-modal-box').classList.replace('scale-100', 'scale-95'); setTimeout(() => { modal.classList.replace('flex', 'hidden'); }, 300); }
         function insertLinkToEditor() {
             const text = document.getElementById('link-text-input').value.trim() || 'Klik di sini';
             const url = document.getElementById('link-url-input').value.trim();
             if (url === '' || url === 'https://') return;
-            const textarea = document.getElementById('train-response');
+            const textarea = document.getElementById(activeLinkTarget);
             const linkMd = `[${text}](${url})`;
             textarea.value = textarea.value.substring(0, savedSelectionStart) + linkMd + textarea.value.substring(savedSelectionEnd);
             closeLinkModal();
-            updatePreview();
+            if(activeLinkTarget === 'train-response') updatePreview();
+            textarea.focus();
         }
 
         function showToastAlert(title, message) {
@@ -729,27 +768,36 @@
         // 💬 CHAT LOGIC (WARGA & ADMIN)
         // ==========================================
         socket.on('user_list', (users) => { activeUsersList = users; renderUserList(); });
+        // Fitur Alias / Ubah Nama Warga
+        let userAliases = JSON.parse(localStorage.getItem('bps_user_aliases')) || {};
+
         function renderUserList() {
-            const query = document.getElementById('search-user-input').value.toLowerCase(); const filtered = activeUsersList.filter(id => id.toLowerCase().includes(query));
+            const query = document.getElementById('search-user-input').value.toLowerCase(); 
+            const filtered = activeUsersList.filter(id => {
+                const alias = userAliases[id] || id;
+                return id.toLowerCase().includes(query) || alias.toLowerCase().includes(query);
+            });
             const userListEl = document.getElementById('user-list'); userListEl.innerHTML = ''; document.getElementById('active-count').innerText = `${activeUsersList.length} ACTIVE`;
             if (filtered.length === 0) return userListEl.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">Tidak ada warga.</div>`;
             filtered.forEach(id => {
+                const displayName = userAliases[id] || id;
                 const active = activeSenderId === id, unread = unreadCounts[id] || 0, help = needsHelpSet.has(id);
                 let cls = active ? 'border-l-primary bg-primary/5' : 'border-l-transparent'; if (help && !active) cls = 'border-l-red-500 bg-red-50';
-                const div = document.createElement('div'); div.className = `p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors border-l-4 ${cls}`;
+                const div = document.createElement('div'); div.className = `p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors border-l-4 group ${cls}`;
                 div.onclick = () => { switchTab('chat'); selectUser(id); };
 
                 const unreadBadge = unread > 0 ? `<div class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-bounce shadow-[0_0_8px_rgba(249,115,22,0.6)] flex items-center gap-1"><span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>${unread} Baru</div>` : '';
                 const statusText = help ? '🚨 Butuh bantuan!' : (unread ? '💬 Ada pesan baru!' : 'Klik untuk obrolan');
                 const statusColor = help || unread ? 'text-slate-800 font-bold' : 'text-slate-500';
 
-                div.innerHTML = `<div class="flex items-center justify-between gap-2"><div class="flex items-start gap-3 min-w-0"><div class="w-10 h-10 rounded-full ${help ? 'bg-red-200 text-red-700' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold shrink-0 shadow-inner">${id.substring(0, 2).toUpperCase()}</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold truncate">${id}</h3><p class="text-[10px] ${statusColor} italic truncate">${statusText}</p></div></div>${unreadBadge}</div>`;
+                div.innerHTML = `<div class="flex items-center justify-between gap-2"><div class="flex items-start gap-3 min-w-0"><div class="w-10 h-10 rounded-full ${help ? 'bg-red-200 text-red-700' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold shrink-0 shadow-inner">${displayName.substring(0, 2).toUpperCase()}</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold truncate flex items-center justify-between"><span>${displayName}</span><button onclick="event.stopPropagation(); window.editAlias('${id}')" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-primary transition-opacity" title="Ubah Nama"><span class="material-symbols-outlined text-[14px]">edit</span></button></h3><p class="text-[10px] ${statusColor} italic truncate">${statusText}</p></div></div>${unreadBadge}</div>`;
                 userListEl.appendChild(div);
             });
         }
 
         async function selectUser(id) {
-            activeSenderId = id; document.getElementById('active-user-title').innerText = id; document.getElementById('header-avatar').innerText = id.substring(0, 2).toUpperCase(); unreadCounts[id] = 0; renderUserList(); const chatBox = document.getElementById('chat-box'); chatBox.innerHTML = '';
+            const displayName = userAliases[id] || id;
+            activeSenderId = id; document.getElementById('active-user-title').innerText = displayName; document.getElementById('header-avatar').innerText = displayName.substring(0, 2).toUpperCase(); unreadCounts[id] = 0; renderUserList(); const chatBox = document.getElementById('chat-box'); chatBox.innerHTML = '';
             try { const r = await fetch(`/api/chat/history/${id}`, { headers: { 'Authorization': `Bearer ${adminToken}` } }); const h = await r.json(); if (h.length === 0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>'; else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at)); } catch (e) { }
         }
 
@@ -762,7 +810,10 @@
         function appendMessage(sender, text, time) {
             const timeStr = (time ? new Date(time) : new Date()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); const div = document.createElement('div'); const cb = document.getElementById('chat-box');
             const parsedText = mdToHtml(text);
-            if (sender === 'user' || sender === 'warga') { div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-slate-500">WARGA</span><span class="text-[10px] text-slate-400">${timeStr}</span></div><div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-200 whitespace-pre-line">${parsedText}</div>`; }
+            if (sender === 'user' || sender === 'warga') { 
+                const aliasName = (userAliases[activeSenderId] || 'WARGA').toUpperCase();
+                div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-slate-500 truncate max-w-[150px]" title="${aliasName}">${aliasName}</span><span class="text-[10px] text-slate-400 shrink-0">${timeStr}</span></div><div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-200 whitespace-pre-line">${parsedText}</div>`; 
+            }
             else if (sender === 'bot') { div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-bot-cyan flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">smart_toy</span> BOT</span><span class="text-[10px] text-slate-400">${timeStr}</span></div><div class="bg-bot-cyan/10 border border-bot-cyan/30 p-3.5 rounded-2xl rounded-tl-none text-sm whitespace-pre-line">${parsedText}</div>`; }
             else { div.className = 'flex flex-col items-end self-end max-w-[85%] mb-4 ml-auto fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pr-1"><span class="text-[10px] text-slate-400">${timeStr}</span><span class="text-[10px] font-bold text-admin-blue">ADMIN</span></div><div class="bg-admin-blue text-white p-3.5 rounded-2xl rounded-tr-none shadow-md text-sm whitespace-pre-line">${parsedText}</div>`; }
             cb.appendChild(div); cb.scrollTop = cb.scrollHeight;
@@ -776,7 +827,21 @@
         function sendMessage() {
             const inp = document.getElementById('admin-input'); const text = inp.value.trim(); if (!activeSenderId || !text) return;
             socket.emit('admin_message', { targetSenderId: activeSenderId, message: text });
-            if (text !== '/selesai') appendMessage('admin', text, new Date()); else { needsHelpSet.delete(activeSenderId); renderUserList(); }
+            if (text !== '/selesai') {
+                appendMessage('admin', text, new Date()); 
+            } else { 
+                needsHelpSet.delete(activeSenderId); 
+                renderUserList(); 
+                
+                // Notifikasi visual untuk Admin
+                const cb = document.getElementById('chat-box');
+                const div = document.createElement('div');
+                div.className = 'flex justify-center my-4 fade-in w-full';
+                div.innerHTML = `<div class="bg-slate-100 text-slate-500 border border-slate-200 text-[11px] font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm"><span class="material-symbols-outlined text-[14px] text-green-500">verified</span> Anda telah mengakhiri sesi obrolan (Bot AI kembali mengambil alih)</div>`;
+                cb.appendChild(div);
+                cb.scrollTop = cb.scrollHeight;
+                showToastAlert('✅ Sesi Diakhiri', 'Chat dikembalikan ke Asisten Virtual SISCA.');
+            }
             inp.value = '';
         }
 
@@ -785,6 +850,52 @@
             document.getElementById('admin-input').value = text;
             sendMessage();
         }
+
+        window.closeAliasModal = function() {
+            const modal = document.getElementById('alias-modal'); 
+            modal.classList.add('opacity-0'); 
+            document.getElementById('alias-modal-box').classList.replace('scale-100', 'scale-95'); 
+            setTimeout(() => { modal.classList.replace('flex', 'hidden'); }, 300);
+        };
+
+        window.confirmEditAlias = function() {
+            if(!activeAliasTargetId) return closeAliasModal();
+            const id = activeAliasTargetId;
+            const newName = document.getElementById('alias-name-input').value;
+            
+            if (newName.trim() === '') {
+                delete userAliases[id];
+                showToastAlert('✅ Nama Direset', 'Dikembalikan ke ID Warga bawaan.');
+            } else {
+                userAliases[id] = newName.trim();
+                showToastAlert('✅ Berhasil', 'Nama panggilan warga tersimpan.');
+            }
+            
+            localStorage.setItem('bps_user_aliases', JSON.stringify(userAliases));
+            renderUserList();
+            if (activeSenderId === id) { selectUser(id); }
+            closeAliasModal();
+        };
+
+        let activeAliasTargetId = null;
+        window.editAlias = function(id) {
+            activeAliasTargetId = id;
+            const currentName = userAliases[id] || id;
+            const input = document.getElementById('alias-name-input');
+            input.value = currentName !== id ? currentName : '';
+            
+            const modal = document.getElementById('alias-modal'); 
+            modal.classList.replace('hidden', 'flex'); 
+            setTimeout(() => { 
+                modal.classList.remove('opacity-0'); 
+                document.getElementById('alias-modal-box').classList.replace('scale-95', 'scale-100'); 
+                input.focus();
+            }, 10);
+        };
+        
+        document.getElementById('alias-name-input').addEventListener('keypress', (e) => { 
+            if(e.key === 'Enter') window.confirmEditAlias(); 
+        });
 
         document.getElementById('send-btn').addEventListener('click', sendMessage); document.getElementById('admin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
     </script>

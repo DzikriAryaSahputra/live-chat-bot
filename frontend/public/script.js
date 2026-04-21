@@ -70,11 +70,18 @@ function formatWaktuChat(waktuMentah) {
 function formatTextWithLink(text) {
     if (!text) return '';
     if (text.includes('<a href=') || text.includes("<a href='")) return text.replace(/\n/g, '<br>');
-    const urlRegex = /(https?:\/\/[^\s<]+)/g;
-    let formattedText = text.replace(urlRegex, function (url) {
-        // 👇 Ubah text-decoration menjadi none 👇
-        return `<a href="${url}" target="_blank" style="color: #38bdf8; text-decoration: none;">${url}</a>`;
+    
+    // 1. Parsing Markdown: [Teks](URL)
+    let formattedText = text.replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, function(match, label, url) {
+        return `<a href="${url}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-weight: 600;">${label}</a>`;
     });
+
+    // 2. Parsing Raw URLs murni yang belum kena Markdown
+    const urlRegex = /(?<!href="|href=")(https?:\/\/[^\s<()]+)/g;
+    formattedText = formattedText.replace(urlRegex, function (url) {
+        return `<a href="${url}" target="_blank" style="color: #38bdf8; text-decoration: underline;">${url}</a>`;
+    });
+
     return formattedText.replace(/\n/g, '<br>');
 }
 
