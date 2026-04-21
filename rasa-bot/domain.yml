@@ -19,7 +19,7 @@ actions:
   - action_cari_website_bps
 responses:
   utter_sapaan:
-    - text: Halo!😊 Saya SISCA. Ada data atau informasi statistik yang bisa saya bantu carikan hari ini?
+    - text: Halo! 😊 Saya SISCA, siap membantu Anda menemukan data dan informasi yang dibutuhkan. Ada yang ingin ditanyakan?
   utter_tanya_data_statistik:
     - text: Untuk data statistik terbaru seperti inflasi, kependudukan, atau berita resmi statistik, Anda bisa melihat publikasi langsung di website resmi BPS. Ada indikator spesifik yang sedang Anda cari?
   utter_tanya_profil_bps:
@@ -40,7 +40,7 @@ responses:
   utter_alihkan_ke_petugas:
     - text: Baik, mohon tunggu sebentar. Saya sedang meneruskan pesan Anda ke petugas...
   utter_tanya_jam_operasional:
-    - text: BPS kota jambi buka dari hari Senin - Jumat Jam <b>07:30 - 16.00</b> WIB
+    - text: BPS kota jambi buka pelayanan dari hari Senin - Jumat Jam <b>07:30 - 16.00</b> WIB
   utter_tanya_tabel_dinamis:
     - text: <b>Tabel Dinamis</b><br>Berikut Informasi Terkait <a href="https://jambikota.bps.go.id/id/query-builder" target="_blank">Tabel Dinamis</a> Apakah Ada Yang Ingin Ditanyakan Lagi?:)
   utter_tanya_jumlah_umkm:

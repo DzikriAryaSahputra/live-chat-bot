@@ -95,11 +95,6 @@ nlu:
       - berikan saya tabel dinamis
       - website tabel dinamis
       - arahkan saya tabel dinamis
-  - intent: tanya_jam_operasional
-    examples: |
-      - jam berapa buka
-      - jam operasional
-      - jam buka
   - intent: tanya_jumlah_umkm
     examples: |
       - berapa jumlah umkm di jambi?
@@ -119,3 +114,11 @@ nlu:
       - selamat siang
       - selamat sore
       - selamat malam
+      - hai
+      - oi
+      - p
+  - intent: tanya_jam_operasional
+    examples: |
+      - jam berapa buka
+      - jam operasional
+      - jam buka

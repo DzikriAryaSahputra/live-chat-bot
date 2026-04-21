@@ -73,7 +73,18 @@ async function broadcastUserList() {
     try {
         const users = await db.query('SELECT DISTINCT sender_id FROM chat_logs ORDER BY sender_id ASC');
         const userList = users.rows.map(row => row.sender_id);
-        io.emit('user_list', userList);
+        
+        // Cek mana saja warga yang saat ini sedang 'Online' berdasarkan Room Socket yang aktif
+        const onlineUsers = [];
+        const rooms = io.sockets.adapter.rooms;
+        userList.forEach(userId => {
+            const room = rooms.get(userId);
+            if (room && room.size > 0) {
+                onlineUsers.push(userId);
+            }
+        });
+
+        io.emit('user_list', { userList, onlineUsers });
     } catch (err) {
         console.error('Gagal mengambil daftar user:', err.message);
     }
@@ -98,6 +109,22 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
     console.log(`🔌 User terhubung: ${socket.id} (Admin: ${socket.data.isAdmin})`);
     broadcastUserList();
+
+    // 🔗 MENDAFTAR ROOM SAAT INisialisasi WIDGET (SANGAT PENTING AGAR CHAT ADMIN MASUK)
+    socket.on('register_session', (data) => {
+        if (data.senderId) {
+            socket.join(data.senderId);
+            console.log(`📡 Klien telah memasuki jaringan room: ${data.senderId}`);
+            // Pancarkan ulang daftar, karena ada user yang baru online!
+            broadcastUserList();
+        }
+    });
+
+    // 🔴 KETIKA USER TERPUTUS (OFFLINE)
+    socket.on('disconnect', () => {
+        // Beri delay sedikit agar status room adapter ke-update dengan matang sebelum broadcast
+        setTimeout(() => { broadcastUserList(); }, 500);
+    });
 
     // 💬 WARGA MENGIRIM PESAN
     socket.on('user_message', async (data) => {

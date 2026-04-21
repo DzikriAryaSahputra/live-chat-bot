@@ -13,6 +13,11 @@ if (!mySenderId) {
 // Variabel "Ingatan" untuk mengecek siapa lawan bicara saat ini
 let currentResponder = 'bot';
 
+// Saat terkoneksi ke soket, langsung mendaftar ke server agar terhubung ke jaringan pesan pribadinya
+socket.on('connect', () => {
+    socket.emit('register_session', { senderId: mySenderId });
+});
+
 // Tangkap elemen-elemen DOM HTML
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
