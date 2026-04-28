@@ -1,23 +1,5 @@
 version: '3.1'
 nlu:
-  - intent: tanya_data_statistik
-    examples: |
-      - kapan rilis data inflasi terbaru?
-      - rilis berita resmi statistik kapan?
-      - tolong info data inflasi di Jambi bulan ini dong
-      - berapa angka kemiskinan terbaru di Jambi?
-      - mau cari data ekspor impor
-      - saya mau cari data kependudukan
-      - saya mau cari data statistik terbaru
-  - intent: tanya_sensus_ekonomi
-    examples: |
-      - kapan sensus penduduk lagi?
-      - kapan sensus ekonomi lagi?
-      - kapan sensus ekonomi?
-      - sensus ekonomi kapan?
-      - kapan sensus ekonomi 2026?
-      - kapan SE2026?
-      - sensus ekonomi
   - intent: cari_info_website
     examples: |
       - minta link publikasi dong
@@ -122,3 +104,21 @@ nlu:
       - jam berapa buka
       - jam operasional
       - jam buka
+  - intent: tanya_sensus_ekonomi
+    examples: |
+      - kapan sensus penduduk lagi?
+      - kapan sensus ekonomi lagi?
+      - kapan sensus ekonomi?
+      - sensus ekonomi kapan?
+      - kapan sensus ekonomi 2026?
+      - kapan SE2026?
+      - sensus ekonomi
+  - intent: tanya_data_statistik
+    examples: |
+      - kapan rilis data terbaru?
+      - rilis berita resmi statistik kapan?
+      - tolong info data di Jambi bulan ini dong
+      - berapa angka kemiskinan terbaru di Jambi?
+      - mau cari data ekspor impor
+      - saya mau cari data kependudukan
+      - saya mau cari data statistik terbaru

@@ -5,6 +5,9 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const pdfParse = require('pdf-parse');
+const cheerio = require('cheerio');
 
 // Modul CMS Bot
 const fs = require('fs');
@@ -29,6 +32,13 @@ app.use(express.json());
 const RASA_DIR = path.join(__dirname, '../../rasa-bot');
 const PUBLIC_DIR = path.join(__dirname, '../../frontend/public');
 const PROTECTED_DIR = path.join(__dirname, '../../frontend/protected');
+const KNOWLEDGE_DOCS_DIR = path.join(__dirname, '../knowledge_docs');
+const UPLOADS_DIR = path.join(__dirname, '../uploads');
+const TOKEN_USAGE_FILE = path.join(__dirname, '../token_usage.json');
+
+// Pastikan folder dinamis otomatis terbuat jika belum ada di server
+if (!fs.existsSync(KNOWLEDGE_DOCS_DIR)) fs.mkdirSync(KNOWLEDGE_DOCS_DIR, { recursive: true });
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 // Melayani file statis (CSS, JS, Gambar)
 app.use(express.static(PUBLIC_DIR));
@@ -73,7 +83,7 @@ async function broadcastUserList() {
     try {
         const users = await db.query('SELECT DISTINCT sender_id FROM chat_logs ORDER BY sender_id ASC');
         const userList = users.rows.map(row => row.sender_id);
-        
+
         // Cek mana saja warga yang saat ini sedang 'Online' berdasarkan Room Socket yang aktif
         const onlineUsers = [];
         const rooms = io.sockets.adapter.rooms;
@@ -88,6 +98,119 @@ async function broadcastUserList() {
     } catch (err) {
         console.error('Gagal mengambil daftar user:', err.message);
     }
+}
+
+// ==========================================
+// 🧠 FUNGSI HYBRID RAG (GROQ & GEMINI FALLBACK)
+// ==========================================
+async function getKnowledgeBaseContext() {
+    try {
+        const nluData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'data/nlu.yml'), 'utf8'));
+        const domainData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'domain.yml'), 'utf8'));
+        if (!nluData || !nluData.nlu) return '';
+
+        let baseKnowledge = nluData.nlu.map(item => {
+            const utterName = `utter_${item.intent}`;
+            const answer = (domainData.responses && domainData.responses[utterName]) ? domainData.responses[utterName][0].text : '-';
+            return `[Topik: ${item.intent}]\nPertanyaan Warga: ${item.examples.trim().replace(/\n/g, ' | ')}\nJawaban Bot: ${answer}`;
+        }).join('\n\n');
+
+        let externalDocs = '';
+        if (fs.existsSync(KNOWLEDGE_DOCS_DIR)) {
+            const files = fs.readdirSync(KNOWLEDGE_DOCS_DIR).filter(f => f.endsWith('.txt'));
+            for (const file of files) {
+                const content = fs.readFileSync(path.join(KNOWLEDGE_DOCS_DIR, file), 'utf8');
+                externalDocs += `\n\n--- DOKUMEN [${file}] ---\n${content.substring(0, 3000)}`;
+            }
+        }
+
+        // Limit TOTAL pengetahuan agar tidak melampaui 6000 Token (Groq Free Tier)
+        // 6000 token = ~24.000 karakter. Kita limit base+external maksimal 12.000 karakter.
+        const combined = baseKnowledge + externalDocs;
+        return combined.length > 12000 ? combined.substring(0, 12000) + "\n...[DIPOTONG KARENA LIMIT TOKEN]" : combined;
+    } catch (e) {
+        console.error('Gagal membaca Knowledge Base untuk RAG:', e.message);
+        return '';
+    }
+}
+
+// Fungsi Pelacakan Token Harian
+function trackTokenUsage(model, tokens) {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        let usageData = { date: today, groq: 0, gemini: 0 };
+        
+        if (fs.existsSync(TOKEN_USAGE_FILE)) {
+            const raw = fs.readFileSync(TOKEN_USAGE_FILE, 'utf8');
+            usageData = JSON.parse(raw);
+            if (usageData.date !== today) {
+                // Reset harian
+                usageData = { date: today, groq: 0, gemini: 0 };
+            }
+        }
+        
+        if (model === 'groq') usageData.groq += tokens;
+        if (model === 'gemini') usageData.gemini += tokens;
+        
+        fs.writeFileSync(TOKEN_USAGE_FILE, JSON.stringify(usageData, null, 2));
+    } catch(err) {
+        console.error("Gagal mencatat pemakaian token:", err.message);
+    }
+}
+
+async function generateLLMResponse(userMessage) {
+    const knowledgeStr = await getKnowledgeBaseContext();
+    const systemPrompt = `Anda adalah Asisten Virtual BPS Kota Jambi bernama SISCA.
+TUGAS UTAMA ANDA: Menjawab pertanyaan warga dengan cerdas, ramah, dan solutif HANYA berdasarkan informasi pada "DOKUMEN PENGETAHUAN BPS" (termasuk Dokumen Eksternal) di bawah ini.
+DILARANG KERAS berhalusinasi atau memberikan informasi angka/fakta yang tidak tertulis pada dokumen di bawah ini.
+Jika jawaban memang tidak tersedia sama sekali di dalam dokumen di bawah, katakan: "Maaf, SISCA belum dibekali jawaban terkait hal tersebut. Ketik 'bantuan' atau klik tombol 'Hubungi Admin' jika butuh bicara dengan petugas asli."
+
+=== DOKUMEN PENGETAHUAN BPS ===
+${knowledgeStr}
+===============================`;
+
+    // 1. Coba Gunakan Groq API (Super Cepat)
+    if (process.env.GROQ_API_KEY) {
+        try {
+            const groqRes = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+                model: "llama-3.1-8b-instant",
+                messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }],
+                temperature: 0.1, max_tokens: 500
+            }, { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }, timeout: 10000 });
+
+            if (groqRes.data && groqRes.data.choices) {
+                console.log("🤖 Respons RAG dikembalikan oleh: GROQ");
+                if(groqRes.data.usage && groqRes.data.usage.total_tokens) {
+                    trackTokenUsage('groq', groqRes.data.usage.total_tokens);
+                }
+                return groqRes.data.choices[0].message.content;
+            }
+        } catch (groqErr) {
+            console.error("⚠️ Groq API gagal/limit:", groqErr.response ? groqErr.response.data : groqErr.message);
+        }
+    }
+
+    // 2. Fallback ke Gemini API (Kuat)
+    if (process.env.GEMINI_API_KEY) {
+        try {
+            // Menggunakan gemini-2.0-flash (Versi 2.5 belum dirilis secara publik di endpoint v1beta)
+            const geminiRes = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+                contents: [{ parts: [{ text: systemPrompt + "\n\nPERTANYAAN WARGA: " + userMessage }] }]
+            }, { timeout: 15000 });
+
+            if (geminiRes.data && geminiRes.data.candidates) {
+                console.log("🤖 Respons RAG dikembalikan oleh: GEMINI (Fallback)");
+                if(geminiRes.data.usageMetadata && geminiRes.data.usageMetadata.totalTokenCount) {
+                    trackTokenUsage('gemini', geminiRes.data.usageMetadata.totalTokenCount);
+                }
+                return geminiRes.data.candidates[0].content.parts[0].text;
+            }
+        } catch (geminiErr) {
+            console.error("⚠️ Gemini API gagal:", geminiErr.response ? geminiErr.response.data : geminiErr.message);
+        }
+    }
+
+    return "Maaf, sistem AI sedang mengalami kendala jaringan API. Mohon ketik 'bantuan' untuk menghubungi admin.";
 }
 
 let activeSessions = {};
@@ -139,14 +262,35 @@ io.on('connection', (socket) => {
         if (activeSessions[senderId] === 'admin') return;
 
         try {
-            const rasaResponse = await axios.post('http://localhost:5005/webhooks/rest/webhook', { sender: senderId, message: message });
-            const botResponses = rasaResponse.data;
-            if (botResponses && botResponses.length > 0) {
-                const botReply = botResponses[0].text;
+            // 1. PARSE INTENT KE RASA UNTUK MELIHAT TINGKAT KEPERCAYAAN (CONFIDENCE)
+            const parseRes = await axios.post('http://localhost:5005/model/parse', { text: message });
+            const intentName = parseRes.data.intent.name;
+            const confidence = parseRes.data.intent.confidence;
+
+            let botReply = "";
+
+            // 2. JIKA CONFIDENCE >= 85% DAN BUKAN FALLBACK, BIARKAN RASA YANG MENJAWAB
+            if (intentName !== 'nlu_fallback' && confidence >= 0.85) {
+                const rasaResponse = await axios.post('http://localhost:5005/webhooks/rest/webhook', { sender: senderId, message: message });
+                if (rasaResponse.data && rasaResponse.data.length > 0) {
+                    botReply = rasaResponse.data[0].text;
+                }
+            }
+
+            // 3. JIKA RASA RAGU (< 85%), TEMBAKKAN KE HYBRID LLM (RAG)
+            if (!botReply) {
+                console.log(`🧠 Rasa NLP ragu (Intent: ${intentName}, Conf: ${(confidence * 100).toFixed(1)}%). Melempar ke LLM...`);
+                botReply = await generateLLMResponse(message);
+            }
+
+            // 4. KIRIM JAWABAN KE WARGA
+            if (botReply) {
                 await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'bot', botReply]);
                 io.emit('receive_message', { senderId: senderId, message: botReply, senderType: 'bot' });
 
-                if (botReply.includes('meneruskan pesan')) { activeSessions[senderId] = 'admin'; }
+                if (botReply.toLowerCase().includes('meneruskan pesan') || botReply.toLowerCase().includes('petugas asli')) {
+                    activeSessions[senderId] = 'admin';
+                }
                 socket.emit('bot_response', { message: botReply });
             }
         } catch (error) {
@@ -375,6 +519,76 @@ app.delete('/api/chat/history/:senderId', authenticateJWT, async (req, res) => {
         broadcastUserList();
         res.json({ message: 'Riwayat dibersihkan!' });
     } catch (err) { res.status(500).json({ error: 'Gagal menghapus' }); }
+});
+
+// ==========================================
+// 📚 RAG EXTERNAL KNOWLEDGE (PDF & URL) ROUTES
+// ==========================================
+
+const upload = multer({ dest: 'uploads/' });
+
+app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Tidak ada file yang diunggah.' });
+    try {
+        const dataBuffer = fs.readFileSync(req.file.path);
+        const data = await pdfParse(dataBuffer);
+        const rawText = data.text.trim();
+
+        if (!rawText) throw new Error('PDF kosong atau tidak dapat terbaca teksnya.');
+
+        const fileName = req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_') + '.txt';
+        const safePath = path.join(KNOWLEDGE_DOCS_DIR, fileName);
+
+        if (!fs.existsSync(KNOWLEDGE_DOCS_DIR)) fs.mkdirSync(KNOWLEDGE_DOCS_DIR);
+        fs.writeFileSync(safePath, `[SUMBER: ${req.file.originalname}]\n${rawText}`);
+        fs.unlinkSync(req.file.path); // Hapus file temporary
+
+        res.json({ message: 'PDF berhasil disuntikkan ke otak bot!' });
+    } catch (err) {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        res.status(500).json({ error: 'Gagal mengekstrak teks PDF: ' + err.message });
+    }
+});
+
+
+
+app.get('/api/bot/docs', authenticateJWT, (req, res) => {
+    try {
+        if (!fs.existsSync(KNOWLEDGE_DOCS_DIR)) return res.json([]);
+        const files = fs.readdirSync(KNOWLEDGE_DOCS_DIR).filter(f => f.endsWith('.txt'));
+        const docs = files.map(f => {
+            const stats = fs.statSync(path.join(KNOWLEDGE_DOCS_DIR, f));
+            return { filename: f.replace('.txt', ''), size: (stats.size / 1024).toFixed(1) + ' KB', date: stats.mtime };
+        });
+        res.json(docs);
+    } catch (err) { res.status(500).json({ error: 'Gagal mengambil daftar dokumen.' }); }
+});
+
+app.get('/api/bot/token-usage', authenticateJWT, (req, res) => {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        let usageData = { date: today, groq: 0, gemini: 0 };
+        if (fs.existsSync(TOKEN_USAGE_FILE)) {
+            const raw = fs.readFileSync(TOKEN_USAGE_FILE, 'utf8');
+            usageData = JSON.parse(raw);
+            if (usageData.date !== today) usageData = { date: today, groq: 0, gemini: 0 };
+        }
+        res.json(usageData);
+    } catch (err) {
+        res.status(500).json({ error: 'Gagal mengambil data penggunaan token.' });
+    }
+});
+
+app.delete('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
+    try {
+        const safePath = path.join(KNOWLEDGE_DOCS_DIR, req.params.filename);
+        if (fs.existsSync(safePath)) {
+            fs.unlinkSync(safePath);
+            res.json({ message: 'Dokumen dilupakan.' });
+        } else {
+            res.status(404).json({ error: 'Dokumen tidak ditemukan.' });
+        }
+    } catch (err) { res.status(500).json({ error: 'Gagal menghapus dokumen.' }); }
 });
 
 server.listen(port, () => console.log(`🚀 Server menyala di http://localhost:${port}`));

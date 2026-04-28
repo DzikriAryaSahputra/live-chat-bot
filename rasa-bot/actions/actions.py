@@ -92,14 +92,13 @@ class ActionCariWebsiteBPS(Action):
         elif "website pelayanan" in pesan_warga or "pelayanan statistik" in pesan_warga or "pelayanan statistik terpadu bps" in pesan_warga:
             kategori = "Layanan Statistik Terpadu"
             link = "https://pst.bps.go.id/?_gl=1*t6auxj*_ga*NzMzNzQ4NzA0LjE3NzE0MDEwMTg.*_ga_XXTTVXWHDB*czE3NzMyOTQ4MDkkbzExJGcwJHQxNzczMjk0ODA5JGo2MCRsMCRoMA.."
-        # --- JIKA TIDAK ADA KATA KUNCI YANG COCOK (Fallback) ---
+        # --- JIKA TIDAK ADA KATA KUNCI YANG COCOK (False Positive dari NLU) ---
         else:
-            kategori = "Halaman Utama BPS Kota Jambi"
-            link = base_url
+            # Mengembalikan list kosong tanpa utter_message. 
+            # Ini akan membuat app.js menerima response kosong dan memicu LLM (Gemini).
+            return []
 
-        # --- MERAKIT PESAN BALASAN ---
-        # Baris ini memastikan {link} dan teks penutup selalu ikut terkirim
-# Mengganti \n dengan <br> agar aman saat dibaca oleh website
+        # --- MERAKIT PESAN BALASAN (Jika Cocok) ---
         pesan_balasan = f"Untuk informasi terkait **{kategori}**, Anda bisa mengaksesnya langsung melalui portal resmi kami di tautan berikut:<br><br>🔗 {link}<br><br>Apakah ada hal lain yang ingin ditanyakan?"        
         # Mengirimkan balasan ke layar warga
         dispatcher.utter_message(text=pesan_balasan)

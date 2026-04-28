@@ -111,7 +111,7 @@
             </div>
 
             <div class="px-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                <div class="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 relative">
+                <div class="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 relative gap-1">
                     <button onclick="switchTab('chat')" id="tab-btn-chat"
                         class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300">
                         <span class="material-symbols-outlined text-[16px]">forum</span> Live Chat
@@ -297,22 +297,32 @@
                 <div>
                     <h2 class="font-bold text-lg flex items-center gap-2"><span
                             class="material-symbols-outlined text-primary">database</span> Database Ilmu Bot</h2>
-                    <p class="text-xs text-slate-500 font-medium">Kelola topik dan jawaban yang sudah dipelajari Asisten
-                        Virtual.</p>
+                    <p class="text-xs text-slate-500 font-medium">Kelola topik NLU dan Dokumen RAG Asisten Virtual.</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="fetchKnowledgeBase()"
-                        class="p-2 text-slate-500 hover:text-primary rounded-lg transition-all"
-                        title="Segarkan Data"><span class="material-symbols-outlined">refresh</span></button>
-                    <button onclick="openTrainModal(true)"
-                        class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md active:scale-95 transition-all">
-                        <span class="material-symbols-outlined text-bot-cyan text-[18px]">add_circle</span> Tambah Ilmu
-                        Baru
+                
+                <!-- Sub Menu Navigasi -->
+                <div class="flex items-center bg-slate-100 p-1 rounded-xl shadow-sm border border-slate-200">
+                    <button id="subtab-btn-nlu" onclick="switchSubTab('nlu')" class="px-4 py-2 text-xs font-bold bg-white text-primary rounded-lg shadow-sm transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">psychology</span> Topik NLU
+                    </button>
+                    <button id="subtab-btn-rag" onclick="switchSubTab('rag')" class="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span> Dokumen (PDF)
                     </button>
                 </div>
             </header>
 
-            <div id="knowledge-scroll-container" class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar relative">
+            <!-- KONTEN SUB-PAGE NLU (Rasa) -->
+            <div id="subpage-nlu" class="flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-28 custom-scrollbar relative flex flex-col">
+                <div class="flex items-center justify-end gap-3 mb-4">
+                    <button onclick="fetchKnowledgeBase()"
+                        class="p-2 text-slate-500 hover:text-primary rounded-lg transition-all border border-transparent hover:border-slate-200 hover:bg-white"
+                        title="Segarkan Data"><span class="material-symbols-outlined">refresh</span></button>
+                    <button onclick="openTrainModal(true)"
+                        class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-bot-cyan text-[16px]">add_circle</span> Tambah Ilmu
+                    </button>
+                </div>
+
                 <div id="train-warning-alert"
                     class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 shadow-sm hidden items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -344,7 +354,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden shrink-0">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr
@@ -361,6 +371,90 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- KONTEN SUB-PAGE RAG (Dokumen PDF) -->
+            <div id="subpage-rag" class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar relative hidden flex-col">
+                
+                <!-- START: STATISTIK TOKEN LLM -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Groq Card -->
+                    <div id="card-groq" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg material-symbols-outlined text-[18px]">bolt</span>
+                                <h3 class="font-bold text-slate-800 text-sm">Groq Llama 3.1 8B</h3>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase bg-slate-100 text-slate-500 px-2 py-1 rounded">Primary</span>
+                        </div>
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-xs text-slate-500">Pemakaian Hari Ini</span>
+                            <span class="text-xs font-bold text-slate-700"><span id="groq-usage">0</span> / 100K Token</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div id="groq-progress" class="bg-orange-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div id="groq-limit-warning" class="mt-2 hidden">
+                            <p class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold animate-pulse inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">warning</span> Limit Tercapai!</p>
+                        </div>
+                    </div>
+
+                    <!-- Gemini Card -->
+                    <div id="card-gemini" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-blue-100 text-blue-600 p-1.5 rounded-lg material-symbols-outlined text-[18px]">auto_awesome</span>
+                                <h3 class="font-bold text-slate-800 text-sm">Gemini 2.0 Flash</h3>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase bg-slate-100 text-slate-500 px-2 py-1 rounded">Fallback</span>
+                        </div>
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-xs text-slate-500">Pemakaian Hari Ini</span>
+                            <span class="text-xs font-bold text-slate-700"><span id="gemini-usage">0</span> / 1M Token</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div id="gemini-progress" class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div id="gemini-limit-warning" class="mt-2 hidden">
+                            <p class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold animate-pulse inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">warning</span> Limit Tercapai!</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- END: STATISTIK TOKEN LLM -->
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+                    <div class="flex flex-col mb-6">
+                        <div class="w-full border border-dashed border-slate-300 rounded-xl p-8 bg-slate-50 relative group hover:border-purple-400 transition-colors">
+                            <label for="pdf-upload" class="cursor-pointer flex flex-col items-center justify-center gap-4">
+                                <span class="material-symbols-outlined text-5xl text-slate-400 group-hover:text-purple-500 transition-colors">upload_file</span>
+                                <div class="text-center">
+                                    <span class="text-base font-bold text-slate-600 group-hover:text-purple-600 block">Klik untuk Unggah Berkas PDF</span>
+                                    <span class="text-xs text-slate-500 mt-1">Maksimal 1 PDF sekali unggah (Isi teks akan otomatis diekstrak)</span>
+                                </div>
+                            </label>
+                            <input type="file" id="pdf-upload" accept="application/pdf" class="hidden" onchange="handlePDFUpload(event)">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-3 border-b pb-2">
+                        <h3 class="font-bold text-slate-800 text-sm">Daftar Dokumen yang Telah Dipelajari</h3>
+                        <span class="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full shadow-sm">Total Terpakai: <span id="total-docs-size">0 KB</span></span>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden shrink-0">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-3 pl-4 font-bold">Nama File / Referensi</th>
+                                    <th class="p-3 font-bold w-28">Ukuran</th>
+                                    <th class="p-3 font-bold text-center w-20">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docs-table-body" class="text-sm divide-y divide-slate-100">
+                                <tr><td colspan="3" class="p-4 text-center text-slate-400">Belum ada dokumen eksternal.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -579,7 +673,6 @@
         // ==========================================
         function logoutAdmin() { openConfirmModal('Keluar', 'Yakin ingin keluar dari Dashboard?', () => { localStorage.removeItem('bps_admin_token'); window.location.replace('/login'); }); }
 
-        // 👇 PERBAIKAN ANIMASI SWITCH TAB 👇
         function switchTab(tab) {
             const btnChat = document.getElementById('tab-btn-chat');
             const btnKnowledge = document.getElementById('tab-btn-knowledge');
@@ -599,18 +692,58 @@
                 document.getElementById('sidebar-chat-area').classList.add('hidden');
                 document.getElementById('sidebar-guide-area').classList.remove('hidden');
 
-                btnKnowledge.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300";
                 btnChat.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-300";
-
+                btnKnowledge.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300";
+                
                 fetchKnowledgeBase();
                 if (isDataChanged) { 
                     document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); 
                 }
             }
         }
+
+        // FUNGSI SWITCH SUB-TAB
+        function switchSubTab(subtab) {
+            const btnNlu = document.getElementById('subtab-btn-nlu');
+            const btnRag = document.getElementById('subtab-btn-rag');
+            const pageNlu = document.getElementById('subpage-nlu');
+            const pageRag = document.getElementById('subpage-rag');
+            const trainReminderBtn = document.getElementById('floating-train-reminder');
+
+            const activeClass = "px-4 py-2 text-xs font-bold bg-white text-primary rounded-lg shadow-sm transition-all flex items-center gap-2";
+            const inactiveClass = "px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all flex items-center gap-2";
+
+            if(subtab === 'nlu') {
+                pageNlu.classList.remove('hidden');
+                pageNlu.classList.add('flex');
+                pageRag.classList.add('hidden');
+                pageRag.classList.remove('flex');
+                
+                btnNlu.className = activeClass;
+                btnRag.className = inactiveClass;
+
+                // Tampilkan floating button jika data NLU berubah
+                if (isDataChanged) trainReminderBtn.style.display = 'flex';
+            } else {
+                pageRag.classList.remove('hidden');
+                pageRag.classList.add('flex');
+                pageNlu.classList.add('hidden');
+                pageNlu.classList.remove('flex');
+
+                btnRag.className = activeClass;
+                btnNlu.className = inactiveClass;
+
+                // Sembunyikan floating button di halaman RAG
+                trainReminderBtn.style.display = 'none';
+
+                // Fetch ulang data agar up-to-date
+                fetchExternalDocs();
+                fetchTokenUsage();
+            }
+        }
         
         // Cek Scroll Posisi untuk Nunjukin FAB
-        document.getElementById('knowledge-scroll-container').addEventListener('scroll', function() {
+        document.getElementById('subpage-nlu').addEventListener('scroll', function() {
             const fab = document.getElementById('floating-train-reminder');
             if (isDataChanged && this.scrollTop > 100) {
                 fab.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
@@ -962,6 +1095,152 @@
         });
 
         document.getElementById('send-btn').addEventListener('click', sendMessage); document.getElementById('admin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+        // ==========================================
+        // 📚 DOKUMEN EKSTERNAL RAG (PDF)
+        // ==========================================
+        async function fetchExternalDocs() {
+            try {
+                const res = await fetch('/api/bot/docs', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                const docs = await res.json();
+                const tbody = document.getElementById('docs-table-body');
+                const totalSizeEl = document.getElementById('total-docs-size');
+                
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                
+                if (docs.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">Belum ada dokumen eksternal.</td></tr>`;
+                    if(totalSizeEl) totalSizeEl.innerText = "0 KB";
+                    return;
+                }
+                
+                let totalBytes = 0;
+                
+                docs.forEach(doc => {
+                    // Konversi size format kembali ke bytes kasar untuk perhitungan (Misal "1.5 MB" -> 1500000)
+                    const sizeMatch = doc.size.match(/([\d.]+)\s+(KB|MB|GB|Bytes)/i);
+                    if(sizeMatch) {
+                        let val = parseFloat(sizeMatch[1]);
+                        let unit = sizeMatch[2].toUpperCase();
+                        if(unit === 'KB') val *= 1024;
+                        else if(unit === 'MB') val *= 1024 * 1024;
+                        else if(unit === 'GB') val *= 1024 * 1024 * 1024;
+                        totalBytes += val;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="p-3 pl-4 text-slate-700 font-medium break-all flex items-center gap-2"><span class="material-symbols-outlined text-slate-400 text-[18px]">picture_as_pdf</span> ${doc.filename}</td>
+                        <td class="p-3 text-slate-500 text-xs">${doc.size}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteExternalDoc('${doc.filename}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 hover:bg-red-100 rounded transition-colors" title="Hapus">
+                                <span class="material-symbols-outlined text-[16px]">delete</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                if(totalSizeEl) {
+                    if(totalBytes < 1024) totalSizeEl.innerText = totalBytes + ' Bytes';
+                    else if(totalBytes < 1048576) totalSizeEl.innerText = (totalBytes / 1024).toFixed(1) + ' KB';
+                    else totalSizeEl.innerText = (totalBytes / 1048576).toFixed(2) + ' MB';
+                }
+
+            } catch (err) { console.error("Gagal load docs:", err); }
+        }
+
+        async function handlePDFUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const btnLabel = event.target.previousElementSibling.querySelector('.font-bold');
+            const originalText = btnLabel.innerText;
+            btnLabel.innerText = "Mengunggah...";
+            
+            try {
+                const res = await fetch('/api/bot/upload-pdf', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${adminToken}` },
+                    body: formData
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    showToastAlert('✅ Berhasil', data.message);
+                    fetchExternalDocs();
+                } else {
+                    showToastAlert('❌ Gagal', data.error || 'Terjadi kesalahan sistem.');
+                }
+            } catch (err) {
+                showToastAlert('❌ Gagal', 'Koneksi ke server terputus.');
+            } finally {
+                btnLabel.innerText = originalText;
+                event.target.value = ''; // reset
+            }
+        }
+
+        async function deleteExternalDoc(filename) {
+            openConfirmModal('Hapus Dokumen?', `Dokumen "${filename}" akan dilupakan oleh AI. Yakin?`, async () => {
+                try {
+                    const res = await fetch(`/api/bot/docs/${encodeURIComponent(filename)}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+                    if (res.ok) {
+                        showToastAlert('🗑️ Terhapus', 'Dokumen berhasil dihapus.');
+                        fetchExternalDocs();
+                    }
+                } catch(e) { showToastAlert('❌ Gagal', 'Gagal menghubungi server.'); }
+            });
+        }
+
+        async function fetchTokenUsage() {
+            try {
+                const res = await fetch('/api/bot/token-usage', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                if(!res.ok) return;
+                const data = await res.json();
+                
+                const GROQ_LIMIT = 100000;
+                const GEMINI_LIMIT = 1000000;
+                
+                document.getElementById('groq-usage').innerText = data.groq.toLocaleString();
+                document.getElementById('gemini-usage').innerText = data.gemini.toLocaleString();
+                
+                let groqPct = (data.groq / GROQ_LIMIT) * 100;
+                let geminiPct = (data.gemini / GEMINI_LIMIT) * 100;
+                
+                if (groqPct > 100) groqPct = 100;
+                if (geminiPct > 100) geminiPct = 100;
+                
+                document.getElementById('groq-progress').style.width = groqPct + '%';
+                document.getElementById('gemini-progress').style.width = geminiPct + '%';
+                
+                // Visual Limit Tercapai untuk Groq
+                if (groqPct >= 100) {
+                    document.getElementById('groq-progress').classList.replace('bg-orange-500', 'bg-red-500');
+                    document.getElementById('card-groq').classList.add('border-red-300', 'bg-red-50');
+                    document.getElementById('groq-limit-warning').classList.remove('hidden');
+                }
+                
+                // Visual Limit Tercapai untuk Gemini
+                if (geminiPct >= 100) {
+                    document.getElementById('gemini-progress').classList.replace('bg-blue-500', 'bg-red-500');
+                    document.getElementById('card-gemini').classList.add('border-red-300', 'bg-red-50');
+                    document.getElementById('gemini-limit-warning').classList.remove('hidden');
+                }
+                
+            } catch(e) { console.error('Gagal load token usage:', e); }
+        }
+
+        // Initialize Fetching RAG
+        fetchExternalDocs();
+        fetchTokenUsage();
     </script>
 </body>
 

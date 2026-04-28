@@ -31,7 +31,7 @@ responses:
   utter_tanya_arti_logo:
     - text: <b>Arti Logo BPS</b><br>Logo pada Badan Pusat Statistik memiliki warna biru, hijau dan orange dan disetiap warna memiliki arti khusus, yaitu :<br><b>Biru</b><br><i>Melambangkan kegiatan sensus penduduk yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 0 (nol).</i><br><b>Hijau</b><br><i>Melambangkan kegiatan sensus pertanian yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 3 (tiga).</i><br><b>Orange</b><br><i>Melambangkan kegiatan sensus ekonomi yang dilakukan sepuluh tahun sekali pada setiap tahun yang berakhiran angka 6 (enam).</i>
   utter_tanya_sensus_ekonomi:
-    - text: Sensus terakhir dilaksanakan pada tahun 2020. Dan untuk tahun ini akan ada sensus ekonomi 2026 (SE2026) yang merupakan sensus ekonomi ke-5 loh🤩. Untuk informasi lebih lanjut mengenai sensus ekonomi, Anda bisa melihat di website resmi BPS.
+    - text: Terkait Sensus terakhir dilaksanakan pada tahun 2020. Dan untuk tahun ini akan ada sensus ekonomi 2026 (SE2026) yang merupakan sensus ekonomi ke-5 loh🤩. Untuk informasi lebih lanjut mengenai sensus ekonomi, Anda bisa melihat di website resmi BPS.
   utter_pilihan_admin:
     - text: |
         Baik, Silakan pilih bagaimana Anda ingin menghubungi petugas BPS kami😊:<br><br>

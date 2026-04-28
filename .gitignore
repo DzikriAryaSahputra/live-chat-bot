@@ -7,8 +7,20 @@ rasa-bot/.rasa/
 rasa-bot/models/
 __pycache__/
 
+# Dinamis & Uploads (Backend)
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/knowledge_docs/*
+!backend/knowledge_docs/.gitkeep
+backend/token_usage.json
+
 # Keamanan
 .env
 
 # Testing File (Lokal Saja)
 test_iframe.html
+
+# OS Cache & Logs
+.DS_Store
+Thumbs.db
+*.log
