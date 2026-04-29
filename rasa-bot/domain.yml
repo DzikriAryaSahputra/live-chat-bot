@@ -15,8 +15,6 @@ intents:
   - tanya_jam_operasional
   - tanya_tabel_dinamis
   - tanya_jumlah_umkm
-actions:
-  - action_cari_website_bps
 responses:
   utter_sapaan:
     - text: Halo! 😊 Saya SISCA, siap membantu Anda menemukan data dan informasi yang dibutuhkan. Ada yang ingin ditanyakan?

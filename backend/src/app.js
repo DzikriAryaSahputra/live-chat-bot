@@ -35,10 +35,51 @@ const PROTECTED_DIR = path.join(__dirname, '../../frontend/protected');
 const KNOWLEDGE_DOCS_DIR = path.join(__dirname, '../knowledge_docs');
 const UPLOADS_DIR = path.join(__dirname, '../uploads');
 const TOKEN_USAGE_FILE = path.join(__dirname, '../token_usage.json');
+const EMBEDDINGS_FILE = path.join(__dirname, '../knowledge_docs/embeddings.json');
 
 // Pastikan folder dinamis otomatis terbuat jika belum ada di server
 if (!fs.existsSync(KNOWLEDGE_DOCS_DIR)) fs.mkdirSync(KNOWLEDGE_DOCS_DIR, { recursive: true });
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+// ==========================================
+// 🧮 HELPER UNTUK TRUE RAG (MINI VECTOR DB)
+// ==========================================
+function cosineSimilarity(vecA, vecB) {
+    let dotProduct = 0; let normA = 0; let normB = 0;
+    for (let i = 0; i < vecA.length; i++) {
+        dotProduct += vecA[i] * vecB[i];
+        normA += vecA[i] * vecA[i];
+        normB += vecB[i] * vecB[i];
+    }
+    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+function chunkText(text, chunkSize = 800, overlap = 100) {
+    const chunks = [];
+    let i = 0;
+    while (i < text.length) {
+        chunks.push(text.slice(i, i + chunkSize));
+        i += chunkSize - overlap;
+    }
+    return chunks;
+}
+
+async function generateEmbedding(text) {
+    try {
+        if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY tidak ditemukan");
+        const res = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent?key=${process.env.GEMINI_API_KEY}`,
+            {
+                model: "models/gemini-embedding-2",
+                content: { parts: [{ text: text }] }
+            }
+        );
+        return res.data.embedding.values;
+    } catch (e) {
+        console.error("Gagal generate embedding:", e.message);
+        return null;
+    }
+}
 
 // Melayani file statis (CSS, JS, Gambar)
 app.use(express.static(PUBLIC_DIR));
@@ -103,31 +144,37 @@ async function broadcastUserList() {
 // ==========================================
 // 🧠 FUNGSI HYBRID RAG (GROQ & GEMINI FALLBACK)
 // ==========================================
-async function getKnowledgeBaseContext() {
+async function getKnowledgeBaseContext(userMessage) {
     try {
         const nluData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'data/nlu.yml'), 'utf8'));
         const domainData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'domain.yml'), 'utf8'));
         if (!nluData || !nluData.nlu) return '';
 
-        let baseKnowledge = nluData.nlu.map(item => {
-            const utterName = `utter_${item.intent}`;
-            const answer = (domainData.responses && domainData.responses[utterName]) ? domainData.responses[utterName][0].text : '-';
-            return `[Topik: ${item.intent}]\nPertanyaan Warga: ${item.examples.trim().replace(/\n/g, ' | ')}\nJawaban Bot: ${answer}`;
-        }).join('\n\n');
-
         let externalDocs = '';
-        if (fs.existsSync(KNOWLEDGE_DOCS_DIR)) {
-            const files = fs.readdirSync(KNOWLEDGE_DOCS_DIR).filter(f => f.endsWith('.txt'));
-            for (const file of files) {
-                const content = fs.readFileSync(path.join(KNOWLEDGE_DOCS_DIR, file), 'utf8');
-                externalDocs += `\n\n--- DOKUMEN [${file}] ---\n${content.substring(0, 3000)}`;
+        if (fs.existsSync(EMBEDDINGS_FILE) && userMessage) {
+            const existingEmbeddings = JSON.parse(fs.readFileSync(EMBEDDINGS_FILE, 'utf8'));
+            if (existingEmbeddings.length > 0) {
+                const userVec = await generateEmbedding(userMessage);
+                if (userVec) {
+                    const scoredChunks = existingEmbeddings.map(e => ({
+                        text: e.text,
+                        fileName: e.txtFileName,
+                        score: cosineSimilarity(userVec, e.vector)
+                    }));
+                    // Urutkan berdasarkan skor tertinggi
+                    scoredChunks.sort((a, b) => b.score - a.score);
+                    // Ambil Top 2 chunks
+                    const topChunks = scoredChunks.slice(0, 2);
+                    for (const chunk of topChunks) {
+                        externalDocs += `\n\n--- DOKUMEN [${chunk.fileName}] (Relevansi: ${(chunk.score * 100).toFixed(1)}%) ---\n${chunk.text}`;
+                    }
+                }
             }
         }
 
-        // Limit TOTAL pengetahuan agar tidak melampaui 6000 Token (Groq Free Tier)
-        // 6000 token = ~24.000 karakter. Kita limit base+external maksimal 12.000 karakter.
-        const combined = baseKnowledge + externalDocs;
-        return combined.length > 12000 ? combined.substring(0, 12000) + "\n...[DIPOTONG KARENA LIMIT TOKEN]" : combined;
+        // Limit TOTAL pengetahuan agar tidak melampaui batas (jaga-jaga)
+        const combined = externalDocs;
+        return combined.length > 6000 ? combined.substring(0, 6000) + "\n...[DIPOTONG KARENA LIMIT]" : combined;
     } catch (e) {
         console.error('Gagal membaca Knowledge Base untuk RAG:', e.message);
         return '';
@@ -139,7 +186,7 @@ function trackTokenUsage(model, tokens) {
     try {
         const today = new Date().toISOString().split('T')[0];
         let usageData = { date: today, groq: 0, gemini: 0 };
-        
+
         if (fs.existsSync(TOKEN_USAGE_FILE)) {
             const raw = fs.readFileSync(TOKEN_USAGE_FILE, 'utf8');
             usageData = JSON.parse(raw);
@@ -148,18 +195,18 @@ function trackTokenUsage(model, tokens) {
                 usageData = { date: today, groq: 0, gemini: 0 };
             }
         }
-        
+
         if (model === 'groq') usageData.groq += tokens;
         if (model === 'gemini') usageData.gemini += tokens;
-        
+
         fs.writeFileSync(TOKEN_USAGE_FILE, JSON.stringify(usageData, null, 2));
-    } catch(err) {
+    } catch (err) {
         console.error("Gagal mencatat pemakaian token:", err.message);
     }
 }
 
 async function generateLLMResponse(userMessage) {
-    const knowledgeStr = await getKnowledgeBaseContext();
+    const knowledgeStr = await getKnowledgeBaseContext(userMessage);
     const systemPrompt = `Anda adalah Asisten Virtual BPS Kota Jambi bernama SISCA.
 TUGAS UTAMA ANDA: Menjawab pertanyaan warga dengan cerdas, ramah, dan solutif HANYA berdasarkan informasi pada "DOKUMEN PENGETAHUAN BPS" (termasuk Dokumen Eksternal) di bawah ini.
 DILARANG KERAS berhalusinasi atau memberikan informasi angka/fakta yang tidak tertulis pada dokumen di bawah ini.
@@ -180,7 +227,7 @@ ${knowledgeStr}
 
             if (groqRes.data && groqRes.data.choices) {
                 console.log("🤖 Respons RAG dikembalikan oleh: GROQ");
-                if(groqRes.data.usage && groqRes.data.usage.total_tokens) {
+                if (groqRes.data.usage && groqRes.data.usage.total_tokens) {
                     trackTokenUsage('groq', groqRes.data.usage.total_tokens);
                 }
                 return groqRes.data.choices[0].message.content;
@@ -200,7 +247,7 @@ ${knowledgeStr}
 
             if (geminiRes.data && geminiRes.data.candidates) {
                 console.log("🤖 Respons RAG dikembalikan oleh: GEMINI (Fallback)");
-                if(geminiRes.data.usageMetadata && geminiRes.data.usageMetadata.totalTokenCount) {
+                if (geminiRes.data.usageMetadata && geminiRes.data.usageMetadata.totalTokenCount) {
                     trackTokenUsage('gemini', geminiRes.data.usageMetadata.totalTokenCount);
                 }
                 return geminiRes.data.candidates[0].content.parts[0].text;
@@ -263,7 +310,7 @@ io.on('connection', (socket) => {
 
         try {
             // 1. PARSE INTENT KE RASA UNTUK MELIHAT TINGKAT KEPERCAYAAN (CONFIDENCE)
-            const parseRes = await axios.post('http://localhost:5005/model/parse', { text: message });
+            const parseRes = await axios.post('http://localhost:5005/model/parse', { text: message }, { timeout: 5000 });
             const intentName = parseRes.data.intent.name;
             const confidence = parseRes.data.intent.confidence;
 
@@ -271,7 +318,7 @@ io.on('connection', (socket) => {
 
             // 2. JIKA CONFIDENCE >= 85% DAN BUKAN FALLBACK, BIARKAN RASA YANG MENJAWAB
             if (intentName !== 'nlu_fallback' && confidence >= 0.85) {
-                const rasaResponse = await axios.post('http://localhost:5005/webhooks/rest/webhook', { sender: senderId, message: message });
+                const rasaResponse = await axios.post('http://localhost:5005/webhooks/rest/webhook', { sender: senderId, message: message }, { timeout: 5000 });
                 if (rasaResponse.data && rasaResponse.data.length > 0) {
                     botReply = rasaResponse.data[0].text;
                 }
@@ -288,7 +335,7 @@ io.on('connection', (socket) => {
                 await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'bot', botReply]);
                 io.emit('receive_message', { senderId: senderId, message: botReply, senderType: 'bot' });
 
-                if (botReply.toLowerCase().includes('meneruskan pesan') || botReply.toLowerCase().includes('petugas asli')) {
+                if (botReply.toLowerCase().includes('meneruskan pesan')) {
                     activeSessions[senderId] = 'admin';
                 }
                 socket.emit('bot_response', { message: botReply });
@@ -543,6 +590,26 @@ app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (r
         fs.writeFileSync(safePath, `[SUMBER: ${req.file.originalname}]\n${rawText}`);
         fs.unlinkSync(req.file.path); // Hapus file temporary
 
+        // === PROSES TRUE RAG: CHUNKING & EMBEDDING ===
+        const chunks = chunkText(rawText);
+        let existingEmbeddings = [];
+        if (fs.existsSync(EMBEDDINGS_FILE)) {
+            existingEmbeddings = JSON.parse(fs.readFileSync(EMBEDDINGS_FILE, 'utf8'));
+        }
+
+        for (const chunk of chunks) {
+            const vec = await generateEmbedding(chunk);
+            if (vec) {
+                existingEmbeddings.push({
+                    txtFileName: fileName,
+                    text: chunk,
+                    vector: vec
+                });
+            }
+        }
+        fs.writeFileSync(EMBEDDINGS_FILE, JSON.stringify(existingEmbeddings));
+        // ===========================================
+
         res.json({ message: 'PDF berhasil disuntikkan ke otak bot!' });
     } catch (err) {
         if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
@@ -581,9 +648,18 @@ app.get('/api/bot/token-usage', authenticateJWT, (req, res) => {
 
 app.delete('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
     try {
-        const safePath = path.join(KNOWLEDGE_DOCS_DIR, req.params.filename);
+        const targetFilename = req.params.filename.endsWith('.txt') ? req.params.filename : req.params.filename + '.txt';
+        const safePath = path.join(KNOWLEDGE_DOCS_DIR, targetFilename);
         if (fs.existsSync(safePath)) {
             fs.unlinkSync(safePath);
+
+            // Hapus juga vektor dari embeddings.json
+            if (fs.existsSync(EMBEDDINGS_FILE)) {
+                let existingEmbeddings = JSON.parse(fs.readFileSync(EMBEDDINGS_FILE, 'utf8'));
+                existingEmbeddings = existingEmbeddings.filter(e => e.txtFileName !== targetFilename);
+                fs.writeFileSync(EMBEDDINGS_FILE, JSON.stringify(existingEmbeddings));
+            }
+
             res.json({ message: 'Dokumen dilupakan.' });
         } else {
             res.status(404).json({ error: 'Dokumen tidak ditemukan.' });

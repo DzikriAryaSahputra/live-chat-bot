@@ -40,3 +40,22 @@ Kini *chatbot* sudah dirancang sepenuhnya menggunakan sistem **Skrip Injektor Di
 ### 📝 Catatan Penting Parameter Kode:
 - `src="https://domaintarget.go.id/widget.js"` 👉 **Wajib diubah** dengan URL Production/Server aplikasi Node.js chatbot ini di BPS Jambi. Saat diuji lokalan, Anda bisa menggunakan `src="http://localhost:3000/widget.js"`.
 - Anda tidak perlu memusingkan `z-index` atau ukuran layar iframe secara manual. Skrip `widget.js` secara otomatis akan melahirkan kotak Iframe transparan yang akan **membesar** ketika di-klik dan **mengecil** kembali saat *chat* ditutup. Dengan ini, kursor warga 100% aman mengklik berbagai tombol BPS di belakangnya!
+
+---
+
+## 🧠 Panduan Manajemen NLU (Khusus Admin BPS)
+
+Agar chatbot merespon dengan cerdas dan tidak tumpang tindih antara "Pengetahuan Dasar (NLU)" dan "Dokumen PDF (LLM RAG)", Admin BPS wajib mematuhi **3 Aturan Emas NLU** berikut saat menambahkan topik baru di Dashboard:
+
+1. **Berikan Variasi Kalimat, Bukan Sekadar Pengulangan**
+   Berikan variasi gaya bahasa asli manusia, bukan sekadar mengubah urutan kata.
+   - ❌ *Kurang Bagus:* "apa visi misi bps", "apa visi misi bps jambi"
+   - ✅ *Sangat Bagus:* "apa visi misi bps", "tujuan utama instansi ini apa", "minta info visi misi dong"
+   *(Saran: Masukkan minimal 10-15 contoh per topik)*
+
+2. **Gunakan Kata Kunci yang Sangat Spesifik (Unik)**
+   Setiap topik/intent harus memiliki "identitas kata" yang kuat.
+   - *Contoh:* Untuk topik **Sensus Ekonomi**, pastikan selalu menyertakan kata kunci "sensus", "ekonomi", atau "SE2026". Jangan gunakan angka acak seperti "2026" saja.
+
+3. **Hindari Topik "Sapu Jagat" (Kelewat Umum)**
+   Jangan membuat topik NLU yang bertugas merespons kata-kata generik (seperti sekadar *"data"*, *"angka"*, atau *"info"*). Biarkan pertanyaan berbasis data ditangani langsung oleh AI dengan membaca Dokumen PDF. Topik NLU sebaiknya difokuskan pada informasi statis (seperti: profil, alamat, jam operasional, link aplikasi).

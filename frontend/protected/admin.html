@@ -180,6 +180,23 @@
 
                     <div
                         class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-xs text-bot-cyan mb-2 flex items-center gap-1"><span
+                                class="material-symbols-outlined text-[14px]">psychology</span> 3 Aturan Emas NLU</h3>
+                        <ul
+                            class="text-[11px] text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 leading-relaxed">
+                            <li><b>Variasi Kaya:</b> Masukkan 10-15 variasi gaya bahasa untuk setiap topik, jangan
+                                sekadar mengulang kata yang sama.</li>
+                            <li><b>Kata Kunci Spesifik:</b> Gunakan kata kunci identitas yang unik (contoh: "SE2026"
+                                untuk topik Sensus Ekonomi).</li>
+                            <li><b>Hindari Kata Umum:</b> JANGAN buat topik yang diisi kalimat terlalu luas seperti
+                                "cari data" atau "angka". Biarkan pertanyaan seputar data dijawab otomatis oleh LLM
+                                (RAG).</li>
+                            <li><b>Format Topik:</b> Dilarang pakai spasi (gunakan_garis_bawah).</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
                         <h3 class="font-bold text-xs text-green-500 mb-2 flex items-center gap-1"><span
                                 class="material-symbols-outlined text-[14px]">model_training</span> Pelatihan Ulang</h3>
                         <ul
@@ -232,7 +249,8 @@
                         <h2 class="font-bold text-base" id="active-user-title">Pilih Obrolan</h2>
                         <div class="flex items-center gap-2 hidden" id="header-status-container">
                             <span id="header-status-dot" class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                            <span id="header-status-text" class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">Menunggu</span>
+                            <span id="header-status-text"
+                                class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">Menunggu</span>
                         </div>
                     </div>
                 </div>
@@ -272,9 +290,11 @@
 
                 <div
                     class="max-w-4xl mx-auto w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-2 flex items-center gap-2">
-                    
+
                     <!-- NEW: Tombol Modul Link untuk Chat -->
-                    <button type="button" onclick="openLinkModal('admin-input')" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all shrink-0" title="Sisipkan Tautan Khusus">
+                    <button type="button" onclick="openLinkModal('admin-input')"
+                        class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all shrink-0"
+                        title="Sisipkan Tautan Khusus">
                         <span class="material-symbols-outlined">link</span>
                     </button>
 
@@ -297,22 +317,25 @@
                 <div>
                     <h2 class="font-bold text-lg flex items-center gap-2"><span
                             class="material-symbols-outlined text-primary">database</span> Database Ilmu Bot</h2>
-                    <p class="text-xs text-slate-500 font-medium">Kelola topik NLU dan Dokumen RAG Asisten Virtual.</p>
+                    <p class="text-xs text-slate-500 font-medium">Kelola topik NLU dan LLM RAG Asisten Virtual.</p>
                 </div>
-                
+
                 <!-- Sub Menu Navigasi -->
                 <div class="flex items-center bg-slate-100 p-1 rounded-xl shadow-sm border border-slate-200">
-                    <button id="subtab-btn-nlu" onclick="switchSubTab('nlu')" class="px-4 py-2 text-xs font-bold bg-white text-primary rounded-lg shadow-sm transition-all flex items-center gap-2">
+                    <button id="subtab-btn-nlu" onclick="switchSubTab('nlu')"
+                        class="px-4 py-2 text-xs font-bold bg-white text-primary rounded-lg shadow-sm transition-all flex items-center gap-2">
                         <span class="material-symbols-outlined text-[16px]">psychology</span> Topik NLU
                     </button>
-                    <button id="subtab-btn-rag" onclick="switchSubTab('rag')" class="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span> Dokumen (PDF)
+                    <button id="subtab-btn-rag" onclick="switchSubTab('rag')"
+                        class="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span> LLM (PDF)
                     </button>
                 </div>
             </header>
 
             <!-- KONTEN SUB-PAGE NLU (Rasa) -->
-            <div id="subpage-nlu" class="flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-28 custom-scrollbar relative flex flex-col">
+            <div id="subpage-nlu"
+                class="flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-28 custom-scrollbar relative flex flex-col">
                 <div class="flex items-center justify-end gap-3 mb-4">
                     <button onclick="fetchKnowledgeBase()"
                         class="p-2 text-slate-500 hover:text-primary rounded-lg transition-all border border-transparent hover:border-slate-200 hover:bg-white"
@@ -376,48 +399,64 @@
 
             <!-- KONTEN SUB-PAGE RAG (Dokumen PDF) -->
             <div id="subpage-rag" class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar relative hidden flex-col">
-                
+
                 <!-- START: STATISTIK TOKEN LLM -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <!-- Groq Card -->
-                    <div id="card-groq" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
+                    <div id="card-groq"
+                        class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg material-symbols-outlined text-[18px]">bolt</span>
+                                <span
+                                    class="bg-orange-100 text-orange-600 p-1.5 rounded-lg material-symbols-outlined text-[18px]">bolt</span>
                                 <h3 class="font-bold text-slate-800 text-sm">Groq Llama 3.1 8B</h3>
                             </div>
-                            <span class="text-[10px] font-bold uppercase bg-slate-100 text-slate-500 px-2 py-1 rounded">Primary</span>
+                            <span
+                                class="text-[10px] font-bold uppercase bg-slate-100 text-slate-500 px-2 py-1 rounded">Primary</span>
                         </div>
                         <div class="flex justify-between items-end mb-1">
                             <span class="text-xs text-slate-500">Pemakaian Hari Ini</span>
-                            <span class="text-xs font-bold text-slate-700"><span id="groq-usage">0</span> / 100K Token</span>
+                            <span class="text-xs font-bold text-slate-700"><span id="groq-usage">0</span> / 100K
+                                Token</span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div id="groq-progress" class="bg-orange-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            <div id="groq-progress" class="bg-orange-500 h-2 rounded-full transition-all duration-500"
+                                style="width: 0%"></div>
                         </div>
                         <div id="groq-limit-warning" class="mt-2 hidden">
-                            <p class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold animate-pulse inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">warning</span> Limit Tercapai!</p>
+                            <p
+                                class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold animate-pulse inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[12px]">warning</span> Limit Tercapai!
+                            </p>
                         </div>
                     </div>
 
                     <!-- Gemini Card -->
-                    <div id="card-gemini" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
+                    <div id="card-gemini"
+                        class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="bg-blue-100 text-blue-600 p-1.5 rounded-lg material-symbols-outlined text-[18px]">auto_awesome</span>
+                                <span
+                                    class="bg-blue-100 text-blue-600 p-1.5 rounded-lg material-symbols-outlined text-[18px]">auto_awesome</span>
                                 <h3 class="font-bold text-slate-800 text-sm">Gemini 2.0 Flash</h3>
                             </div>
-                            <span class="text-[10px] font-bold uppercase bg-slate-100 text-slate-500 px-2 py-1 rounded">Fallback</span>
+                            <span
+                                class="text-[10px] font-bold uppercase bg-slate-100 text-slate-500 px-2 py-1 rounded">Fallback</span>
                         </div>
                         <div class="flex justify-between items-end mb-1">
                             <span class="text-xs text-slate-500">Pemakaian Hari Ini</span>
-                            <span class="text-xs font-bold text-slate-700"><span id="gemini-usage">0</span> / 1M Token</span>
+                            <span class="text-xs font-bold text-slate-700"><span id="gemini-usage">0</span> / 1M
+                                Token</span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div id="gemini-progress" class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            <div id="gemini-progress" class="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                                style="width: 0%"></div>
                         </div>
                         <div id="gemini-limit-warning" class="mt-2 hidden">
-                            <p class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold animate-pulse inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">warning</span> Limit Tercapai!</p>
+                            <p
+                                class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold animate-pulse inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[12px]">warning</span> Limit Tercapai!
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -425,25 +464,35 @@
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
                     <div class="flex flex-col mb-6">
-                        <div class="w-full border border-dashed border-slate-300 rounded-xl p-8 bg-slate-50 relative group hover:border-purple-400 transition-colors">
-                            <label for="pdf-upload" class="cursor-pointer flex flex-col items-center justify-center gap-4">
-                                <span class="material-symbols-outlined text-5xl text-slate-400 group-hover:text-purple-500 transition-colors">upload_file</span>
+                        <div
+                            class="w-full border border-dashed border-slate-300 rounded-xl p-8 bg-slate-50 relative group hover:border-purple-400 transition-colors">
+                            <label for="pdf-upload"
+                                class="cursor-pointer flex flex-col items-center justify-center gap-4">
+                                <span
+                                    class="material-symbols-outlined text-5xl text-slate-400 group-hover:text-purple-500 transition-colors">upload_file</span>
                                 <div class="text-center">
-                                    <span class="text-base font-bold text-slate-600 group-hover:text-purple-600 block">Klik untuk Unggah Berkas PDF</span>
-                                    <span class="text-xs text-slate-500 mt-1">Maksimal 1 PDF sekali unggah (Isi teks akan otomatis diekstrak)</span>
+                                    <span
+                                        class="text-base font-bold text-slate-600 group-hover:text-purple-600 block">Klik
+                                        untuk Unggah Berkas PDF</span>
+                                    <span class="text-xs text-slate-500 mt-1">Maksimal 1 PDF sekali unggah (Isi teks
+                                        akan otomatis diekstrak)</span>
                                 </div>
                             </label>
-                            <input type="file" id="pdf-upload" accept="application/pdf" class="hidden" onchange="handlePDFUpload(event)">
+                            <input type="file" id="pdf-upload" accept="application/pdf" class="hidden"
+                                onchange="handlePDFUpload(event)">
                         </div>
                     </div>
-                    
+
                     <div class="flex items-center justify-between mb-3 border-b pb-2">
                         <h3 class="font-bold text-slate-800 text-sm">Daftar Dokumen yang Telah Dipelajari</h3>
-                        <span class="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full shadow-sm">Total Terpakai: <span id="total-docs-size">0 KB</span></span>
+                        <span
+                            class="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full shadow-sm">Total
+                            Terpakai: <span id="total-docs-size">0 KB</span></span>
                     </div>
                     <div class="border border-slate-200 rounded-xl overflow-hidden shrink-0">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider">
+                            <thead
+                                class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider">
                                 <tr>
                                     <th class="p-3 pl-4 font-bold">Nama File / Referensi</th>
                                     <th class="p-3 font-bold w-28">Ukuran</th>
@@ -451,7 +500,10 @@
                                 </tr>
                             </thead>
                             <tbody id="docs-table-body" class="text-sm divide-y divide-slate-100">
-                                <tr><td colspan="3" class="p-4 text-center text-slate-400">Belum ada dokumen eksternal.</td></tr>
+                                <tr>
+                                    <td colspan="3" class="p-4 text-center text-slate-400">Belum ada dokumen eksternal.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -460,8 +512,10 @@
 
             <!-- TOMBOL POP MENGAMBANG PENGINGAT TRAINING -->
             <button id="floating-train-reminder" onclick="openTrainModal(true)"
-                class="absolute bottom-8 right-8 z-[100] bg-yellow-500 hover:bg-yellow-600 text-white rounded-full px-5 py-3 shadow-[0_4px_20px_rgba(234,179,8,0.5)] translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center gap-2 group border-2 border-white" title="Latih Ulang Bot Sekarang">
-                <span class="material-symbols-outlined text-[20px] font-bold group-hover:-translate-y-1 transition-transform">publish</span>
+                class="absolute bottom-8 right-8 z-[100] bg-yellow-500 hover:bg-yellow-600 text-white rounded-full px-5 py-3 shadow-[0_4px_20px_rgba(234,179,8,0.5)] translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center gap-2 group border-2 border-white"
+                title="Latih Ulang Bot Sekarang">
+                <span
+                    class="material-symbols-outlined text-[20px] font-bold group-hover:-translate-y-1 transition-transform">publish</span>
                 <span class="text-xs font-bold whitespace-nowrap">Latih Bot (Ada Perubahan)</span>
             </button>
         </section>
@@ -618,7 +672,8 @@
                     <input type="text" id="alias-name-input" placeholder="Misal: Budi Jambi"
                         class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50" />
                     <p class="text-[10px] text-slate-500 mt-2 leading-relaxed">
-                        <span class="font-bold text-red-500">Info:</span> Kosongkan kolom teks lalu klik 'Simpan' untuk menghapus alias dan mengembalikan nama warga ke ID Acak bawaan mesin.
+                        <span class="font-bold text-red-500">Info:</span> Kosongkan kolom teks lalu klik 'Simpan' untuk
+                        menghapus alias dan mengembalikan nama warga ke ID Acak bawaan mesin.
                     </p>
                 </div>
             </div>
@@ -694,10 +749,10 @@
 
                 btnChat.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-300";
                 btnKnowledge.className = "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold bg-white dark:bg-slate-custom shadow-sm rounded-lg text-primary transition-all duration-300";
-                
+
                 fetchKnowledgeBase();
-                if (isDataChanged) { 
-                    document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); 
+                if (isDataChanged) {
+                    document.getElementById('train-warning-alert').classList.replace('hidden', 'flex');
                 }
             }
         }
@@ -713,12 +768,12 @@
             const activeClass = "px-4 py-2 text-xs font-bold bg-white text-primary rounded-lg shadow-sm transition-all flex items-center gap-2";
             const inactiveClass = "px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all flex items-center gap-2";
 
-            if(subtab === 'nlu') {
+            if (subtab === 'nlu') {
                 pageNlu.classList.remove('hidden');
                 pageNlu.classList.add('flex');
                 pageRag.classList.add('hidden');
                 pageRag.classList.remove('flex');
-                
+
                 btnNlu.className = activeClass;
                 btnRag.className = inactiveClass;
 
@@ -741,9 +796,9 @@
                 fetchTokenUsage();
             }
         }
-        
+
         // Cek Scroll Posisi untuk Nunjukin FAB
-        document.getElementById('subpage-nlu').addEventListener('scroll', function() {
+        document.getElementById('subpage-nlu').addEventListener('scroll', function () {
             const fab = document.getElementById('floating-train-reminder');
             if (isDataChanged && this.scrollTop > 100) {
                 fab.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
@@ -800,7 +855,7 @@
             const linkMd = `[${text}](${url})`;
             textarea.value = textarea.value.substring(0, savedSelectionStart) + linkMd + textarea.value.substring(savedSelectionEnd);
             closeLinkModal();
-            if(activeLinkTarget === 'train-response') updatePreview();
+            if (activeLinkTarget === 'train-response') updatePreview();
             textarea.focus();
         }
 
@@ -854,9 +909,9 @@
             openConfirmModal('Hapus Topik AI', `Yakin menghapus topik <b>[${intentName}]</b> secara permanen?`, async () => {
                 try {
                     const r = await fetch(`/api/bot/intents/${intentName}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
-                    if (r.ok) { 
-                        isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); 
-                        fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`); 
+                    if (r.ok) {
+                        isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex');
+                        fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`);
                     }
                     else { const res = await r.json(); showToastAlert('❌ Gagal', res.error); if (r.status === 403) logoutAdmin(); }
                 } catch (e) { showToastAlert('❌ Error', 'Jaringan terputus.'); }
@@ -915,12 +970,12 @@
             }
         }
 
-        socket.on('train_success', (msg) => { 
-            stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg); 
-            isDataChanged = false; localStorage.removeItem('bps_needs_training'); 
-            document.getElementById('train-warning-alert').classList.replace('flex', 'hidden'); 
+        socket.on('train_success', (msg) => {
+            stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg);
+            isDataChanged = false; localStorage.removeItem('bps_needs_training');
+            document.getElementById('train-warning-alert').classList.replace('flex', 'hidden');
             document.getElementById('floating-train-reminder').classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
-            fetchKnowledgeBase(); setTimeout(() => closeTrainModal(), 2500); 
+            fetchKnowledgeBase(); setTimeout(() => closeTrainModal(), 2500);
         });
         socket.on('train_error', (msg) => { stopSmartLoading(false, "Gagal Melatih Model AI"); showToastAlert('❌ Gagal', msg); document.getElementById('train-cancel-btn').disabled = false; });
 
@@ -928,21 +983,21 @@
         // 💬 CHAT LOGIC (WARGA & ADMIN)
         // ==========================================
         let onlineUsersSet = new Set();
-        socket.on('user_list', (data) => { 
+        socket.on('user_list', (data) => {
             if (Array.isArray(data)) {
-                 activeUsersList = data; // Kompatibilitas mundur
+                activeUsersList = data; // Kompatibilitas mundur
             } else {
-                 activeUsersList = data.userList;
-                 onlineUsersSet = new Set(data.onlineUsers || []);
+                activeUsersList = data.userList;
+                onlineUsersSet = new Set(data.onlineUsers || []);
             }
-            renderUserList(); 
+            renderUserList();
         });
 
         // Fitur Alias / Ubah Nama Warga
         let userAliases = JSON.parse(localStorage.getItem('bps_user_aliases')) || {};
 
         function renderUserList() {
-            const query = document.getElementById('search-user-input').value.toLowerCase(); 
+            const query = document.getElementById('search-user-input').value.toLowerCase();
             const filtered = activeUsersList.filter(id => {
                 const alias = userAliases[id] || id;
                 return id.toLowerCase().includes(query) || alias.toLowerCase().includes(query);
@@ -961,25 +1016,25 @@
                 const statusColor = help || unread ? 'text-slate-800 font-bold' : 'text-slate-500';
 
                 const isOnline = onlineUsersSet.has(id);
-                const onlineIndicator = isOnline 
+                const onlineIndicator = isOnline
                     ? `<span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm shadow-green-500/50" title="Online Sekarang"></span>`
                     : `<span class="absolute bottom-0 right-0 w-3 h-3 bg-slate-300 border-2 border-white rounded-full" title="Offline"></span>`;
 
                 div.innerHTML = `<div class="flex items-center justify-between gap-2"><div class="flex items-start gap-3 min-w-0"><div class="relative w-10 h-10 rounded-full ${help ? 'bg-red-200 text-red-700' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold shrink-0 shadow-inner">${displayName.substring(0, 2).toUpperCase()}${onlineIndicator}</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold truncate flex items-center justify-between"><span>${displayName}</span><button onclick="event.stopPropagation(); window.editAlias('${id}')" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-primary transition-opacity" title="Ubah Nama"><span class="material-symbols-outlined text-[14px]">edit</span></button></h3><p class="text-[10px] ${statusColor} italic truncate">${statusText}</p></div></div>${unreadBadge}</div>`;
                 userListEl.appendChild(div);
             });
-            
+
             // Render dan Sinkronisasi Header yang Sedang Aktif
-            if(activeSenderId) {
+            if (activeSenderId) {
                 const isOnline = onlineUsersSet.has(activeSenderId);
                 const hdrInd = document.getElementById('header-online-indicator');
                 const hdrDot = document.getElementById('header-status-dot');
                 const hdrTxt = document.getElementById('header-status-text');
                 const hdrContainer = document.getElementById('header-status-container');
-                
+
                 hdrInd.classList.remove('hidden');
                 hdrContainer.classList.remove('hidden');
-                
+
                 if (isOnline) {
                     hdrInd.className = "absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm shadow-green-500/50";
                     hdrDot.className = "w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse";
@@ -1007,9 +1062,9 @@
         function appendMessage(sender, text, time) {
             const timeStr = (time ? new Date(time) : new Date()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); const div = document.createElement('div'); const cb = document.getElementById('chat-box');
             const parsedText = mdToHtml(text);
-            if (sender === 'user' || sender === 'warga') { 
+            if (sender === 'user' || sender === 'warga') {
                 const aliasName = (userAliases[activeSenderId] || 'WARGA').toUpperCase();
-                div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-slate-500 truncate max-w-[150px]" title="${aliasName}">${aliasName}</span><span class="text-[10px] text-slate-400 shrink-0">${timeStr}</span></div><div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-200 whitespace-pre-line">${parsedText}</div>`; 
+                div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-slate-500 truncate max-w-[150px]" title="${aliasName}">${aliasName}</span><span class="text-[10px] text-slate-400 shrink-0">${timeStr}</span></div><div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-200 whitespace-pre-line">${parsedText}</div>`;
             }
             else if (sender === 'bot') { div.className = 'flex flex-col items-start max-w-[85%] mb-4 fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pl-1"><span class="text-[10px] font-bold text-bot-cyan flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">smart_toy</span> BOT</span><span class="text-[10px] text-slate-400">${timeStr}</span></div><div class="bg-bot-cyan/10 border border-bot-cyan/30 p-3.5 rounded-2xl rounded-tl-none text-sm whitespace-pre-line">${parsedText}</div>`; }
             else { div.className = 'flex flex-col items-end self-end max-w-[85%] mb-4 ml-auto fade-in'; div.innerHTML = `<div class="flex gap-2 mb-1 pr-1"><span class="text-[10px] text-slate-400">${timeStr}</span><span class="text-[10px] font-bold text-admin-blue">ADMIN</span></div><div class="bg-admin-blue text-white p-3.5 rounded-2xl rounded-tr-none shadow-md text-sm whitespace-pre-line">${parsedText}</div>`; }
@@ -1025,11 +1080,11 @@
             const inp = document.getElementById('admin-input'); const text = inp.value.trim(); if (!activeSenderId || !text) return;
             socket.emit('admin_message', { targetSenderId: activeSenderId, message: text });
             if (text !== '/selesai') {
-                appendMessage('admin', text, new Date()); 
-            } else { 
-                needsHelpSet.delete(activeSenderId); 
-                renderUserList(); 
-                
+                appendMessage('admin', text, new Date());
+            } else {
+                needsHelpSet.delete(activeSenderId);
+                renderUserList();
+
                 // Notifikasi visual untuk Admin
                 const cb = document.getElementById('chat-box');
                 const div = document.createElement('div');
@@ -1048,18 +1103,18 @@
             sendMessage();
         }
 
-        window.closeAliasModal = function() {
-            const modal = document.getElementById('alias-modal'); 
-            modal.classList.add('opacity-0'); 
-            document.getElementById('alias-modal-box').classList.replace('scale-100', 'scale-95'); 
+        window.closeAliasModal = function () {
+            const modal = document.getElementById('alias-modal');
+            modal.classList.add('opacity-0');
+            document.getElementById('alias-modal-box').classList.replace('scale-100', 'scale-95');
             setTimeout(() => { modal.classList.replace('flex', 'hidden'); }, 300);
         };
 
-        window.confirmEditAlias = function() {
-            if(!activeAliasTargetId) return closeAliasModal();
+        window.confirmEditAlias = function () {
+            if (!activeAliasTargetId) return closeAliasModal();
             const id = activeAliasTargetId;
             const newName = document.getElementById('alias-name-input').value;
-            
+
             if (newName.trim() === '') {
                 delete userAliases[id];
                 showToastAlert('✅ Nama Direset', 'Dikembalikan ke ID Warga bawaan.');
@@ -1067,7 +1122,7 @@
                 userAliases[id] = newName.trim();
                 showToastAlert('✅ Berhasil', 'Nama panggilan warga tersimpan.');
             }
-            
+
             localStorage.setItem('bps_user_aliases', JSON.stringify(userAliases));
             renderUserList();
             if (activeSenderId === id) { selectUser(id); }
@@ -1075,23 +1130,23 @@
         };
 
         let activeAliasTargetId = null;
-        window.editAlias = function(id) {
+        window.editAlias = function (id) {
             activeAliasTargetId = id;
             const currentName = userAliases[id] || id;
             const input = document.getElementById('alias-name-input');
             input.value = currentName !== id ? currentName : '';
-            
-            const modal = document.getElementById('alias-modal'); 
-            modal.classList.replace('hidden', 'flex'); 
-            setTimeout(() => { 
-                modal.classList.remove('opacity-0'); 
-                document.getElementById('alias-modal-box').classList.replace('scale-95', 'scale-100'); 
+
+            const modal = document.getElementById('alias-modal');
+            modal.classList.replace('hidden', 'flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('alias-modal-box').classList.replace('scale-95', 'scale-100');
                 input.focus();
             }, 10);
         };
-        
-        document.getElementById('alias-name-input').addEventListener('keypress', (e) => { 
-            if(e.key === 'Enter') window.confirmEditAlias(); 
+
+        document.getElementById('alias-name-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.confirmEditAlias();
         });
 
         document.getElementById('send-btn').addEventListener('click', sendMessage); document.getElementById('admin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
@@ -1105,27 +1160,27 @@
                 const docs = await res.json();
                 const tbody = document.getElementById('docs-table-body');
                 const totalSizeEl = document.getElementById('total-docs-size');
-                
-                if(!tbody) return;
+
+                if (!tbody) return;
                 tbody.innerHTML = '';
-                
+
                 if (docs.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">Belum ada dokumen eksternal.</td></tr>`;
-                    if(totalSizeEl) totalSizeEl.innerText = "0 KB";
+                    if (totalSizeEl) totalSizeEl.innerText = "0 KB";
                     return;
                 }
-                
+
                 let totalBytes = 0;
-                
+
                 docs.forEach(doc => {
                     // Konversi size format kembali ke bytes kasar untuk perhitungan (Misal "1.5 MB" -> 1500000)
                     const sizeMatch = doc.size.match(/([\d.]+)\s+(KB|MB|GB|Bytes)/i);
-                    if(sizeMatch) {
+                    if (sizeMatch) {
                         let val = parseFloat(sizeMatch[1]);
                         let unit = sizeMatch[2].toUpperCase();
-                        if(unit === 'KB') val *= 1024;
-                        else if(unit === 'MB') val *= 1024 * 1024;
-                        else if(unit === 'GB') val *= 1024 * 1024 * 1024;
+                        if (unit === 'KB') val *= 1024;
+                        else if (unit === 'MB') val *= 1024 * 1024;
+                        else if (unit === 'GB') val *= 1024 * 1024 * 1024;
                         totalBytes += val;
                     }
 
@@ -1143,9 +1198,9 @@
                     tbody.appendChild(tr);
                 });
 
-                if(totalSizeEl) {
-                    if(totalBytes < 1024) totalSizeEl.innerText = totalBytes + ' Bytes';
-                    else if(totalBytes < 1048576) totalSizeEl.innerText = (totalBytes / 1024).toFixed(1) + ' KB';
+                if (totalSizeEl) {
+                    if (totalBytes < 1024) totalSizeEl.innerText = totalBytes + ' Bytes';
+                    else if (totalBytes < 1048576) totalSizeEl.innerText = (totalBytes / 1024).toFixed(1) + ' KB';
                     else totalSizeEl.innerText = (totalBytes / 1048576).toFixed(2) + ' MB';
                 }
 
@@ -1155,21 +1210,21 @@
         async function handlePDFUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             const formData = new FormData();
             formData.append('file', file);
-            
+
             const btnLabel = event.target.previousElementSibling.querySelector('.font-bold');
             const originalText = btnLabel.innerText;
             btnLabel.innerText = "Mengunggah...";
-            
+
             try {
                 const res = await fetch('/api/bot/upload-pdf', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${adminToken}` },
                     body: formData
                 });
-                
+
                 const data = await res.json();
                 if (res.ok) {
                     showToastAlert('✅ Berhasil', data.message);
@@ -1196,46 +1251,46 @@
                         showToastAlert('🗑️ Terhapus', 'Dokumen berhasil dihapus.');
                         fetchExternalDocs();
                     }
-                } catch(e) { showToastAlert('❌ Gagal', 'Gagal menghubungi server.'); }
+                } catch (e) { showToastAlert('❌ Gagal', 'Gagal menghubungi server.'); }
             });
         }
 
         async function fetchTokenUsage() {
             try {
                 const res = await fetch('/api/bot/token-usage', { headers: { 'Authorization': `Bearer ${adminToken}` } });
-                if(!res.ok) return;
+                if (!res.ok) return;
                 const data = await res.json();
-                
+
                 const GROQ_LIMIT = 100000;
                 const GEMINI_LIMIT = 1000000;
-                
+
                 document.getElementById('groq-usage').innerText = data.groq.toLocaleString();
                 document.getElementById('gemini-usage').innerText = data.gemini.toLocaleString();
-                
+
                 let groqPct = (data.groq / GROQ_LIMIT) * 100;
                 let geminiPct = (data.gemini / GEMINI_LIMIT) * 100;
-                
+
                 if (groqPct > 100) groqPct = 100;
                 if (geminiPct > 100) geminiPct = 100;
-                
+
                 document.getElementById('groq-progress').style.width = groqPct + '%';
                 document.getElementById('gemini-progress').style.width = geminiPct + '%';
-                
+
                 // Visual Limit Tercapai untuk Groq
                 if (groqPct >= 100) {
                     document.getElementById('groq-progress').classList.replace('bg-orange-500', 'bg-red-500');
                     document.getElementById('card-groq').classList.add('border-red-300', 'bg-red-50');
                     document.getElementById('groq-limit-warning').classList.remove('hidden');
                 }
-                
+
                 // Visual Limit Tercapai untuk Gemini
                 if (geminiPct >= 100) {
                     document.getElementById('gemini-progress').classList.replace('bg-blue-500', 'bg-red-500');
                     document.getElementById('card-gemini').classList.add('border-red-300', 'bg-red-50');
                     document.getElementById('gemini-limit-warning').classList.remove('hidden');
                 }
-                
-            } catch(e) { console.error('Gagal load token usage:', e); }
+
+            } catch (e) { console.error('Gagal load token usage:', e); }
         }
 
         // Initialize Fetching RAG

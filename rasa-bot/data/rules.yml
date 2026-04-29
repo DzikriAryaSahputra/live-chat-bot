@@ -4,10 +4,6 @@ rules:
     steps:
       - intent: sapaan
       - action: utter_sapaan
-  - rule: Arahkan ke link BPS Kota Jambi saat diminta
-    steps:
-      - intent: cari_info_website
-      - action: action_cari_website_bps
   - rule: Tampilkan opsi saat minta admin
     steps:
       - intent: hubungi_admin
