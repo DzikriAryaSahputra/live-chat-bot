@@ -43,9 +43,9 @@ Kini *chatbot* sudah dirancang sepenuhnya menggunakan sistem **Skrip Injektor Di
 
 ---
 
-## 🧠 Panduan Manajemen NLU (Khusus Admin BPS)
+## 🧠 Panduan Manajemen NLU
 
-Agar chatbot merespon dengan cerdas dan tidak tumpang tindih antara "Pengetahuan Dasar (NLU)" dan "Dokumen PDF (LLM RAG)", Admin BPS wajib mematuhi **3 Aturan Emas NLU** berikut saat menambahkan topik baru di Dashboard:
+Agar chatbot merespon dengan cerdas dan tidak tumpang tindih antara "Pengetahuan Dasar (NLU)" dan "Dokumen PDF (LLM RAG)", Admin wajib mematuhi **3 Aturan Emas NLU** berikut saat menambahkan topik baru di Dashboard:
 
 1. **Berikan Variasi Kalimat, Bukan Sekadar Pengulangan**
    Berikan variasi gaya bahasa asli manusia, bukan sekadar mengubah urutan kata.
