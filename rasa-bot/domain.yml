@@ -1,7 +1,6 @@
 version: '3.1'
 intents:
   - sapaan
-  - tanya_data_statistik
   - cari_info_website
   - tanya_sensus_ekonomi
   - hubungi_admin
@@ -18,8 +17,6 @@ intents:
 responses:
   utter_sapaan:
     - text: Halo! 😊 Saya SISCA, siap membantu Anda menemukan data dan informasi yang dibutuhkan. Ada yang ingin ditanyakan?
-  utter_tanya_data_statistik:
-    - text: Untuk data statistik terbaru seperti inflasi, kependudukan, atau berita resmi statistik, Anda bisa melihat publikasi langsung di website resmi BPS. Ada indikator spesifik yang sedang Anda cari?
   utter_tanya_profil_bps:
     - text: Berikut adalah <b>Profil BPS Kota Jambi</b>:<br>Badan Pusat Statistik (BPS) Kota Jambi adalah instansi vertikal BPS yang bertugas melaksanakan kegiatan statistik di wilayah Kota Jambi. BPS Kota Jambi bertanggung jawab langsung kepada BPS Provinsi Jambi dan Kepala BPS Republik Indonesia.<br><br> BPS Kota Jambi menyelenggarakan sensus, survei, pengolahan data statistik, serta mendiseminasikan data dan informasi statistik kepada seluruh lapisan masyarakat, akademisi, dunia usaha, dan pemerintah daerah.<br><br> <i><ul><li>1. Menyelenggarakan kegiatan sensus dan survei di wilayah Kota Jambi</li><li>2. Mengolah dan mempublikasikan data statistik daerah</li><li>3. Melayani kebutuhan data pengguna secara profesional</li><li>4. Membina koordinasi statistik sektoral di Kota Jambi</li></ul></i><br>Apakah informasi diatas membantu?😊
   utter_tanya_visi_misi_bps:

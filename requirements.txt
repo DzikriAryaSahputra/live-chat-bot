@@ -1,0 +1,58 @@
+=======================================================
+DAFTAR KEBUTUHAN (REQUIREMENTS) & CARA INSTALASI
+BPS LIVE CHAT BOT (SISCA)
+=======================================================
+
+Proyek ini memiliki 2 sistem utama yang berjalan bersamaan:
+1. BACKEND (Node.js) -> Mengurus Server, RAG, AI Embedding Lokal, Socket.io
+2. RASA NLU (Python) -> Mengurus klasifikasi niat (intent) pertanyaan warga
+
+-------------------------------------------------------
+BAGIAN 1: KEBUTUHAN BACKEND NODE.JS
+-------------------------------------------------------
+Pastikan Anda sudah menginstal Node.js (versi 18 ke atas disarankan).
+Semua dependensi ini sudah tercatat di file `backend/package.json`.
+
+Daftar Dependensi (NPM):
+- express        : Framework web server HTTP
+- socket.io      : Komunikasi real-time (Live Chat)
+- cors           : Mengizinkan akses antar-domain
+- dotenv         : Membaca file konfigurasi environment (.env)
+- pg             : Koneksi ke database PostgreSQL
+- multer         : Menangani upload file PDF
+- pdf-parse      : Mengekstrak teks dari file PDF
+- axios          : Mengirim request ke API eksternal (Groq, Gemini)
+- js-yaml        : Membaca dan menulis file konfigurasi NLU (.yml)
+- jsonwebtoken   : (jwt) Autentikasi token untuk login Admin
+- cheerio        : (Opsional) parsing HTML jika dibutuhkan
+- @xenova/transformers : Menjalankan Local Embedding AI tanpa internet (Gratis)
+
+CARA INSTAL:
+1. Buka terminal, masuk ke folder backend: `cd backend`
+2. Jalankan perintah: `npm install`
+
+-------------------------------------------------------
+BAGIAN 2: KEBUTUHAN RASA NLU (PYTHON)
+-------------------------------------------------------
+Pastikan Anda sudah menginstal Python (versi 3.8 - 3.10 disarankan).
+
+Daftar Dependensi Utama (PIP):
+- rasa           : Mesin chatbot utama
+- rasa-sdk       : Untuk menjalankan custom actions Rasa
+- spacy          : (Opsional) untuk pemrosesan teks tingkat lanjut
+
+CARA INSTAL:
+1. Buka terminal, masuk ke folder rasa-bot: `cd rasa-bot`
+2. Buat Virtual Environment (disarankan): `python -m venv venv`
+3. Aktifkan Virtual Environment:
+   - Windows: `venv\Scripts\activate`
+   - Mac/Linux: `source venv/bin/activate`
+4. Jalankan perintah: `pip install rasa` atau `pip install -r requirements.txt`
+
+-------------------------------------------------------
+BAGIAN 3: KEBUTUHAN DATABASE
+-------------------------------------------------------
+- PostgreSQL     : Database engine
+- pgAdmin 4      : (Opsional) untuk melihat dan mengelola isi database
+
+Pastikan database `bps_chatbot` sudah dibuat di PostgreSQL sebelum menjalankan server Node.js.

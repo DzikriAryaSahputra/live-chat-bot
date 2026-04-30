@@ -89,6 +89,117 @@
                 transform: translateY(0);
             }
         }
+
+        /* ===== PREMIUM POLISH ===== */
+
+        /* Sidebar gradient */
+        main.sidebar-premium {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 40%, #f1f5f9 100%) !important;
+        }
+
+        /* Header glassmorphism */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.72) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+        }
+
+        /* Premium card hover glow */
+        .card-premium {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-premium:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(236, 91, 19, 0.06);
+            transform: translateY(-2px);
+        }
+
+        /* Table row hover polish */
+        #knowledge-table-body tr {
+            transition: all 0.2s ease;
+        }
+
+        #knowledge-table-body tr:hover {
+            background: linear-gradient(90deg, rgba(236, 91, 19, 0.03) 0%, rgba(34, 211, 238, 0.03) 100%) !important;
+        }
+
+        /* Chat input area glow on focus-within */
+        .input-glow {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .input-glow:focus-within {
+            box-shadow: 0 0 0 3px rgba(236, 91, 19, 0.12), 0 8px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Primary button gradient */
+        .btn-gradient {
+            background: linear-gradient(135deg, #ec5b13 0%, #f97316 100%) !important;
+            transition: all 0.25s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #dc4a06 0%, #ea580c 100%) !important;
+            box-shadow: 0 4px 15px rgba(236, 91, 19, 0.35);
+        }
+
+        /* User list item hover polish */
+        .user-item-hover {
+            transition: all 0.2s ease;
+        }
+
+        .user-item-hover:hover {
+            background: linear-gradient(90deg, rgba(236, 91, 19, 0.04) 0%, transparent 100%) !important;
+        }
+
+        /* Toast entrance */
+        #toast-container>div {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Modal overlay premium blur */
+        .modal-overlay-premium {
+            background: rgba(15, 23, 42, 0.5) !important;
+            backdrop-filter: blur(8px) saturate(120%);
+        }
+
+        /* Upload zone hover gradient */
+        .upload-zone:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.04) 0%, rgba(59, 130, 246, 0.04) 100%) !important;
+            border-color: #a855f7 !important;
+        }
+
+        /* Progress bar shimmer */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .progress-shimmer {
+            background-size: 200% 100%;
+            background-image: linear-gradient(90deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+            animation: shimmer 2s infinite;
+        }
+
+        /* Quick reply buttons hover */
+        .quick-reply-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quick-reply-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Subtab indicator animation */
+        .subtab-active {
+            box-shadow: 0 1px 8px rgba(236, 91, 19, 0.15);
+        }
     </style>
 </head>
 
@@ -99,7 +210,7 @@
 
     <div class="flex h-full w-full overflow-hidden">
         <main
-            class="flex-shrink-0 bg-white dark:bg-slate-custom border-r border-slate-200 dark:border-slate-800 flex flex-col w-72 lg:w-80 z-20 shadow-xl">
+            class="sidebar-premium flex-shrink-0 dark:bg-slate-custom border-r border-slate-200/80 dark:border-slate-800 flex flex-col w-72 lg:w-80 z-20 shadow-[0_0_40px_rgba(0,0,0,0.08)]">
             <div class="p-6 pb-4 flex items-center gap-3">
                 <div class="bg-primary p-2 rounded-xl flex items-center justify-center shadow-md">
                     <span class="material-symbols-outlined text-white">monitoring</span>
@@ -236,7 +347,7 @@
         <section id="page-chat"
             class="flex-1 flex flex-col bg-slate-50 dark:bg-navy-deep relative overflow-hidden fade-in">
             <header
-                class="h-20 bg-white/80 dark:bg-slate-custom/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-10 shadow-sm">
+                class="glass-header h-20 dark:bg-slate-custom/80 border-b border-slate-200/60 dark:border-slate-800 flex items-center justify-between px-8 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 <div class="flex items-center gap-4">
                     <div class="relative">
                         <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold overflow-hidden shadow-inner"
@@ -289,7 +400,7 @@
                 </div>
 
                 <div
-                    class="max-w-4xl mx-auto w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-2 flex items-center gap-2">
+                    class="input-glow max-w-4xl mx-auto w-full bg-white rounded-2xl shadow-lg border border-slate-200/80 p-2 flex items-center gap-2">
 
                     <!-- NEW: Tombol Modul Link untuk Chat -->
                     <button type="button" onclick="openLinkModal('admin-input')"
@@ -301,9 +412,8 @@
                     <input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-2 focus:outline-none"
                         id="admin-input" placeholder="Ketik pesan... (Atau klik saran di atas)" type="text"
                         autocomplete="off" />
-                    <button
-                        class="bg-primary text-white p-2.5 rounded-xl hover:bg-orange-600 transition-all active:scale-95"
-                        id="send-btn" title="Kirim (Enter)">
+                    <button class="btn-gradient text-white p-2.5 rounded-xl active:scale-95" id="send-btn"
+                        title="Kirim (Enter)">
                         <span class="material-symbols-outlined">send</span>
                     </button>
                 </div>
@@ -313,7 +423,7 @@
         <section id="page-knowledge"
             class="flex-1 flex flex-col bg-slate-50 dark:bg-navy-deep relative overflow-hidden hidden fade-in">
             <header
-                class="h-20 bg-white/80 dark:bg-slate-custom/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-10 shrink-0">
+                class="glass-header h-20 dark:bg-slate-custom/80 border-b border-slate-200/60 dark:border-slate-800 flex items-center justify-between px-8 z-10 shrink-0">
                 <div>
                     <h2 class="font-bold text-lg flex items-center gap-2"><span
                             class="material-symbols-outlined text-primary">database</span> Database Ilmu Bot</h2>
@@ -404,7 +514,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <!-- Groq Card -->
                     <div id="card-groq"
-                        class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
+                        class="card-premium bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 relative overflow-hidden">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
                                 <span
@@ -433,7 +543,7 @@
 
                     <!-- Gemini Card -->
                     <div id="card-gemini"
-                        class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden transition-all duration-300">
+                        class="card-premium bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 relative overflow-hidden">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
                                 <span
@@ -465,7 +575,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
                     <div class="flex flex-col mb-6">
                         <div
-                            class="w-full border border-dashed border-slate-300 rounded-xl p-8 bg-slate-50 relative group hover:border-purple-400 transition-colors">
+                            class="upload-zone w-full border-2 border-dashed border-slate-300 rounded-xl p-8 bg-slate-50/50 relative group transition-all duration-300">
                             <label for="pdf-upload"
                                 class="cursor-pointer flex flex-col items-center justify-center gap-4">
                                 <span
@@ -522,10 +632,11 @@
     </div>
 
     <div id="train-modal"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden items-center justify-center opacity-0 transition-opacity duration-300 p-4 md:p-8">
-        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-full"
+        class="modal-overlay-premium fixed inset-0 z-[200] hidden items-center justify-center opacity-0 transition-opacity duration-300 p-4 md:p-8">
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.2)] overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-full"
             id="train-modal-box">
-            <div class="bg-slate-800 p-5 md:p-6 flex justify-between items-center text-white shrink-0">
+            <div
+                class="bg-gradient-to-r from-slate-800 to-slate-900 p-5 md:p-6 flex justify-between items-center text-white shrink-0">
                 <h2 class="text-lg font-bold flex items-center gap-2">
                     <span class="material-symbols-outlined text-bot-cyan" id="modal-icon">model_training</span>
                     <span id="modal-title-text">Suntik Ilmu Baru & Latih AI</span>
@@ -627,10 +738,10 @@
     </div>
 
     <div id="link-modal"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
+        class="modal-overlay-premium fixed inset-0 z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.2)] overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
             id="link-modal-box">
-            <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-4 flex justify-between items-center text-white">
                 <h3 class="text-base font-bold flex items-center gap-2"><span
                         class="material-symbols-outlined text-bot-cyan">link</span>Sisipkan Tautan</h3>
                 <button type="button" onclick="closeLinkModal()" class="text-slate-400 hover:text-white"><span
@@ -657,10 +768,10 @@
 
     <!-- MODAL ALIAS NAMA CUSTOM -->
     <div id="alias-modal"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
+        class="modal-overlay-premium fixed inset-0 z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.2)] overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
             id="alias-modal-box">
-            <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-4 flex justify-between items-center text-white">
                 <h3 class="text-base font-bold flex items-center gap-2"><span
                         class="material-symbols-outlined text-primary">edit_square</span>Ubah Nama Warga</h3>
                 <button type="button" onclick="closeAliasModal()" class="text-slate-400 hover:text-white"><span
@@ -688,8 +799,8 @@
 
 
     <div id="confirm-modal"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
+        class="modal-overlay-premium fixed inset-0 z-[300] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.2)] overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col"
             id="confirm-modal-box">
             <div class="p-6 text-center">
                 <div

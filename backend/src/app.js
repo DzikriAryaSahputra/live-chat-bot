@@ -54,29 +54,57 @@ function cosineSimilarity(vecA, vecB) {
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-function chunkText(text, chunkSize = 800, overlap = 100) {
+function chunkText(text, maxChars = 800) {
+    // 1. Rapihkan teks (hapus enter/spasi berlebih hasil ekstraksi PDF)
+    const cleanText = text.replace(/\s+/g, ' ').trim();
+    const words = cleanText.split(' ');
+
     const chunks = [];
-    let i = 0;
-    while (i < text.length) {
-        chunks.push(text.slice(i, i + chunkSize));
-        i += chunkSize - overlap;
+    let currentChunk = [];
+    let currentLength = 0;
+
+    for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        // Jika menambahkan kata ini akan melebihi batas karakter
+        if (currentLength + word.length > maxChars && currentChunk.length > 0) {
+            chunks.push(currentChunk.join(' '));
+            // Sisipkan sedikit kalimat sebelumnya (overlap ~15 kata) agar konteks tidak terputus
+            const overlapWords = currentChunk.slice(-15);
+            currentChunk = [...overlapWords];
+            currentLength = currentChunk.join(' ').length;
+        }
+        currentChunk.push(word);
+        currentLength += word.length + 1; // +1 untuk spasi
     }
+
+    // Masukkan sisa kata terakhir
+    if (currentChunk.length > 0) {
+        chunks.push(currentChunk.join(' '));
+    }
+
     return chunks;
+}
+
+let embeddingExtractor = null;
+async function getEmbeddingExtractor() {
+    if (!embeddingExtractor) {
+        console.log("⏳ Memuat model embedding lokal (Xenova/all-MiniLM-L6-v2)...");
+        const { pipeline, env } = await import('@xenova/transformers');
+        env.allowLocalModels = false;
+        embeddingExtractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+        console.log("✅ Model embedding lokal berhasil dimuat!");
+    }
+    return embeddingExtractor;
 }
 
 async function generateEmbedding(text) {
     try {
-        if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY tidak ditemukan");
-        const res = await axios.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent?key=${process.env.GEMINI_API_KEY}`,
-            {
-                model: "models/gemini-embedding-2",
-                content: { parts: [{ text: text }] }
-            }
-        );
-        return res.data.embedding.values;
+        const extractor = await getEmbeddingExtractor();
+        // Generate embedding secara offline di CPU (384 dimensi)
+        const res = await extractor(text, { pooling: 'mean', normalize: true });
+        return Array.from(res.data);
     } catch (e) {
-        console.error("Gagal generate embedding:", e.message);
+        console.error("Gagal generate embedding lokal:", e.message);
         return null;
     }
 }
@@ -163,8 +191,8 @@ async function getKnowledgeBaseContext(userMessage) {
                     }));
                     // Urutkan berdasarkan skor tertinggi
                     scoredChunks.sort((a, b) => b.score - a.score);
-                    // Ambil Top 2 chunks
-                    const topChunks = scoredChunks.slice(0, 2);
+                    // Ambil Top 6 chunks (agar AI tahu lebih banyak isi dari tengah ke bawah)
+                    const topChunks = scoredChunks.slice(0, 6);
                     for (const chunk of topChunks) {
                         externalDocs += `\n\n--- DOKUMEN [${chunk.fileName}] (Relevansi: ${(chunk.score * 100).toFixed(1)}%) ---\n${chunk.text}`;
                     }
@@ -172,9 +200,9 @@ async function getKnowledgeBaseContext(userMessage) {
             }
         }
 
-        // Limit TOTAL pengetahuan agar tidak melampaui batas (jaga-jaga)
+        // Limit TOTAL pengetahuan agar tidak melampaui batas (dinaikkan ke 10000 agar muat 6 chunk)
         const combined = externalDocs;
-        return combined.length > 6000 ? combined.substring(0, 6000) + "\n...[DIPOTONG KARENA LIMIT]" : combined;
+        return combined.length > 10000 ? combined.substring(0, 10000) + "\n...[DIPOTONG KARENA LIMIT]" : combined;
     } catch (e) {
         console.error('Gagal membaca Knowledge Base untuk RAG:', e.message);
         return '';
@@ -210,6 +238,9 @@ async function generateLLMResponse(userMessage) {
     const systemPrompt = `Anda adalah Asisten Virtual BPS Kota Jambi bernama SISCA.
 TUGAS UTAMA ANDA: Menjawab pertanyaan warga dengan cerdas, ramah, dan solutif HANYA berdasarkan informasi pada "DOKUMEN PENGETAHUAN BPS" (termasuk Dokumen Eksternal) di bawah ini.
 DILARANG KERAS berhalusinasi atau memberikan informasi angka/fakta yang tidak tertulis pada dokumen di bawah ini.
+Teks dari PDF terkadang "acak-acakan" (misal: "BPS me- naungi "). WAJIB BACALAH DENGAN SEKSAMA dan PERBAIKI TYPO DI KEPALA ANDA saat menjawab.
+jawab dengan semaksimal mungkin.
+jangan sisipkan nama file pdf.
 Jika jawaban memang tidak tersedia sama sekali di dalam dokumen di bawah, katakan: "Maaf, SISCA belum dibekali jawaban terkait hal tersebut. Ketik 'bantuan' atau klik tombol 'Hubungi Admin' jika butuh bicara dengan petugas asli."
 
 === DOKUMEN PENGETAHUAN BPS ===
@@ -579,7 +610,10 @@ app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (r
     try {
         const dataBuffer = fs.readFileSync(req.file.path);
         const data = await pdfParse(dataBuffer);
-        const rawText = data.text.trim();
+
+        // Bersihkan teks agar rapih (menghapus enter/spasi ganda yang berantakan dari PDF)
+        const cleanText = data.text.replace(/\s+/g, ' ').replace(/\s+([.,?!])/g, '$1').trim();
+        const rawText = cleanText;
 
         if (!rawText) throw new Error('PDF kosong atau tidak dapat terbaca teksnya.');
 
@@ -587,7 +621,7 @@ app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (r
         const safePath = path.join(KNOWLEDGE_DOCS_DIR, fileName);
 
         if (!fs.existsSync(KNOWLEDGE_DOCS_DIR)) fs.mkdirSync(KNOWLEDGE_DOCS_DIR);
-        fs.writeFileSync(safePath, `[SUMBER: ${req.file.originalname}]\n${rawText}`);
+        fs.writeFileSync(safePath, `[SUMBER: ${req.file.originalname}]\n\n${rawText}`);
         fs.unlinkSync(req.file.path); // Hapus file temporary
 
         // === PROSES TRUE RAG: CHUNKING & EMBEDDING ===

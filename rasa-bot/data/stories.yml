@@ -5,11 +5,6 @@ stories:
   - intent: sapaan
   - action: utter_sapaan
 
-- story: alur tanya data
-  steps:
-  - intent: tanya_data_statistik
-  - action: utter_tanya_data_statistik
-
 - story: alur tanya sensus ekonomi
   steps:
   - intent: tanya_sensus_ekonomi
