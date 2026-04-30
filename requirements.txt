@@ -1,58 +1,67 @@
 =======================================================
-DAFTAR KEBUTUHAN (REQUIREMENTS) & CARA INSTALASI
+DAFTAR REQUIREMENTS & TEKNOLOGI (TECH STACK)
 BPS LIVE CHAT BOT (SISCA)
 =======================================================
-
-Proyek ini memiliki 2 sistem utama yang berjalan bersamaan:
-1. BACKEND (Node.js) -> Mengurus Server, RAG, AI Embedding Lokal, Socket.io
-2. RASA NLU (Python) -> Mengurus klasifikasi niat (intent) pertanyaan warga
+Dokumen ini berisi daftar lengkap semua alat (tools), bahasa pemrograman,
+dan pustaka (dependencies) yang digunakan untuk membangun proyek ini.
 
 -------------------------------------------------------
-BAGIAN 1: KEBUTUHAN BACKEND NODE.JS
+1. BAHASA PEMROGRAMAN & ENGINE UTAMA
 -------------------------------------------------------
-Pastikan Anda sudah menginstal Node.js (versi 18 ke atas disarankan).
-Semua dependensi ini sudah tercatat di file `backend/package.json`.
-
-Daftar Dependensi (NPM):
-- express        : Framework web server HTTP
-- socket.io      : Komunikasi real-time (Live Chat)
-- cors           : Mengizinkan akses antar-domain
-- dotenv         : Membaca file konfigurasi environment (.env)
-- pg             : Koneksi ke database PostgreSQL
-- multer         : Menangani upload file PDF
-- pdf-parse      : Mengekstrak teks dari file PDF
-- axios          : Mengirim request ke API eksternal (Groq, Gemini)
-- js-yaml        : Membaca dan menulis file konfigurasi NLU (.yml)
-- jsonwebtoken   : (jwt) Autentikasi token untuk login Admin
-- cheerio        : (Opsional) parsing HTML jika dibutuhkan
-- @xenova/transformers : Menjalankan Local Embedding AI tanpa internet (Gratis)
-
-CARA INSTAL:
-1. Buka terminal, masuk ke folder backend: `cd backend`
-2. Jalankan perintah: `npm install`
+- Node.js (v18+) : Engine utama untuk menjalankan server Backend.
+- Python (v3.8+) : Engine untuk menjalankan mesin cerdas Rasa NLU.
+- HTML/CSS/JS    : Bahasa standar untuk antarmuka pengguna (Frontend).
 
 -------------------------------------------------------
-BAGIAN 2: KEBUTUHAN RASA NLU (PYTHON)
+2. DEPENDENSI BACKEND (NODE.JS / NPM)
+Lokasi: /backend/package.json
 -------------------------------------------------------
-Pastikan Anda sudah menginstal Python (versi 3.8 - 3.10 disarankan).
+Framework & Jaringan:
+- express (^5.2.1)    : Web framework untuk membuat API & Server.
+- socket.io (^4.8.3)  : Library untuk komunikasi chat dua arah (Real-time).
+- cors (^2.8.6)       : Mengizinkan frontend berkomunikasi dengan backend.
+- axios (^1.13.6)     : Klien HTTP untuk menembak API eksternal (Groq/Gemini).
 
-Daftar Dependensi Utama (PIP):
-- rasa           : Mesin chatbot utama
-- rasa-sdk       : Untuk menjalankan custom actions Rasa
-- spacy          : (Opsional) untuk pemrosesan teks tingkat lanjut
+Manajemen Data & Database:
+- pg (^8.18.0)        : Driver untuk terhubung ke Database PostgreSQL.
+- dotenv (^17.3.1)    : Membaca konfigurasi rahasia dari file .env.
+- jsonwebtoken (^9.0.3): Mengamankan sesi login Admin (JWT).
+- js-yaml (^4.1.1)    : Membaca dan memanipulasi file pelatihan Rasa (.yml) dari Admin Panel.
 
-CARA INSTAL:
-1. Buka terminal, masuk ke folder rasa-bot: `cd rasa-bot`
-2. Buat Virtual Environment (disarankan): `python -m venv venv`
-3. Aktifkan Virtual Environment:
-   - Windows: `venv\Scripts\activate`
-   - Mac/Linux: `source venv/bin/activate`
-4. Jalankan perintah: `pip install rasa` atau `pip install -r requirements.txt`
+Pemrosesan PDF & AI RAG:
+- multer (^2.1.1)          : Menangkap file PDF yang diunggah dari Dashboard Admin.
+- pdf-parse (^1.1.1)       : Mengekstrak teks murni dari file PDF.
+- @xenova/transformers (^2.17.2) : Engine AI Lokal (WebAssembly) untuk mengonversi teks menjadi Vektor (Embedding).
+- Model AI (Offline)       : Xenova/all-MiniLM-L6-v2 (Dijalankan lokal via Transformers.js).
+- Model LLM (Online)       : Groq (Llama-3.1-8b-instant) sebagai Utama, Gemini (2.0-flash) sebagai Cadangan.
 
 -------------------------------------------------------
-BAGIAN 3: KEBUTUHAN DATABASE
+3. DEPENDENSI NLU (PYTHON / PIP)
+Lokasi: /rasa-bot/requirements.txt
 -------------------------------------------------------
-- PostgreSQL     : Database engine
-- pgAdmin 4      : (Opsional) untuk melihat dan mengelola isi database
+- rasa           : Framework utama Natural Language Understanding (Pemahaman Bahasa).
+- rasa-sdk       : Action server khusus untuk fungsi custom (Python).
+- spacy          : Engine NLP tambahan (opsional) untuk klasifikasi yang lebih dalam.
 
-Pastikan database `bps_chatbot` sudah dibuat di PostgreSQL sebelum menjalankan server Node.js.
+-------------------------------------------------------
+4. DATABASE & PENYIMPANAN
+-------------------------------------------------------
+- PostgreSQL     : Menyimpan riwayat obrolan (chat_logs) dan sesi user.
+- Local JSON     : Menyimpan database vektor (/backend/knowledge_docs/embeddings.json).
+- Local File     : Menyimpan raw text PDF di dalam folder /backend/knowledge_docs/.
+
+-------------------------------------------------------
+5. FRONTEND & UI/UX
+Lokasi: /frontend
+-------------------------------------------------------
+- Tailwind CSS   : Framework CSS modern (via CDN) untuk styling yang sangat rapi dan responsif.
+- Plus Jakarta Sans : Tipografi modern resmi dari Google Fonts.
+- Material Symbols  : Paket ikon estetik dari Google.
+- SweetAlert2    : (Opsional) Library untuk memunculkan pop-up yang cantik.
+- Glassmorphism  : Gaya desain CSS khusus untuk Admin Panel.
+
+-------------------------------------------------------
+CARA INSTALASI CEPAT (AUTO-INSTALLER)
+-------------------------------------------------------
+Jika Anda menggunakan Windows, Anda tidak perlu menginstal library di atas satu per satu.
+Cukup jalankan file `install.bat` yang ada di luar folder, dan sistem akan otomatis mengunduh semuanya!
