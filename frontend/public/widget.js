@@ -15,7 +15,9 @@
     iframe.style.border = 'none';
     iframe.style.zIndex = '2147483647';
     iframe.style.background = 'transparent';
-    iframe.allow = 'microphone';
+    iframe.allow = 'microphone; speaker-selection';
+    // KRITIS: sandbox tanpa allow-top-navigation mencegah iframe menavigasi/refresh halaman parent
+    iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads';
 
     // 3. Mulai dengan ukuran kecil (Hanya seukuran tombol Bubble)
     iframe.style.width = '100px';

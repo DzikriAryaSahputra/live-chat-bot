@@ -48,23 +48,6 @@ nlu:
       - berapa jumlah umkm di jambi?
       - jumlah umkm jambi
       - umkm jambi
-  - intent: sapaan
-    examples: |
-      - halo
-      - selamat pagi
-      - permisi admin
-      - hai bps
-      - halo bps
-      - halo asisten virtual
-      - halo asisten bps
-      - halo asisten virtual bps
-      - siang
-      - selamat siang
-      - selamat sore
-      - selamat malam
-      - hai
-      - oi
-      - p
   - intent: tanya_jam_operasional
     examples: |
       - jam berapa buka
@@ -88,3 +71,20 @@ nlu:
       - kapan SE2026?
       - sensus ekonomi
       - SE2026
+  - intent: sapaan
+    examples: |
+      - halo
+      - selamat pagi
+      - permisi admin
+      - hai bps
+      - halo bps
+      - halo asisten virtual
+      - halo asisten bps
+      - halo asisten virtual bps
+      - siang
+      - selamat siang
+      - selamat sore
+      - selamat malam
+      - hai
+      - oi
+      - p

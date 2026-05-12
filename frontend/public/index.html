@@ -4,153 +4,112 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BPS Floating Chat Widget</title>
+  <title>BIPS Chat Widget</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Poppins', 'sans-serif'] }
+          fontFamily: { sans: ['Poppins', 'sans-serif'] },
+          colors: {
+            brand: { DEFAULT: '#f59e0b', dark: '#d97706', header: '#0f2b56' }
+          },
+          boxShadow: { 'widget': '0 10px 40px -10px rgba(0,0,0,0.2)' }
         }
       }
     }
   </script>
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" />
 
   <style>
     :root {
-      --bps-blue: #19376D;
-      --bps-dark-blue: #003366;
-      --bps-orange: #E8A020;
-      --bps-light-blue: #E6F0F9;
+      --bps-blue: #0f2b56;
+      --bps-orange: #f59e0b;
     }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: transparent;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Mempercantik Scrollbar di kotak chat */
-    #chat-box::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    #chat-box::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    #chat-box::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-    }
-
-    /* 👇 SIHIR CSS UNTUK LINK DI CHAT WARGA 👇 */
-    a {
-      color: #3b82f6 !important;
-      /* Warna biru cerah */
-      text-decoration: none !important;
-      text-underline-offset: 3px;
-      font-weight: 600;
-      transition: all 0.2s ease-in-out;
-    }
-
-    a:hover {
-      color: #1d4ed8 !important;
-      /* Biru gelap saat disentuh */
-      text-decoration-thickness: 2px;
-    }
+    body { font-family: 'Poppins', sans-serif; }
+    #chat-box::-webkit-scrollbar { width: 4px; }
+    #chat-box::-webkit-scrollbar-track { background: transparent; }
+    #chat-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    a { color: #3b82f6 !important; text-decoration: none !important; font-weight: 600; transition: all 0.2s ease-in-out; }
+    a:hover { color: #1d4ed8 !important; }
   </style>
 </head>
 
 <body class="relative h-screen w-full bg-transparent pointer-events-none overflow-hidden">
 
-  <!-- ==============================================
-       WIDGET LIVE CHAT BPS (Mode Iframe)
-       Semua elemen klik diarahkan kembali ke iframe
-       ============================================== -->
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans pointer-events-auto">
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-auto">
 
-    <div
-      class="chat-container relative w-[360px] h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden transition-all transform origin-bottom-right">
+    <!-- Chat Container -->
+    <div class="chat-container relative w-[380px] bg-gray-50 rounded-2xl shadow-widget overflow-hidden flex flex-col border border-gray-200 transition-all transform origin-bottom-right h-[600px] max-h-[80vh]">
 
-      <div
-        class="chat-header bg-gradient-to-r from-[var(--bps-blue)] to-[var(--bps-dark-blue)] p-4 text-white flex items-center justify-between shrink-0">
-
+      <!-- Header -->
+      <header class="bg-[#0f2b56] text-white p-4 flex items-center justify-between rounded-t-2xl shrink-0">
         <div class="flex items-center gap-3">
-          <div
-            class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md shrink-0 border border-white overflow-hidden">
-            <img class="w-full h-full object-cover" alt="Logo BPS" src="img/SISCA_BOT.png"
-              onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" />
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-white/20">
+            <img class="w-full h-full object-cover" alt="BIPS Avatar" src="img/SISCA_BOT.png"
+              onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'"/>
           </div>
           <div>
-            <h3 class="font-bold text-sm leading-tight">SISCA (Bot Asisten Virtual)</h3>
-            <div class="flex items-center gap-1.5 mt-0.5">
+            <h2 class="font-bold text-sm leading-tight">BIPS (Bot Informasi Pelayanan Statistik)</h2>
+            <div class="flex items-center gap-1.5 mt-1">
               <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-              <p class="text-xs text-blue-100 font-light">Online</p>
+              <span class="text-xs text-blue-100 font-medium">Online</span>
             </div>
           </div>
         </div>
-
-        <div class="flex items-center gap-1 shrink-0">
-          <button onclick="window.openDeleteModal()"
-            class="w-8 h-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-all"
-            title="Hapus Riwayat">
-            <span class="material-symbols-outlined text-[20px]">delete</span>
+        <div class="flex items-center gap-4 text-blue-100 shrink-0 pl-2">
+          <button type="button" id="tts-toggle-btn"
+            onclick="event.preventDefault(); window.toggleVoiceMode(); return false;"
+            title="Aktifkan Mode Suara (Disabilitas)" class="hover:text-white transition-colors">
+            <i id="tts-icon" class="fa-solid fa-volume-xmark text-lg"></i>
           </button>
-          <button aria-label="Close"
-            class="w-8 h-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-all"
-            title="Tutup Chat">
-            <span class="material-symbols-outlined text-[22px]">close</span>
+          <button type="button" onclick="event.preventDefault(); window.openDeleteModal(); return false;"
+            title="Hapus Riwayat" class="hover:text-white transition-colors">
+            <i class="fa-regular fa-trash-can text-lg"></i>
+          </button>
+          <button type="button" aria-label="Close" title="Tutup Chat" class="hover:text-white transition-colors">
+            <i class="fa-solid fa-xmark text-xl"></i>
           </button>
         </div>
+      </header>
 
-      </div>
+      <!-- Chat Box -->
+      <div class="flex-1 overflow-y-auto p-5 bg-[#f8fafc] flex flex-col gap-4" id="chat-box"></div>
 
-      <div class="chat-box flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3" id="chat-box"></div>
-
-      <div class="chat-input-area p-3 bg-white border-t border-gray-100 shrink-0">
-        <div class="relative flex items-center gap-2">
+      <!-- Input Area -->
+      <footer class="bg-white p-4 border-t border-gray-100 rounded-b-2xl shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+        <div class="relative flex items-center">
           <input id="user-input" type="text" autocomplete="off" placeholder="Ketik pesan..."
-            class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--bps-blue)] focus:border-transparent text-sm transition-all placeholder-gray-400" />
-          <button id="send-btn"
-            class="absolute right-1.5 p-2 bg-[var(--bps-orange)] hover:bg-orange-600 text-white rounded-full shadow-sm flex items-center justify-center transition-transform active:scale-95">
-            <span class="material-symbols-outlined text-[18px] translate-x-0.5">send</span>
+            class="w-full bg-gray-50 border border-gray-200 rounded-full py-3.5 pl-5 pr-14 text-sm focus:outline-none focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] text-gray-700 placeholder-gray-400"/>
+          <button type="button" id="send-btn" aria-label="Kirim pesan"
+            class="absolute right-1.5 bg-[#f59e0b] hover:bg-[#d97706] text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-sm">
+            <i class="fa-solid fa-paper-plane text-sm" style="margin-left:-2px"></i>
           </button>
         </div>
-        <p class="text-center text-[10px] text-gray-400 mt-2">Didukung oleh AI BPS</p>
-      </div>
+        <div class="text-center mt-3">
+          <span class="text-[11px] text-gray-400 font-medium">Didukung oleh AI BPS</span>
+        </div>
+      </footer>
 
-      <!-- MATIKAN BLUR, TAMBAHKAN POINTER EVENTS AUTO -->
+      <!-- Delete Modal -->
       <div id="delete-modal"
         class="absolute inset-0 z-[100] flex items-center justify-center hidden pointer-events-auto">
         <div class="absolute inset-0 bg-transparent cursor-pointer" onclick="window.closeDeleteModal()"></div>
-
-        <div
-          class="relative bg-white rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.15)] border border-gray-100 w-[90%] p-6 transform transition-all scale-100 mx-auto">
+        <div class="relative bg-white rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.15)] border border-gray-100 w-[90%] p-6 transform transition-all scale-100 mx-auto">
           <div class="flex flex-col items-center text-center">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
-              <span class="material-symbols-outlined text-4xl">delete_forever</span>
+              <i class="fa-solid fa-trash-can text-3xl"></i>
             </div>
-
             <h3 class="text-xl font-bold text-gray-900 mb-2">Hapus Riwayat?</h3>
-            <p class="text-xs text-gray-500 mb-6 leading-relaxed">Tindakan ini akan menghapus obrolan secara permanen.
-            </p>
-
+            <p class="text-xs text-gray-500 mb-6 leading-relaxed">Tindakan ini akan menghapus obrolan secara permanen.</p>
             <div class="flex w-full gap-3">
-              <button onclick="window.closeDeleteModal()"
-                class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition-colors">
-                Batal
-              </button>
-              <button onclick="window.confirmClearChat()"
-                class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-shadow shadow-lg shadow-red-200">
-                Ya, Hapus
-              </button>
+              <button type="button" onclick="window.closeDeleteModal()"
+                class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition-colors">Batal</button>
+              <button type="button" onclick="window.confirmClearChat()"
+                class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-shadow shadow-lg shadow-red-200">Ya, Hapus</button>
             </div>
           </div>
         </div>
@@ -158,9 +117,10 @@
 
     </div>
 
-    <button
-      class="w-14 h-14 rounded-full bg-[var(--bps-orange)] hover:bg-orange-600 shadow-lg hover:shadow-xl text-white flex items-center justify-center transition-all transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-4 focus:ring-orange-200 group">
-      <span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">chat_bubble</span>
+    <!-- Open Button (selector: .fixed.bottom-6.right-6 > button.w-14.h-14) -->
+    <button type="button"
+      class="w-14 h-14 rounded-full bg-[#f59e0b] hover:bg-[#d97706] shadow-lg hover:shadow-xl text-white flex items-center justify-center transition-all transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-4 focus:ring-amber-200 group">
+      <i class="fa-solid fa-comment-dots text-2xl"></i>
     </button>
 
   </div>
@@ -169,5 +129,4 @@
   <script src="script.js"></script>
 
 </body>
-
 </html>

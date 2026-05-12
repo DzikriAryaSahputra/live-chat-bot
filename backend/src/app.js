@@ -20,7 +20,14 @@ const db = require('./config/db');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, {
+    cors: { origin: "*" },
+    // Naikkan timeout agar koneksi tidak putus saat LLM memproses PDF (bisa 30-60 detik)
+    pingTimeout: 120000,   // 120 detik (default hanya 20 detik!)
+    pingInterval: 30000,   // Ping setiap 30 detik
+    transports: ['websocket', 'polling'], // Prioritaskan WebSocket
+    upgradeTimeout: 30000,
+});
 const port = process.env.PORT || 3000;
 
 app.use(cors());
@@ -235,13 +242,13 @@ function trackTokenUsage(model, tokens) {
 
 async function generateLLMResponse(userMessage) {
     const knowledgeStr = await getKnowledgeBaseContext(userMessage);
-    const systemPrompt = `Anda adalah Asisten Virtual BPS Kota Jambi bernama SISCA.
+    const systemPrompt = `Anda adalah Asisten Virtual BPS Kota Jambi bernama BIPS (Bot Informasi Pelayanan Statistik).
 TUGAS UTAMA ANDA: Menjawab pertanyaan warga dengan cerdas, ramah, dan solutif HANYA berdasarkan informasi pada "DOKUMEN PENGETAHUAN BPS" (termasuk Dokumen Eksternal) di bawah ini.
 DILARANG KERAS berhalusinasi atau memberikan informasi angka/fakta yang tidak tertulis pada dokumen di bawah ini.
 Teks dari PDF terkadang "acak-acakan" (misal: "BPS me- naungi "). WAJIB BACALAH DENGAN SEKSAMA dan PERBAIKI TYPO DI KEPALA ANDA saat menjawab.
 jawab dengan semaksimal mungkin.
 jangan sisipkan nama file pdf.
-Jika jawaban memang tidak tersedia sama sekali di dalam dokumen di bawah, katakan: "Maaf, SISCA belum dibekali jawaban terkait hal tersebut. Ketik 'bantuan' atau klik tombol 'Hubungi Admin' jika butuh bicara dengan petugas asli."
+Jika jawaban memang tidak tersedia sama sekali di dalam dokumen di bawah, katakan: "Maaf, BIPS belum dibekali jawaban terkait hal tersebut. Ketik 'bantuan' atau klik tombol 'Hubungi Admin' jika butuh bicara dengan petugas asli."
 
 === DOKUMEN PENGETAHUAN BPS ===
 ${knowledgeStr}
@@ -363,12 +370,24 @@ io.on('connection', (socket) => {
 
             // 4. KIRIM JAWABAN KE WARGA
             if (botReply) {
+                // FITUR 1: Cek Jam Operasional Admin (Senin-Jumat, 08:00 - 16:00)
+                if (botReply.toLowerCase().includes('meneruskan pesan')) {
+                    const now = new Date();
+                    const currentHour = now.getHours();
+                    const currentDay = now.getDay(); // 0: Minggu, 1: Senin, ..., 6: Sabtu
+                    
+                    const isWeekday = currentDay >= 1 && currentDay <= 5;
+                    const isWorkingHour = currentHour >= 8 && currentHour < 16;
+
+                    if (isWeekday && isWorkingHour) {
+                        activeSessions[senderId] = 'admin';
+                    } else {
+                        botReply = "Maaf, layanan Live Chat dengan petugas BPS hanya tersedia pada hari kerja (Senin - Jumat, Pukul 08:00 - 16:00 WIB). Di luar jam tersebut, Anda tetap bisa bertanya dan BIPS akan mencoba menjawabnya.";
+                    }
+                }
+
                 await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'bot', botReply]);
                 io.emit('receive_message', { senderId: senderId, message: botReply, senderType: 'bot' });
-
-                if (botReply.toLowerCase().includes('meneruskan pesan')) {
-                    activeSessions[senderId] = 'admin';
-                }
                 socket.emit('bot_response', { message: botReply });
             }
         } catch (error) {
