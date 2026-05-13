@@ -136,10 +136,49 @@ function removeTypingIndicator() {
 // ==========================================
 // 5. FITUR MENAMPILKAN PESAN KE LAYAR
 // ==========================================
+
+// Lacak tanggal terakhir yang sudah ditampilkan (untuk pemisah hari seperti WhatsApp)
+let lastShownDate = null;
+
+function getDateLabel(date) {
+    const d = new Date(date);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const sameDay = (a, b) =>
+        a.getDate() === b.getDate() &&
+        a.getMonth() === b.getMonth() &&
+        a.getFullYear() === b.getFullYear();
+
+    if (sameDay(d, today)) return 'Hari ini';
+    if (sameDay(d, yesterday)) return 'Kemarin';
+    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function getDateKey(date) {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function appendDateSeparator(date) {
+    const sep = document.createElement('div');
+    sep.className = 'flex justify-center my-3';
+    sep.innerHTML = `<span class="bg-blue-50/80 text-gray-500 text-[11px] px-3 py-1 rounded-full font-medium border border-blue-100/50">${getDateLabel(date)}</span>`;
+    chatBox.appendChild(sep);
+}
 function appendMessage(sender, text, timestamp = null) {
     const wrapper = document.createElement('div');
     const rawTime = timestamp ? timestamp : new Date();
     const jamMenit = new Date(rawTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).replace('.', ':');
+
+    // --- Pemisah Tanggal seperti WhatsApp ---
+    const dateKey = getDateKey(rawTime);
+    if (lastShownDate !== dateKey) {
+        appendDateSeparator(rawTime);
+        lastShownDate = dateKey;
+    }
+    // -----------------------------------------
 
     if (sender === 'user') {
         wrapper.className = 'message-wrapper wrapper-user flex flex-col gap-1 items-end self-end max-w-[85%]';
@@ -366,6 +405,7 @@ window.confirmClearChat = function() {
                 <p class="text-gray-500 text-sm font-medium mt-1">Riwayat obrolan telah dibersihkan.</p>
             </div>
         `;
+        lastShownDate = null; // Reset agar separator tanggal muncul ulang
     }
 
     // 3. Tutup Modal Pop-up Merah

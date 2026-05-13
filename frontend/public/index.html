@@ -6,8 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BIPS Chat Widget</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script>
@@ -29,12 +30,34 @@
       --bps-blue: #0f2b56;
       --bps-orange: #f59e0b;
     }
-    body { font-family: 'Poppins', sans-serif; }
-    #chat-box::-webkit-scrollbar { width: 4px; }
-    #chat-box::-webkit-scrollbar-track { background: transparent; }
-    #chat-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    a { color: #3b82f6 !important; text-decoration: none !important; font-weight: 600; transition: all 0.2s ease-in-out; }
-    a:hover { color: #1d4ed8 !important; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #chat-box::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #chat-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #chat-box::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    a {
+      color: #3b82f6 !important;
+      text-decoration: none !important;
+      font-weight: 600;
+      transition: all 0.2s ease-in-out;
+    }
+
+    a:hover {
+      color: #1d4ed8 !important;
+    }
   </style>
 </head>
 
@@ -43,14 +66,15 @@
   <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-auto">
 
     <!-- Chat Container -->
-    <div class="chat-container relative w-[380px] bg-gray-50 rounded-2xl shadow-widget overflow-hidden flex flex-col border border-gray-200 transition-all transform origin-bottom-right h-[600px] max-h-[80vh]">
+    <div
+      class="chat-container relative w-[380px] bg-gray-50 rounded-2xl shadow-widget overflow-hidden flex flex-col border border-gray-200 transition-all transform origin-bottom-right h-[600px] max-h-[80vh]">
 
       <!-- Header -->
       <header class="bg-[#0f2b56] text-white p-4 flex items-center justify-between rounded-t-2xl shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-white/20">
             <img class="w-full h-full object-cover" alt="BIPS Avatar" src="img/SISCA_BOT.png"
-              onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'"/>
+              onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" />
           </div>
           <div>
             <h2 class="font-bold text-sm leading-tight">BIPS (Bot Informasi Pelayanan Statistik)</h2>
@@ -80,17 +104,18 @@
       <div class="flex-1 overflow-y-auto p-5 bg-[#f8fafc] flex flex-col gap-4" id="chat-box"></div>
 
       <!-- Input Area -->
-      <footer class="bg-white p-4 border-t border-gray-100 rounded-b-2xl shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+      <footer
+        class="bg-white p-4 border-t border-gray-100 rounded-b-2xl shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
         <div class="relative flex items-center">
           <input id="user-input" type="text" autocomplete="off" placeholder="Ketik pesan..."
-            class="w-full bg-gray-50 border border-gray-200 rounded-full py-3.5 pl-5 pr-14 text-sm focus:outline-none focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] text-gray-700 placeholder-gray-400"/>
+            class="w-full bg-gray-50 border border-gray-200 rounded-full py-3.5 pl-5 pr-14 text-sm focus:outline-none focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] text-gray-700 placeholder-gray-400" />
           <button type="button" id="send-btn" aria-label="Kirim pesan"
             class="absolute right-1.5 bg-[#f59e0b] hover:bg-[#d97706] text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-sm">
             <i class="fa-solid fa-paper-plane text-sm" style="margin-left:-2px"></i>
           </button>
         </div>
         <div class="text-center mt-3">
-          <span class="text-[11px] text-gray-400 font-medium">Didukung oleh AI BPS</span>
+          <span class="text-[11px] text-gray-400 font-medium">created by Dzikri Arya</span>
         </div>
       </footer>
 
@@ -98,18 +123,21 @@
       <div id="delete-modal"
         class="absolute inset-0 z-[100] flex items-center justify-center hidden pointer-events-auto">
         <div class="absolute inset-0 bg-transparent cursor-pointer" onclick="window.closeDeleteModal()"></div>
-        <div class="relative bg-white rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.15)] border border-gray-100 w-[90%] p-6 transform transition-all scale-100 mx-auto">
+        <div
+          class="relative bg-white rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.15)] border border-gray-100 w-[90%] p-6 transform transition-all scale-100 mx-auto">
           <div class="flex flex-col items-center text-center">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
               <i class="fa-solid fa-trash-can text-3xl"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">Hapus Riwayat?</h3>
-            <p class="text-xs text-gray-500 mb-6 leading-relaxed">Tindakan ini akan menghapus obrolan secara permanen.</p>
+            <p class="text-xs text-gray-500 mb-6 leading-relaxed">Tindakan ini akan menghapus obrolan secara permanen.
+            </p>
             <div class="flex w-full gap-3">
               <button type="button" onclick="window.closeDeleteModal()"
                 class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition-colors">Batal</button>
               <button type="button" onclick="window.confirmClearChat()"
-                class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-shadow shadow-lg shadow-red-200">Ya, Hapus</button>
+                class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-shadow shadow-lg shadow-red-200">Ya,
+                Hapus</button>
             </div>
           </div>
         </div>
@@ -129,4 +157,5 @@
   <script src="script.js"></script>
 
 </body>
+
 </html>
