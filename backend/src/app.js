@@ -304,27 +304,43 @@ let activeSessions = {};
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
     socket.data.isAdmin = false;
+    
     if (token) {
         jwt.verify(token, JWT_SECRET, (err, decoded) => {
-            if (!err && decoded.role === 'admin') {
+            if (err) {
+                return next(new Error('Authentication Error'));
+            } else if (decoded.role === 'admin') {
                 socket.data.isAdmin = true;
+                return next();
+            } else {
+                return next();
             }
         });
+    } else {
+        // Klien warga biasa (tanpa token)
+        next();
     }
-    next();
 });
 
 io.on('connection', (socket) => {
     console.log(`🔌 User terhubung: ${socket.id} (Admin: ${socket.data.isAdmin})`);
     broadcastUserList();
 
-    // 🔗 MENDAFTAR ROOM SAAT INisialisasi WIDGET (SANGAT PENTING AGAR CHAT ADMIN MASUK)
     socket.on('register_session', (data) => {
         if (data.senderId) {
             socket.join(data.senderId);
             console.log(`📡 Klien telah memasuki jaringan room: ${data.senderId}`);
+            if (data.name) {
+                io.emit('user_name_updated', { senderId: data.senderId, name: data.name });
+            }
             // Pancarkan ulang daftar, karena ada user yang baru online!
             broadcastUserList();
+        }
+    });
+
+    socket.on('set_user_name', (data) => {
+        if (data.senderId && data.name) {
+            io.emit('user_name_updated', { senderId: data.senderId, name: data.name });
         }
     });
 
@@ -389,6 +405,12 @@ io.on('connection', (socket) => {
                 await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'bot', botReply]);
                 io.emit('receive_message', { senderId: senderId, message: botReply, senderType: 'bot' });
                 socket.emit('bot_response', { message: botReply });
+                
+                if (activeSessions[senderId] === 'admin') {
+                    setTimeout(() => {
+                        socket.emit('admin_status', { status: 'connected' });
+                    }, 1500); // Jeda sedikit agar pesan bot selesai muncul
+                }
             }
         } catch (error) {
             socket.emit('bot_response', { message: 'Gagal menghubungi otak AI.' });
@@ -402,7 +424,8 @@ io.on('connection', (socket) => {
 
         if (message.trim() === '/selesai') {
             delete activeSessions[targetSenderId];
-            io.to(targetSenderId).emit('bot_response', { message: '✅ Sesi dengan petugas telah berakhir.' });
+            io.to(targetSenderId).emit('bot_response', { message: '✅ Sesi dengan petugas telah berakhir. BIPS kembali melayani Anda.' });
+            io.to(targetSenderId).emit('admin_status', { status: 'disconnected' });
             return;
         }
 

@@ -18,10 +18,11 @@ if (!mySenderId) {
 
 // Variabel "Ingatan" untuk mengecek siapa lawan bicara saat ini
 let currentResponder = 'bot';
+let isWaitingForName = !localStorage.getItem('bps_user_name');
 
 // Saat terkoneksi ke soket, langsung mendaftar ke server agar terhubung ke jaringan pesan pribadinya
 socket.on('connect', () => {
-    socket.emit('register_session', { senderId: mySenderId });
+    socket.emit('register_session', { senderId: mySenderId, name: localStorage.getItem('bps_user_name') });
     // Restore ikon suara setelah reconnect (jika sempat terputus saat LLM lambat menjawab)
     if (typeof restoreVoiceIcon === 'function') restoreVoiceIcon();
 });
@@ -223,8 +224,36 @@ function sendMessage(e) {
     const text = userInput.value.trim();
     if (text) {
         appendMessage('user', text);
-        showTypingIndicator();
-        socket.emit('user_message', { senderId: mySenderId, message: text });
+        
+        if (isWaitingForName) {
+            // Ekstrak nama jika warga mengetik panjang (misal: "Halo nama saya Budi")
+            let extractedName = text.toLowerCase();
+            const prefixes = ["halo nama saya ", "nama saya ", "saya ", "panggil aja ", "panggil saja ", "namaku ", "perkenalkan nama saya ", "kenalin nama saya ", "ini "];
+            for (let prefix of prefixes) {
+                if (extractedName.startsWith(prefix)) {
+                    extractedName = extractedName.substring(prefix.length);
+                    break;
+                }
+            }
+            // Kapitalisasi huruf pertama
+            extractedName = extractedName.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            if (!extractedName) extractedName = "Warga"; // Fallback jika kosong
+            
+            // Simpan nama dan ubah state
+            localStorage.setItem('bps_user_name', extractedName);
+            socket.emit('set_user_name', { senderId: mySenderId, name: extractedName });
+            isWaitingForName = false;
+            
+            // Jawab langsung secara lokal tanpa panggil API AI
+            setTimeout(() => {
+                appendMessage('bot', `Salam kenal Kak <b>${extractedName}</b>! Ada yang bisa BIPS bantu hari ini?`);
+                if (isVoiceModeEnabled) speakText(`Salam kenal Kak ${extractedName}! Ada yang bisa BIPS bantu hari ini?`);
+                showQuickReplies();
+            }, 600);
+        } else {
+            showTypingIndicator();
+            socket.emit('user_message', { senderId: mySenderId, message: text });
+        }
         userInput.value = '';
     }
 }
@@ -316,6 +345,23 @@ socket.on('admin_response', (data) => {
     if (isVoiceModeEnabled) speakText(data.message);
 });
 
+socket.on('admin_status', (data) => {
+    removeTypingIndicator();
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flex justify-center my-4 fade-in w-full';
+    
+    if (data.status === 'connected') {
+        currentResponder = 'admin';
+        wrapper.innerHTML = `<div class="bg-blue-50 text-blue-600 border border-blue-200 text-[11px] font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm"><i class="fa-solid fa-user-tie text-[14px]"></i> Anda kini terhubung dengan Petugas BPS</div>`;
+    } else if (data.status === 'disconnected') {
+        currentResponder = 'bot';
+        wrapper.innerHTML = `<div class="bg-slate-100 text-slate-500 border border-slate-200 text-[11px] font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm"><i class="fa-solid fa-robot text-[14px]"></i> Sesi dengan Petugas berakhir</div>`;
+    }
+    
+    chatBox.appendChild(wrapper);
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
+
 // ==========================================
 // 8. MEMUAT RIWAYAT (DENGAN INGATAN & QUICK REPLIES)
 // ==========================================
@@ -327,8 +373,14 @@ window.onload = async function () {
         if (history.length === 0) {
             setTimeout(() => {
                 const sapaan = getGreeting();
-                appendMessage('bot', `${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Ada yang bisa BIPS bantu hari ini?`);
-                showQuickReplies();
+                if (isWaitingForName) {
+                    appendMessage('bot', `${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Agar obrolan kita lebih akrab, boleh BIPS tahu siapa nama Anda?`);
+                    if (isVoiceModeEnabled) speakText(`${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Agar obrolan kita lebih akrab, boleh BIPS tahu siapa nama Anda?`);
+                } else {
+                    appendMessage('bot', `${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Ada yang bisa BIPS bantu hari ini?`);
+                    if (isVoiceModeEnabled) speakText(`${sapaan}! Selamat datang di Layanan Live Chat BPS Kota Jambi. Ada yang bisa BIPS bantu hari ini?`);
+                    showQuickReplies();
+                }
             }, 500);
         } else {
             history.forEach(chat => {
@@ -420,3 +472,71 @@ window.confirmClearChat = function() {
         showQuickReplies();
     }, 1200);
 };
+
+// ==========================================
+// 12. FITUR VOICE TO TEXT (SPEECH RECOGNITION)
+// ==========================================
+const micBtn = document.getElementById('mic-btn');
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition && micBtn) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false; // Berhenti otomatis saat hening
+    recognition.lang = 'id-ID'; // Bahasa Indonesia
+    recognition.interimResults = false;
+
+    let isRecording = false;
+
+    micBtn.addEventListener('click', () => {
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Gagal memulai mikrofon:", e);
+            }
+        }
+    });
+
+    recognition.onstart = () => {
+        isRecording = true;
+        // Animasi UI & Ubah Ikon: Mikrofon kedap-kedip merah dan berubah jadi tombol stop
+        micBtn.classList.remove('text-gray-400', 'hover:text-[#f59e0b]');
+        micBtn.classList.add('text-red-500', 'animate-pulse');
+        micBtn.innerHTML = '<i class="fa-solid fa-stop text-lg"></i>';
+        
+        // Ubah placeholder
+        userInput.placeholder = "Mendengarkan suara Anda...";
+        userInput.disabled = true; // Kunci input text saat merekam
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        // Opsi 2 (Manual Review): Masukkan ke kotak input, biarkan user klik kirim sendiri
+        userInput.value = transcript;
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Error Speech Recognition:", event.error);
+        if (event.error === 'not-allowed') {
+            alert("Akses mikrofon diblokir oleh browser. Izinkan akses mikrofon di pengaturan situs.");
+        }
+    };
+
+    recognition.onend = () => {
+        isRecording = false;
+        // Kembalikan UI & Ikon seperti semula
+        micBtn.classList.remove('text-red-500', 'animate-pulse');
+        micBtn.classList.add('text-gray-400', 'hover:text-[#f59e0b]');
+        micBtn.innerHTML = '<i class="fa-solid fa-microphone text-lg"></i>';
+        
+        userInput.placeholder = "Ketik pesan...";
+        userInput.disabled = false; // Buka kunci input
+        userInput.focus(); // Fokus kursor agar user siap review/edit
+    };
+} else if (micBtn) {
+    // Sembunyikan tombol mic jika browser tidak mendukung
+    micBtn.style.display = 'none';
+    console.warn("Browser ini tidak mendukung fitur Speech Recognition.");
+}
