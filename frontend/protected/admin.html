@@ -40,7 +40,8 @@
                             500: '#3b82f6',
                             600: '#2563eb',
                             700: '#1d4ed8',
-                        }
+                        },
+                        "bot-cyan": "#22d3ee",
                     }
                 }
             }
@@ -626,7 +627,7 @@
                         sistem...</p>
                     <div class="w-64 h-2 bg-slate-200 rounded-full overflow-hidden">
                         <div id="loading-progress"
-                            class="h-full bg-primary rounded-full w-0 transition-all duration-[2000ms] ease-out"></div>
+                            class="h-full bg-primary-600 rounded-full w-0 transition-all duration-[2000ms] ease-out"></div>
                     </div>
                 </div>
 
@@ -634,7 +635,7 @@
                     <button type="button" onclick="closeTrainModal()" id="train-cancel-btn"
                         class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Batal</button>
                     <button type="submit" id="train-submit-btn"
-                        class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-all active:scale-95">Simpan
+                        class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-all active:scale-95">Simpan
                         & Latih Bot</button>
                 </div>
             </form>
@@ -696,7 +697,7 @@
                 <button type="button" onclick="closeAliasModal()"
                     class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Batal</button>
                 <button type="button" onclick="confirmEditAlias()"
-                    class="bg-primary hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm">Simpan</button>
+                    class="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm">Simpan</button>
             </div>
         </div>
     </div>
@@ -816,8 +817,8 @@
         }
 
         function showToastAlert(title, message) {
-            const toast = document.createElement('div'); toast.className = 'bg-white border-l-4 border-primary shadow-2xl rounded-xl p-4 w-80 transform transition-all duration-300 translate-x-full opacity-0 flex items-start gap-3 pointer-events-auto';
-            toast.innerHTML = `<div class="bg-primary/10 p-2 rounded-full text-primary shrink-0"><span class="material-symbols-outlined text-xl">notifications_active</span></div><div><h4 class="text-sm font-bold">${title}</h4><p class="text-xs text-slate-500">${message}</p></div>`;
+            const toast = document.createElement('div'); toast.className = 'bg-white border-l-4 border-primary-600 shadow-2xl rounded-xl p-4 w-80 transform transition-all duration-300 translate-x-full opacity-0 flex items-start gap-3 pointer-events-auto';
+            toast.innerHTML = `<div class="bg-primary-600/10 p-2 rounded-full text-primary-600 shrink-0"><span class="material-symbols-outlined text-xl">notifications_active</span></div><div><h4 class="text-sm font-bold">${title}</h4><p class="text-xs text-slate-500">${message}</p></div>`;
             document.getElementById('toast-container').appendChild(toast); setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 50); setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
@@ -855,57 +856,89 @@
             
             dataArray.forEach(item => {
                 const isSystem = PROTECTED_INTENTS.includes(item.intent);
-                const parsedResponse = mdToHtml(item.response);
                 
+                // Highlight {variable} in response with exact styling from user's code
+                const highlightedResponse = (item.response || '').replace(/\{([^}]+)\}/g, '<span class="bg-[#faf8ff] px-1 py-0.5 rounded border border-[#c3c6d7] text-[#fd761a] font-mono text-[12px]">{$1}</span>');
+
+                // Action buttons (edit/delete)
                 let btns = isSystem ? '' : `
-                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="editIntent('${item.intent}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50"><i class="fa-solid fa-pen text-sm"></i></button>
-                        <button onclick="deleteIntent('${item.intent}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"><i class="fa-solid fa-trash text-sm"></i></button>
+                    <div class="flex items-center transition-opacity opacity-100">
+                        <button onclick="editIntent('${item.intent}')" class="w-8 h-8 rounded flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-blue-600 transition-colors" title="Edit Intent">
+                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                        </button>
+                        <button onclick="deleteIntent('${item.intent}')" class="w-8 h-8 rounded flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors" title="Delete Intent">
+                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                        </button>
                     </div>`;
                 
-                const statusBadge = isSystem ? `<span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-slate-200">System</span>` : `<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-green-200">Active</span>`;
+                const statusBadge = isSystem 
+                    ? `<span class="bg-[#dae2fd] text-[#434655] font-semibold text-[12px] px-2 py-0.5 rounded-full border border-[#c3c6d7]/50">SYSTEM</span>` 
+                    : `<span class="bg-[#004ac6]/10 text-[#004ac6] font-semibold text-[12px] px-2 py-0.5 rounded-full border border-[#004ac6]/20">ACTIVE</span>`;
 
-                // Handle examples properly whether it's a string or array
+                // Handle examples
                 let examplesArr = [];
                 if (typeof item.examples === 'string') {
-                    examplesArr = item.examples.split('\\n').map(s => s.replace(/^- /, '').trim()).filter(Boolean);
+                    examplesArr = item.examples.split('\n').map(s => s.replace(/^-\s*/, '').trim()).filter(Boolean);
                 } else if (Array.isArray(item.examples)) {
                     examplesArr = item.examples;
                 }
                 
-                const examplesHtml = examplesArr.map(ex => `<span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1.5 rounded-md border border-slate-200 shadow-sm">${ex}</span>`).join('');
+                // Show max 4 chips initially
+                const MAX_CHIPS = 4;
+                const remaining = examplesArr.length > MAX_CHIPS ? examplesArr.length - MAX_CHIPS : 0;
+                
+                let chipsHtml = '';
+                examplesArr.forEach((ex, idx) => {
+                    const extraClass = idx >= MAX_CHIPS ? 'hidden extra-chip' : '';
+                    chipsHtml += `<span class="bg-[#f2f3ff] text-[#131b2e] border border-[#c3c6d7]/50 px-3 py-1 rounded-md text-[13px] ${extraClass}">${ex}</span>`;
+                });
+                
+                const moreChip = remaining > 0 
+                    ? `<span onclick="this.style.display='none'; Array.from(this.parentElement.querySelectorAll('.extra-chip')).forEach(el => el.classList.remove('hidden'));" class="text-[#004ac6] font-semibold text-[12px] self-center ml-1 cursor-pointer hover:underline">+${remaining} more</span>` 
+                    : '';
 
                 const div = document.createElement('div');
-                div.className = "bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative group flex flex-col h-full";
+                div.className = "bg-white rounded-xl shadow-[0_4px_6px_-1px_rgba(15,23,42,0.05),0_2px_4px_-2px_rgba(15,23,42,0.03)] border border-slate-200/60 flex flex-col hover:border-blue-500/30 transition-colors group";
                 div.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <h3 class="font-bold text-slate-800 text-lg truncate max-w-[200px]" title="${item.intent}">${item.intent}</h3>
-                            ${statusBadge}
+                    <!-- Card Header -->
+                    <div class="p-5 border-b border-slate-200/60 flex items-start justify-between gap-3">
+                        <div class="flex flex-col gap-1 min-w-0">
+                            <div class="flex items-center gap-3">
+                                <h3 class="font-semibold text-lg text-slate-900 truncate" title="${item.intent}">${item.intent}</h3>
+                                ${statusBadge}
+                            </div>
+                            <span class="text-[13px] text-slate-500 truncate">${examplesArr[0] || 'No description'}</span>
                         </div>
                         ${btns}
                     </div>
-                    
-                    <div class="mb-4">
-                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Training Phrases (${examplesArr.length})</h4>
-                        <div class="flex flex-wrap gap-2 max-h-32 overflow-y-auto custom-scrollbar">
-                            ${examplesHtml}
-                        </div>
-                    </div>
 
-                    <div class="mt-auto">
-                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Bot Response Template</h4>
-                        <div class="bg-primary-50/50 border border-primary-100 rounded-xl p-4 flex gap-3 items-start shadow-inner">
-                            <div class="mt-0.5 text-primary-500 bg-white w-6 h-6 rounded flex items-center justify-center shadow-sm border border-primary-100 shrink-0">
-                                <i class="fa-solid fa-robot text-xs"></i>
+                    <!-- Card Body -->
+                    <div class="p-5 flex flex-col gap-5 flex-1">
+                        <!-- Utterances -->
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-[14px] text-[#5e6e85]">Training Phrases (${examplesArr.length})</span>
                             </div>
-                            <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-line max-h-32 overflow-y-auto custom-scrollbar">${parsedResponse}</div>
+                            <div class="flex flex-wrap gap-2">
+                                ${chipsHtml}
+                                ${moreChip}
+                            </div>
+                        </div>
+
+                        <!-- Bot Response -->
+                        <div class="flex flex-col gap-3 mt-auto">
+                            <span class="font-semibold text-[14px] text-[#5e6e85]">Bot Response Template</span>
+                            <div class="bg-[#eaedff] rounded-lg p-3 text-[14px] text-[#131b2e] border border-[#c3c6d7]/30 flex items-start gap-3">
+                                <span class="material-symbols-outlined text-[#004ac6] text-[20px] shrink-0 mt-0.5">smart_toy</span>
+                                <div class="leading-relaxed whitespace-pre-line max-h-28 overflow-y-auto custom-scrollbar">${highlightedResponse || '<span class="text-slate-400 italic">Tidak ada respons</span>'}</div>
+                            </div>
                         </div>
                     </div>
                 `;
                 grid.appendChild(div);
             });
         }
+
 
         function filterKnowledge() {
             const q = document.getElementById('knowledge-search').value.toLowerCase();
@@ -930,7 +963,7 @@
                 try {
                     const r = await fetch(`/api/bot/intents/${intentName}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
                     if (r.ok) {
-                        isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex');
+                        isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); showTrainBanner();
                         fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`);
                     }
                     else { const res = await r.json(); showToastAlert('❌ Gagal', res.error); if (r.status === 403) logoutAdmin(); }
@@ -955,9 +988,9 @@
 
         function startSmartLoading() {
             document.getElementById('form-inputs').classList.add('hidden'); document.getElementById('smart-loading-container').classList.replace('hidden', 'flex'); document.getElementById('train-submit-btn').classList.add('hidden'); document.getElementById('train-cancel-btn').disabled = true;
-            document.getElementById('spinner-circle').className = "absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"; document.getElementById('spinner-icon').innerText = 'psychology';
+            document.getElementById('spinner-circle').className = "absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"; document.getElementById('spinner-icon').innerText = 'psychology';
             const textEl = document.getElementById('loading-text'); const progressEl = document.getElementById('loading-progress');
-            textEl.className = "text-sm font-medium text-slate-500 mb-5 text-center px-4"; textEl.innerText = botPhrases[0]; progressEl.style.width = '10%'; progressEl.className = "h-full bg-primary rounded-full w-0 transition-all duration-[2000ms] ease-out";
+            textEl.className = "text-sm font-medium text-slate-500 mb-5 text-center px-4"; textEl.innerText = botPhrases[0]; progressEl.style.width = '10%'; progressEl.className = "h-full bg-primary-600 rounded-full w-0 transition-all duration-[2000ms] ease-out";
             let i = 0; loadingInterval = setInterval(() => { i = (i + 1) % botPhrases.length; textEl.innerText = botPhrases[i]; let w = parseFloat(progressEl.style.width) || 10; if (w < 90) progressEl.style.width = (w + 4) + '%'; }, 3000);
         }
 
@@ -965,8 +998,8 @@
             clearInterval(loadingInterval);
             const p = document.getElementById('loading-progress'), c = document.getElementById('spinner-circle'), t = document.getElementById('loading-text');
             p.style.width = '100%'; c.classList.remove('animate-spin');
-            if (isSuccess) { p.classList.replace('bg-primary', 'bg-green-500'); document.getElementById('spinner-icon').innerText = 'check_circle'; t.innerText = message; t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; }
-            else { p.classList.replace('bg-primary', 'bg-red-500'); document.getElementById('spinner-icon').innerText = 'error'; t.innerText = message; t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; }
+            if (isSuccess) { p.classList.replace('bg-primary-600', 'bg-green-500'); document.getElementById('spinner-icon').innerText = 'check_circle'; t.innerText = message; t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; }
+            else { p.classList.replace('bg-primary-600', 'bg-red-500'); document.getElementById('spinner-icon').innerText = 'error'; t.innerText = message; t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; }
         }
 
         function openTrainModal(isAdd = true) {
@@ -978,23 +1011,62 @@
         function closeTrainModal() {
             const modal = document.getElementById('train-modal'); modal.classList.add('opacity-0'); document.getElementById('train-modal-box').classList.replace('scale-100', 'scale-95');
             setTimeout(() => { modal.classList.replace('flex', 'hidden'); document.getElementById('form-inputs').classList.remove('hidden'); document.getElementById('smart-loading-container').classList.replace('flex', 'hidden'); document.getElementById('train-submit-btn').classList.remove('hidden'); document.getElementById('train-cancel-btn').disabled = false; }, 300);
+            // Jika training sudah sukses (isDataChanged = false), sembunyikan banner saat modal ditutup
+            if (!isDataChanged) { hideTrainBanner(); }
         }
 
         async function submitTrainData(e) {
-            e.preventDefault(); const intentName = document.getElementById('train-intent').value, examples = document.getElementById('train-examples').value, botResponse = mdToHtml(document.getElementById('train-response').value);
-            if (isEditMode) {
-                try { const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) }); if (r.ok) { isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('train-warning-alert').classList.replace('hidden', 'flex'); fetchKnowledgeBase(); closeTrainModal(); showToastAlert('✅ Diperbarui', 'Ilmu tersimpan.'); } else { const err = await r.json(); showToastAlert('❌ Gagal', err.error); } } catch (e) { showToastAlert('❌ Error', 'Jaringan bermasalah.'); }
-            } else {
-                if (!intentName && !isDataChanged) return showToastAlert('⚠️ Peringatan', 'Data kosong!');
-                startSmartLoading(); socket.emit('train_bot', intentName ? { intentName, examples, botResponse } : { intentName: "SKIP_WRITE", examples: "-", botResponse: "-" });
+            e.preventDefault(); 
+            const intentName = document.getElementById('train-intent').value, examples = document.getElementById('train-examples').value, botResponse = mdToHtml(document.getElementById('train-response').value);
+            
+            if (!intentName) return showToastAlert('⚠️ Peringatan', 'Nama Intent kosong!');
+
+            try { 
+                const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) }); 
+                if (r.ok) { 
+                    isDataChanged = true; 
+                    localStorage.setItem('bps_needs_training', 'true'); 
+                    showTrainBanner(); 
+                    fetchKnowledgeBase(); 
+                    closeTrainModal(); 
+                    showToastAlert('✅ Disimpan', 'Data tersimpan ke sistem. Latih AI untuk menerapkan.'); 
+                } else { 
+                    const err = await r.json(); 
+                    showToastAlert('❌ Gagal', err.error); 
+                } 
+            } catch (err) { 
+                showToastAlert('❌ Error', 'Jaringan bermasalah.'); 
             }
+        }
+
+        function showTrainBanner() {
+            const el = document.getElementById('floating-train-reminder');
+            if (!el) return;
+            el.style.transform = 'translateX(-50%) translateY(0)';
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'auto';
+        }
+
+        function hideTrainBanner() {
+            const el = document.getElementById('floating-train-reminder');
+            if (!el) return;
+            el.style.transform = 'translateX(-50%) translateY(6rem)';
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+        }
+
+        function triggerAITraining() {
+            startSmartLoading();
+            const modal = document.getElementById('train-modal'); 
+            modal.classList.replace('hidden', 'flex'); 
+            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('train-modal-box').classList.replace('scale-95', 'scale-100'); }, 10);
+            socket.emit('train_bot', { intentName: 'SKIP_WRITE', examples: '-', botResponse: '-' });
         }
 
         socket.on('train_success', (msg) => {
             stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg);
             isDataChanged = false; localStorage.removeItem('bps_needs_training');
-            document.getElementById('train-warning-alert').classList.replace('flex', 'hidden');
-            document.getElementById('floating-train-reminder').classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            hideTrainBanner();
             fetchKnowledgeBase(); setTimeout(() => closeTrainModal(), 2500);
         });
         socket.on('train_error', (msg) => { stopSmartLoading(false, "Gagal Melatih Model AI"); showToastAlert('❌ Gagal', msg); document.getElementById('train-cancel-btn').disabled = false; });
@@ -1353,6 +1425,30 @@
         fetchTokenUsage();
     </script>
 
+    <!-- Floating Train Reminder -->
+    <div id="floating-train-reminder" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#0b1c30] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-5 transition-all duration-500 z-50 translate-y-24 opacity-0 pointer-events-none">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400">
+                <span class="material-symbols-outlined">warning</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold text-[15px]">Ada Perubahan Data</span>
+                <span class="text-[12px] text-slate-300">Otak AI perlu dilatih ulang agar sinkron.</span>
+            </div>
+        </div>
+        <button onclick="triggerAITraining()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg transition-colors flex items-center gap-2 whitespace-nowrap">
+            <span class="material-symbols-outlined text-[20px]">psychology</span> Latih AI Sekarang
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Show floating train reminder if there are pending changes on load
+            if (isDataChanged) { 
+                showTrainBanner();
+            }
+        });
+    </script>
 </body>
 
 </html>

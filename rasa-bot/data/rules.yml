@@ -28,3 +28,7 @@ rules:
     steps:
       - intent: tanya_jumlah_umkm
       - action: utter_tanya_jumlah_umkm
+  - rule: Rule untuk tanya_seluruh_sekolah
+    steps:
+      - intent: tanya_seluruh_sekolah
+      - action: utter_tanya_seluruh_sekolah

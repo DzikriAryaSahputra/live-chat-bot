@@ -88,3 +88,10 @@ nlu:
       - hai
       - oi
       - p
+  - intent: tanya_seluruh_sekolah
+    examples: |
+      - berapa sekolah di jambi?
+      - berapa seluruh sekolah di jambi?
+      - sekolah di jambi
+      - total sekolah yang ada di jambi?
+      - banyaknya sekolah di kota jambi
