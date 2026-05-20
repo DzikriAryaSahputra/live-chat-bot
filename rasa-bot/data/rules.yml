@@ -32,3 +32,7 @@ rules:
     steps:
       - intent: tanya_seluruh_sekolah
       - action: utter_tanya_seluruh_sekolah
+  - rule: Rule untuk tanya_mitra
+    steps:
+      - intent: tanya_mitra
+      - action: utter_tanya_mitra

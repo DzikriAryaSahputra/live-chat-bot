@@ -529,15 +529,16 @@ io.on('connection', (socket) => {
                     console.error("⚠️ [CLEANUP] Gagal menghapus model lama:", cleanErr.message);
                 }
 
-                // 👇 LANGSUNG KIRIM SINYAL SUKSES KE LAYAR ADMIN (Mencegah Loading Lama) 👇
-                socket.emit('train_success', 'AI berhasil diverifikasi dan disinkronisasi!');
-
-                // 👇 PROSES HOT-RELOAD BERJALAN DI BACKGROUND 👇
+                // 👇 PROSES HOT-RELOAD DAN TUNGGU SAMPAI SELESAI BARU EMIT SUKSES 👇
                 try {
-                    await axios.put('http://localhost:5005/model', { model_file: latestModelPath }, { timeout: 10000 });
+                    console.log("⚙️ [RASA API] Memulai Hot-Reload model baru...");
+                    await axios.put('http://localhost:5005/model', { model_file: latestModelPath }, { timeout: 60000 });
                     console.log("✅ [RASA API] Model AI berhasil dimuat ulang (Hot-Reload) secara otomatis menggunakan file: " + path.basename(latestModelPath));
+                    socket.emit('train_success', 'AI berhasil disinkronisasi dan siap digunakan!');
                 } catch (e) {
                     console.log("⚠️ [RASA API] Gagal Hot-Reload otomatis. Bot mungkin perlu direstart manual. Error: " + e.message);
+                    // Tetap beri sinyal sukses karena file model berhasil dilatih/dibuat, tapi sertakan catatan peringatan
+                    socket.emit('train_success', 'AI berhasil dilatih, namun gagal memuat ulang otomatis (Hot-Reload). Silakan tunggu sebentar atau restart server bot.');
                 }
             });
         } catch (err) { socket.emit('train_error', 'Gagal memproses file sistem.'); }
@@ -593,14 +594,32 @@ app.put('/api/bot/intents', authenticateJWT, (req, res) => {
     }
 
     try {
+        // 1. Update NLU
         const nluPath = path.join(RASA_DIR, 'data/nlu.yml'); let nluData = yaml.load(fs.readFileSync(nluPath, 'utf8')) || { version: "3.1", nlu: [] };
         if (!nluData.nlu) nluData.nlu = []; nluData.nlu = nluData.nlu.filter(item => item.intent !== intentName);
         const formattedExamples = examples.split(/,|\n/).map(e => e.replace(/^-\s*/, '').trim()).filter(e => e.length > 0).map(e => `- ${e}`).join('\n') + '\n';
         nluData.nlu.push({ intent: intentName, examples: formattedExamples });
         fs.writeFileSync(nluPath, yaml.dump(nluData, { lineWidth: -1 }));
 
-        const domainPath = path.join(RASA_DIR, 'domain.yml'); let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8'));
-        if (domainData) { if (!domainData.responses) domainData.responses = {}; domainData.responses[`utter_${intentName}`] = [{ text: botResponse }]; fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 })); }
+        // 2. Update Rules (Ensure Rasa knows to trigger the response for this intent)
+        const rulesPath = path.join(RASA_DIR, 'data/rules.yml'); let rulesData = yaml.load(fs.readFileSync(rulesPath, 'utf8')) || { version: "3.1", rules: [] };
+        if (!rulesData.rules) rulesData.rules = [];
+        // Filter out old rules for this intent to avoid duplicates
+        rulesData.rules = rulesData.rules.filter(r => !(r.steps && r.steps.length > 0 && r.steps[0].intent === intentName));
+        rulesData.rules.push({ rule: `Rule untuk ${intentName}`, steps: [{ intent: intentName }, { action: `utter_${intentName}` }] });
+        fs.writeFileSync(rulesPath, yaml.dump(rulesData, { lineWidth: -1 }));
+
+        // 3. Update Domain (Register the intent and its response)
+        const domainPath = path.join(RASA_DIR, 'domain.yml'); let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8')) || { version: "3.1", intents: [], responses: {} };
+        if (domainData) { 
+            if (!domainData.intents) domainData.intents = [];
+            if (!domainData.intents.includes(intentName)) {
+                domainData.intents.push(intentName);
+            }
+            if (!domainData.responses) domainData.responses = {}; 
+            domainData.responses[`utter_${intentName}`] = [{ text: botResponse }]; 
+            fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 })); 
+        }
 
         res.json({ message: 'Ilmu diperbarui!' });
     } catch (error) { res.status(500).json({ error: 'Gagal memperbarui file YAML' }); }

@@ -235,7 +235,7 @@
                 try {
                     const r = await fetch(`/api/bot/intents/${intentName}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
                     if (r.ok) {
-                        isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); document.getElementById('floating-train-reminder')?.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+                        isDataChanged = true; localStorage.setItem('bps_needs_training', 'true'); showTrainBanner();
                         fetchKnowledgeBase(); showToastAlert('🗑️ Berhasil', `Topik ${intentName} dihapus.`);
                     }
                     else { const res = await r.json(); showToastAlert('❌ Gagal', res.error); if (r.status === 403) logoutAdmin(); }
@@ -261,6 +261,17 @@
         function startSmartLoading() {
             document.getElementById('form-inputs').classList.add('hidden'); document.getElementById('smart-loading-container').classList.replace('hidden', 'flex'); document.getElementById('train-submit-btn').classList.add('hidden'); document.getElementById('train-cancel-btn').disabled = true;
             document.getElementById('spinner-circle').className = "absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"; document.getElementById('spinner-icon').innerText = 'psychology';
+            
+            // Reset Smart Loading Elements
+            document.getElementById('loading-bar-wrapper')?.classList.remove('hidden');
+            const doneBtn = document.getElementById('train-done-btn');
+            if (doneBtn) {
+                doneBtn.classList.add('hidden');
+                doneBtn.classList.remove('flex');
+            }
+            const header = document.getElementById('loading-header');
+            if (header) header.innerText = "Mengajari AI Bot...";
+
             const textEl = document.getElementById('loading-text'); const progressEl = document.getElementById('loading-progress');
             textEl.className = "text-sm font-medium text-slate-500 mb-5 text-center px-4"; textEl.innerText = botPhrases[0]; progressEl.style.width = '10%'; progressEl.className = "h-full bg-primary-600 rounded-full w-0 transition-all duration-[2000ms] ease-out";
             let i = 0; loadingInterval = setInterval(() => { i = (i + 1) % botPhrases.length; textEl.innerText = botPhrases[i]; let w = parseFloat(progressEl.style.width) || 10; if (w < 90) progressEl.style.width = (w + 4) + '%'; }, 3000);
@@ -270,8 +281,29 @@
             clearInterval(loadingInterval);
             const p = document.getElementById('loading-progress'), c = document.getElementById('spinner-circle'), t = document.getElementById('loading-text');
             p.style.width = '100%'; c.classList.remove('animate-spin');
-            if (isSuccess) { p.classList.replace('bg-primary-600', 'bg-green-500'); document.getElementById('spinner-icon').innerText = 'check_circle'; t.innerText = message; t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; }
-            else { p.classList.replace('bg-primary-600', 'bg-red-500'); document.getElementById('spinner-icon').innerText = 'error'; t.innerText = message; t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; }
+            if (isSuccess) { 
+                p.classList.replace('bg-primary-600', 'bg-green-500'); 
+                document.getElementById('spinner-icon').innerText = 'check_circle'; 
+                t.innerText = message; 
+                t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; 
+                
+                // Hide progress bar, show 'Selesai' button
+                document.getElementById('loading-bar-wrapper')?.classList.add('hidden');
+                const doneBtn = document.getElementById('train-done-btn');
+                if (doneBtn) {
+                    doneBtn.classList.remove('hidden');
+                    doneBtn.classList.add('flex');
+                }
+                const header = document.getElementById('loading-header');
+                if (header) header.innerText = "Proses Selesai!";
+            }
+            else { 
+                p.classList.replace('bg-primary-600', 'bg-red-500'); 
+                document.getElementById('spinner-icon').innerText = 'error'; 
+                t.innerText = message; 
+                t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; 
+                document.getElementById('train-cancel-btn').disabled = false;
+            }
         }
 
         function openTrainModal(isAdd = true) {
@@ -282,7 +314,26 @@
 
         function closeTrainModal() {
             const modal = document.getElementById('train-modal'); modal.classList.add('opacity-0'); document.getElementById('train-modal-box').classList.replace('scale-100', 'scale-95');
-            setTimeout(() => { modal.classList.replace('flex', 'hidden'); document.getElementById('form-inputs').classList.remove('hidden'); document.getElementById('smart-loading-container').classList.replace('flex', 'hidden'); document.getElementById('train-submit-btn').classList.remove('hidden'); document.getElementById('train-cancel-btn').disabled = false; }, 300);
+            setTimeout(() => { 
+                modal.classList.replace('flex', 'hidden'); 
+                document.getElementById('form-inputs').classList.remove('hidden'); 
+                document.getElementById('smart-loading-container').classList.replace('flex', 'hidden'); 
+                document.getElementById('train-submit-btn').classList.remove('hidden'); 
+                document.getElementById('train-cancel-btn').disabled = false; 
+
+                // Reset modal states for subsequent uses
+                document.getElementById('loading-bar-wrapper')?.classList.remove('hidden');
+                const doneBtn = document.getElementById('train-done-btn');
+                if (doneBtn) {
+                    doneBtn.classList.add('hidden');
+                    doneBtn.classList.remove('flex');
+                }
+                const header = document.getElementById('loading-header');
+                if (header) header.innerText = "Mengajari AI Bot...";
+            }, 300);
+            
+            // Jika training sudah sukses (isDataChanged = false), sembunyikan banner saat modal ditutup
+            if (!isDataChanged) { hideTrainBanner(); }
         }
 
         async function submitTrainData(e) {
@@ -296,7 +347,7 @@
                 if (r.ok) { 
                     isDataChanged = true; 
                     localStorage.setItem('bps_needs_training', 'true'); 
-                    document.getElementById('floating-train-reminder')?.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none'); 
+                    showTrainBanner(); 
                     fetchKnowledgeBase(); 
                     closeTrainModal(); 
                     showToastAlert('✅ Disimpan', 'Data tersimpan ke sistem. Latih AI untuk menerapkan.'); 
@@ -309,6 +360,22 @@
             }
         }
 
+        function showTrainBanner() {
+            const el = document.getElementById('floating-train-reminder');
+            if (!el) return;
+            el.style.transform = 'translateX(-50%) translateY(0)';
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'auto';
+        }
+
+        function hideTrainBanner() {
+            const el = document.getElementById('floating-train-reminder');
+            if (!el) return;
+            el.style.transform = 'translateX(-50%) translateY(6rem)';
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+        }
+
         function triggerAITraining() {
             startSmartLoading();
             const modal = document.getElementById('train-modal'); 
@@ -317,12 +384,15 @@
             socket.emit('train_bot', { intentName: 'SKIP_WRITE', examples: '-', botResponse: '-' });
         }
 
+        function onTrainDone() {
+            isDataChanged = false; localStorage.removeItem('bps_needs_training');
+            hideTrainBanner();
+            closeTrainModal();
+        }
+
         socket.on('train_success', (msg) => {
             stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg);
-            isDataChanged = false; localStorage.removeItem('bps_needs_training');
-            document.getElementById('train-warning-alert')?.classList.replace('flex', 'hidden');
-            document.getElementById('floating-train-reminder')?.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
-            fetchKnowledgeBase(); setTimeout(() => closeTrainModal(), 2500);
+            fetchKnowledgeBase();
         });
         socket.on('train_error', (msg) => { stopSmartLoading(false, "Gagal Melatih Model AI"); showToastAlert('❌ Gagal', msg); document.getElementById('train-cancel-btn').disabled = false; });
 
@@ -678,28 +748,4 @@
         // Initialize Fetching RAG
         fetchExternalDocs();
         fetchTokenUsage();
-        
-    <!-- Floating Train Reminder -->
-    <div id="floating-train-reminder" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#0b1c30] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-5 transition-all duration-500 z-50 translate-y-24 opacity-0 pointer-events-none">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400">
-                <span class="material-symbols-outlined">warning</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-bold text-[15px]">Ada Perubahan Data</span>
-                <span class="text-[12px] text-slate-300">Otak AI perlu dilatih ulang agar sinkron.</span>
-            </div>
-        </div>
-        <button onclick="triggerAITraining()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg transition-colors flex items-center gap-2 whitespace-nowrap">
-            <span class="material-symbols-outlined text-[20px]">psychology</span> Latih AI Sekarang
-        </button>
-    </div>
-
-    
-        document.addEventListener('DOMContentLoaded', () => {
-            // Show floating train reminder if there are pending unsaved changes on load
-            if (isDataChanged) { 
-                document.getElementById('floating-train-reminder')?.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none'); 
-            }
-        });
     

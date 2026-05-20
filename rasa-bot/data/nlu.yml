@@ -48,11 +48,6 @@ nlu:
       - berapa jumlah umkm di jambi?
       - jumlah umkm jambi
       - umkm jambi
-  - intent: tanya_jam_operasional
-    examples: |
-      - jam berapa buka
-      - jam operasional
-      - jam buka
   - intent: tanya_profil_ppid
     examples: |
       - profil ppid
@@ -88,10 +83,19 @@ nlu:
       - hai
       - oi
       - p
+  - intent: tanya_jam_operasional
+    examples: |
+      - jam berapa buka
+      - jam operasional
+      - jam buka
   - intent: tanya_seluruh_sekolah
     examples: |
+      - ada berapa sekolah di jambi?
       - berapa sekolah di jambi?
-      - berapa seluruh sekolah di jambi?
+      - di jambi ada berapa sekolah?
       - sekolah di jambi
-      - total sekolah yang ada di jambi?
-      - banyaknya sekolah di kota jambi
+  - intent: tanya_mitra
+    examples: |
+      - kapan mitra bps?
+      - mitra
+      - mitra kapan dilaksanakan?

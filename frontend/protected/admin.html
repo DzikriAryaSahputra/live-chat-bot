@@ -622,13 +622,17 @@
                         <span id="spinner-icon"
                             class="absolute inset-0 flex items-center justify-center material-symbols-outlined text-primary text-3xl animate-pulse">psychology</span>
                     </div>
-                    <h3 class="text-base font-bold text-slate-800 mb-2">Mengajari AI Bot...</h3>
+                    <h3 id="loading-header" class="text-base font-bold text-slate-800 mb-2">Mengajari AI Bot...</h3>
                     <p id="loading-text" class="text-sm font-medium text-slate-500 mb-5 text-center px-4">Inisialisasi
                         sistem...</p>
-                    <div class="w-64 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="loading-bar-wrapper" class="w-64 h-2 bg-slate-200 rounded-full overflow-hidden">
                         <div id="loading-progress"
                             class="h-full bg-primary-600 rounded-full w-0 transition-all duration-[2000ms] ease-out"></div>
                     </div>
+                    <button type="button" id="train-done-btn" onclick="onTrainDone()"
+                        class="hidden mt-4 bg-green-600 hover:bg-green-700 text-white px-8 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-green-600/20 transition-all active:scale-95 items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">check_circle</span> Selesai
+                    </button>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-4 shrink-0">
@@ -989,6 +993,17 @@
         function startSmartLoading() {
             document.getElementById('form-inputs').classList.add('hidden'); document.getElementById('smart-loading-container').classList.replace('hidden', 'flex'); document.getElementById('train-submit-btn').classList.add('hidden'); document.getElementById('train-cancel-btn').disabled = true;
             document.getElementById('spinner-circle').className = "absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"; document.getElementById('spinner-icon').innerText = 'psychology';
+            
+            // Reset Smart Loading Elements
+            document.getElementById('loading-bar-wrapper')?.classList.remove('hidden');
+            const doneBtn = document.getElementById('train-done-btn');
+            if (doneBtn) {
+                doneBtn.classList.add('hidden');
+                doneBtn.classList.remove('flex');
+            }
+            const header = document.getElementById('loading-header');
+            if (header) header.innerText = "Mengajari AI Bot...";
+
             const textEl = document.getElementById('loading-text'); const progressEl = document.getElementById('loading-progress');
             textEl.className = "text-sm font-medium text-slate-500 mb-5 text-center px-4"; textEl.innerText = botPhrases[0]; progressEl.style.width = '10%'; progressEl.className = "h-full bg-primary-600 rounded-full w-0 transition-all duration-[2000ms] ease-out";
             let i = 0; loadingInterval = setInterval(() => { i = (i + 1) % botPhrases.length; textEl.innerText = botPhrases[i]; let w = parseFloat(progressEl.style.width) || 10; if (w < 90) progressEl.style.width = (w + 4) + '%'; }, 3000);
@@ -998,8 +1013,29 @@
             clearInterval(loadingInterval);
             const p = document.getElementById('loading-progress'), c = document.getElementById('spinner-circle'), t = document.getElementById('loading-text');
             p.style.width = '100%'; c.classList.remove('animate-spin');
-            if (isSuccess) { p.classList.replace('bg-primary-600', 'bg-green-500'); document.getElementById('spinner-icon').innerText = 'check_circle'; t.innerText = message; t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; }
-            else { p.classList.replace('bg-primary-600', 'bg-red-500'); document.getElementById('spinner-icon').innerText = 'error'; t.innerText = message; t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; }
+            if (isSuccess) { 
+                p.classList.replace('bg-primary-600', 'bg-green-500'); 
+                document.getElementById('spinner-icon').innerText = 'check_circle'; 
+                t.innerText = message; 
+                t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; 
+                
+                // Hide progress bar, show 'Selesai' button
+                document.getElementById('loading-bar-wrapper')?.classList.add('hidden');
+                const doneBtn = document.getElementById('train-done-btn');
+                if (doneBtn) {
+                    doneBtn.classList.remove('hidden');
+                    doneBtn.classList.add('flex');
+                }
+                const header = document.getElementById('loading-header');
+                if (header) header.innerText = "Proses Selesai!";
+            }
+            else { 
+                p.classList.replace('bg-primary-600', 'bg-red-500'); 
+                document.getElementById('spinner-icon').innerText = 'error'; 
+                t.innerText = message; 
+                t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; 
+                document.getElementById('train-cancel-btn').disabled = false;
+            }
         }
 
         function openTrainModal(isAdd = true) {
@@ -1010,7 +1046,24 @@
 
         function closeTrainModal() {
             const modal = document.getElementById('train-modal'); modal.classList.add('opacity-0'); document.getElementById('train-modal-box').classList.replace('scale-100', 'scale-95');
-            setTimeout(() => { modal.classList.replace('flex', 'hidden'); document.getElementById('form-inputs').classList.remove('hidden'); document.getElementById('smart-loading-container').classList.replace('flex', 'hidden'); document.getElementById('train-submit-btn').classList.remove('hidden'); document.getElementById('train-cancel-btn').disabled = false; }, 300);
+            setTimeout(() => { 
+                modal.classList.replace('flex', 'hidden'); 
+                document.getElementById('form-inputs').classList.remove('hidden'); 
+                document.getElementById('smart-loading-container').classList.replace('flex', 'hidden'); 
+                document.getElementById('train-submit-btn').classList.remove('hidden'); 
+                document.getElementById('train-cancel-btn').disabled = false; 
+
+                // Reset modal states for subsequent uses
+                document.getElementById('loading-bar-wrapper')?.classList.remove('hidden');
+                const doneBtn = document.getElementById('train-done-btn');
+                if (doneBtn) {
+                    doneBtn.classList.add('hidden');
+                    doneBtn.classList.remove('flex');
+                }
+                const header = document.getElementById('loading-header');
+                if (header) header.innerText = "Mengajari AI Bot...";
+            }, 300);
+            
             // Jika training sudah sukses (isDataChanged = false), sembunyikan banner saat modal ditutup
             if (!isDataChanged) { hideTrainBanner(); }
         }
@@ -1063,11 +1116,15 @@
             socket.emit('train_bot', { intentName: 'SKIP_WRITE', examples: '-', botResponse: '-' });
         }
 
-        socket.on('train_success', (msg) => {
-            stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg);
+        function onTrainDone() {
             isDataChanged = false; localStorage.removeItem('bps_needs_training');
             hideTrainBanner();
-            fetchKnowledgeBase(); setTimeout(() => closeTrainModal(), 2500);
+            closeTrainModal();
+        }
+
+        socket.on('train_success', (msg) => {
+            stopSmartLoading(true, "AI Berhasil Disinkronisasi!"); showToastAlert('🎉 Berhasil!', msg);
+            fetchKnowledgeBase();
         });
         socket.on('train_error', (msg) => { stopSmartLoading(false, "Gagal Melatih Model AI"); showToastAlert('❌ Gagal', msg); document.getElementById('train-cancel-btn').disabled = false; });
 
