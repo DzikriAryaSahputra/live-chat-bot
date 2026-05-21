@@ -94,8 +94,3 @@ nlu:
       - berapa sekolah di jambi?
       - di jambi ada berapa sekolah?
       - sekolah di jambi
-  - intent: tanya_mitra
-    examples: |
-      - kapan mitra bps?
-      - mitra
-      - mitra kapan dilaksanakan?

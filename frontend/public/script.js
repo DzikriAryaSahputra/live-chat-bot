@@ -226,30 +226,62 @@ function sendMessage(e) {
         appendMessage('user', text);
         
         if (isWaitingForName) {
-            // Ekstrak nama jika warga mengetik panjang (misal: "Halo nama saya Budi")
-            let extractedName = text.toLowerCase();
+            let extractedName = text.trim();
+            let lowerText = extractedName.toLowerCase();
+            
+            // 1. Cek prefix perkenalan eksplisit
             const prefixes = ["halo nama saya ", "nama saya ", "saya ", "panggil aja ", "panggil saja ", "namaku ", "perkenalkan nama saya ", "kenalin nama saya ", "ini "];
+            let introducedSelf = false;
             for (let prefix of prefixes) {
-                if (extractedName.startsWith(prefix)) {
+                if (lowerText.startsWith(prefix)) {
                     extractedName = extractedName.substring(prefix.length);
+                    lowerText = extractedName.toLowerCase();
+                    introducedSelf = true;
                     break;
                 }
             }
-            // Kapitalisasi huruf pertama
-            extractedName = extractedName.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-            if (!extractedName) extractedName = "Warga"; // Fallback jika kosong
             
-            // Simpan nama dan ubah state
-            localStorage.setItem('bps_user_name', extractedName);
-            socket.emit('set_user_name', { senderId: mySenderId, name: extractedName });
-            isWaitingForName = false;
+            // 2. Kriteria pendeteksi jika input bukan nama melainkan pertanyaan/kata kunci
+            const questionWords = ["apa", "bagaimana", "berapa", "kapan", "dimana", "siapa", "kenapa", "mengapa", "tanya", "cari", "info", "bisa", "tolong", "halo", "hai", "permisi", "selamat"];
+            const domainKeywords = ["data", "statistik", "inflasi", "penduduk", "umkm", "sensus", "sekolah", "visi", "misi", "logo", "profil", "ppid", "operasional", "jam", "buka", "tabel", "admin", "petugas", "manusia", "chat", "live"];
             
-            // Jawab langsung secara lokal tanpa panggil API AI
-            setTimeout(() => {
-                appendMessage('bot', `Salam kenal Kak <b>${extractedName}</b>! Ada yang bisa BIPS bantu hari ini?`);
-                if (isVoiceModeEnabled) speakText(`Salam kenal Kak ${extractedName}! Ada yang bisa BIPS bantu hari ini?`);
-                showQuickReplies();
-            }, 600);
+            // Deteksi kata per-kata agar tidak salah tangkap (misal: nama "Jamal" mengandung kata "jam")
+            const inputWords = lowerText.split(/\s+/);
+            const containsQuestionWord = questionWords.some(word => inputWords.includes(word));
+            const containsDomainKeyword = domainKeywords.some(word => inputWords.includes(word));
+
+            const looksLikeQuery = !introducedSelf && (
+                lowerText.includes('?') || 
+                (lowerText.length > 25 && inputWords.length > 3) ||
+                containsQuestionWord ||
+                containsDomainKeyword
+            );
+
+            if (looksLikeQuery) {
+                // Silenly skip fase nama, set default 'Warga', dan kirim langsung ke AI Rasa
+                localStorage.setItem('bps_user_name', 'Warga');
+                socket.emit('set_user_name', { senderId: mySenderId, name: 'Warga' });
+                isWaitingForName = false;
+                
+                showTypingIndicator();
+                socket.emit('user_message', { senderId: mySenderId, message: text });
+            } else {
+                // Kapitalisasi huruf pertama nama
+                extractedName = extractedName.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                if (!extractedName) extractedName = "Warga"; // Fallback jika kosong
+                
+                // Simpan nama dan ubah state
+                localStorage.setItem('bps_user_name', extractedName);
+                socket.emit('set_user_name', { senderId: mySenderId, name: extractedName });
+                isWaitingForName = false;
+                
+                // Jawab langsung secara lokal tanpa panggil API AI
+                setTimeout(() => {
+                    appendMessage('bot', `Salam kenal Kak <b>${extractedName}</b>! Ada yang bisa BIPS bantu hari ini?`);
+                    if (isVoiceModeEnabled) speakText(`Salam kenal Kak ${extractedName}! Ada yang bisa BIPS bantu hari ini?`);
+                    showQuickReplies();
+                }, 600);
+            }
         } else {
             showTypingIndicator();
             socket.emit('user_message', { senderId: mySenderId, message: text });

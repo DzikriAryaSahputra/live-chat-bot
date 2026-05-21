@@ -11,7 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -210,12 +211,24 @@
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="font-bold text-slate-800">Active Sessions</h2>
                             <span id="active-count"
-                                class="bg-primary-100 text-primary-700 text-[10px] font-bold px-2 py-0.5 rounded-full">0 ACTIVE</span>
+                                class="bg-primary-100 text-primary-700 text-[10px] font-bold px-2 py-0.5 rounded-full">0
+                                ACTIVE</span>
+                        </div>
+                        <div class="flex gap-2 mb-4">
+                            <button id="tab-all" onclick="setChatFilter('all')"
+                                class="flex-1 bg-primary-600 text-white text-[11px] font-bold py-1.5 rounded-lg transition-colors border border-primary-600">Semua
+                                Warga</button>
+                            <button id="tab-help" onclick="setChatFilter('help')"
+                                class="flex-1 bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200 text-[11px] font-bold py-1.5 rounded-lg transition-colors flex items-center justify-center gap-1"><i
+                                    class="fa-solid fa-bell text-orange-500"></i> Butuh Petugas <span
+                                    id="help-count-badge"
+                                    class="hidden ml-1 bg-orange-500 text-white rounded-full px-1.5 py-0.5 text-[9px]">0</span></button>
                         </div>
                         <div class="relative">
                             <i
                                 class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                            <input type="text" id="search-user-input" oninput="renderUserList()" placeholder="Search Chat..."
+                            <input type="text" id="search-user-input" oninput="renderUserList()"
+                                placeholder="Search Chat..."
                                 class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-9 pr-3 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-shadow">
                         </div>
                     </div>
@@ -232,14 +245,14 @@
                         <div class="flex items-center gap-3">
                             <div class="relative">
                                 <img src="https://ui-avatars.com/api/?name=Pilih+Obrolan&background=f1f5f9&color=64748b"
-                                    id="header-avatar"
-                                    class="w-10 h-10 rounded-full" alt="Avatar">
+                                    id="header-avatar" class="w-10 h-10 rounded-full" alt="Avatar">
                                 <span id="header-online-indicator"
                                     class="absolute bottom-0 right-0 w-3 h-3 bg-slate-300 border-2 border-white rounded-full hidden"></span>
                             </div>
                             <div>
                                 <h2 class="font-bold text-slate-800 text-sm" id="active-user-title">Pilih Obrolan</h2>
-                                <p class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5 hidden" id="header-status-container">
+                                <p class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5 hidden"
+                                    id="header-status-container">
                                     <span class="w-1.5 h-1.5 rounded-full bg-slate-300" id="header-status-dot"></span>
                                     <span id="header-status-text">Menunggu</span>
                                 </p>
@@ -255,8 +268,10 @@
                     <!-- Chat Bubbles Area -->
                     <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar" id="chat-box">
                         <div class="m-auto text-center flex flex-col items-center opacity-50">
-                            <span class="material-symbols-outlined text-6xl mb-2 text-slate-400"><i class="fa-regular fa-comments text-5xl"></i></span>
-                            <p class="text-slate-500 font-medium text-sm mt-3">Pilih warga dari daftar di sebelah kiri untuk mulai mengobrol.</p>
+                            <span class="material-symbols-outlined text-6xl mb-2 text-slate-400"><i
+                                    class="fa-regular fa-comments text-5xl"></i></span>
+                            <p class="text-slate-500 font-medium text-sm mt-3">Pilih warga dari daftar di sebelah kiri
+                                untuk mulai mengobrol.</p>
                         </div>
                     </div>
 
@@ -272,12 +287,17 @@
                                 <span
                                     class="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 shrink-0">Quick
                                     Reply:</span>
-                                <button type="button" onclick="insertAndSend('Halo! Ada yang bisa kami bantu terkait data BPS?')"
-                                    class="text-[10px] font-bold text-primary-600 bg-primary-50 border border-primary-200 px-2 py-0.5 rounded hover:bg-primary-100 shrink-0 whitespace-nowrap">👋 Bantuan</button>
-                                <button type="button" onclick="insertAndSend('Silakan tunggu sebentar, kami sedang mengecek ketersediaan data tersebut.')"
-                                    class="text-[10px] font-bold text-primary-600 bg-primary-50 border border-primary-200 px-2 py-0.5 rounded hover:bg-primary-100 shrink-0 whitespace-nowrap">⏳ Tunggu</button>
+                                <button type="button"
+                                    onclick="insertAndSend('Halo! Ada yang bisa kami bantu terkait data BPS?')"
+                                    class="text-[10px] font-bold text-primary-600 bg-primary-50 border border-primary-200 px-2 py-0.5 rounded hover:bg-primary-100 shrink-0 whitespace-nowrap">👋
+                                    Bantuan</button>
+                                <button type="button"
+                                    onclick="insertAndSend('Silakan tunggu sebentar, kami sedang mengecek ketersediaan data tersebut.')"
+                                    class="text-[10px] font-bold text-primary-600 bg-primary-50 border border-primary-200 px-2 py-0.5 rounded hover:bg-primary-100 shrink-0 whitespace-nowrap">⏳
+                                    Tunggu</button>
                                 <button type="button" onclick="insertAndSend('/selesai')"
-                                    class="text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded hover:bg-red-100 shrink-0 whitespace-nowrap">🛑 /selesai</button>
+                                    class="text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded hover:bg-red-100 shrink-0 whitespace-nowrap">🛑
+                                    /selesai</button>
                             </div>
                         </div>
 
@@ -452,7 +472,9 @@
 
                             <label
                                 class="w-full h-full border-2 border-dashed border-primary-200 bg-primary-50 hover:bg-primary-100 transition-colors rounded-xl p-6 cursor-pointer flex flex-col items-center justify-center relative">
-                                <input type="file" accept=".pdf,.txt,.doc,.docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handlePDFUpload(event)">
+                                <input type="file" accept=".pdf,.txt,.doc,.docx"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    onchange="handlePDFUpload(event)">
                                 <div
                                     class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary-600 shadow-sm mb-3 border border-primary-100">
                                     <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
@@ -471,7 +493,8 @@
                                 <a href="#" class="text-xs font-bold text-primary-600 hover:underline">View All</a>
                             </div>
 
-                            <div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 custom-scrollbar" id="rag-documents-grid">
+                            <div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 custom-scrollbar"
+                                id="rag-documents-grid">
                                 <div class="text-center text-slate-400 py-10">Memuat data dokumen RAG...</div>
                             </div>
                         </div>
@@ -627,7 +650,8 @@
                         sistem...</p>
                     <div id="loading-bar-wrapper" class="w-64 h-2 bg-slate-200 rounded-full overflow-hidden">
                         <div id="loading-progress"
-                            class="h-full bg-primary-600 rounded-full w-0 transition-all duration-[2000ms] ease-out"></div>
+                            class="h-full bg-primary-600 rounded-full w-0 transition-all duration-[2000ms] ease-out">
+                        </div>
                     </div>
                     <button type="button" id="train-done-btn" onclick="onTrainDone()"
                         class="hidden mt-4 bg-green-600 hover:bg-green-700 text-white px-8 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-green-600/20 transition-all active:scale-95 items-center gap-2">
@@ -748,12 +772,23 @@
                     localStorage.removeItem('bps_admin_token');
                     window.location.replace('/login?expired=true');
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
         setInterval(checkTokenExpiry, 60000); // Cek setiap 1 menit
         checkTokenExpiry(); // Cek langsung saat pertama dimuat
 
-        let activeSenderId = null; let activeUsersList = []; let unreadCounts = {}; let needsHelpSet = new Set();
+        let activeSenderId = null; let activeUsersList = []; let unreadCounts = {};
+        let needsHelpSet = new Set(JSON.parse(localStorage.getItem('bps_needs_help') || '[]'));
+        function updateNeedsHelp(id, remove = false) {
+            if (remove) needsHelpSet.delete(id);
+            else needsHelpSet.add(id);
+            localStorage.setItem('bps_needs_help', JSON.stringify([...needsHelpSet]));
+
+            // Paksa pembaruan UI (DOM) agar langsung muncul tanpa perlu refresh
+            setTimeout(() => {
+                if (typeof renderUserList === 'function') renderUserList();
+            }, 100);
+        }
         let currentKnowledgeBase = []; let isEditMode = false;
         let isDataChanged = localStorage.getItem('bps_needs_training') === 'true';
 
@@ -837,30 +872,30 @@
         // 📊 KNOWLEDGE BASE & CRUD
         // ==========================================
         async function fetchKnowledgeBase() {
-            const grid = document.getElementById('knowledge-base-grid'); 
-            if(grid) grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-10">Mengambil data AI...</div>`;
-            try { 
-                const response = await fetch('/api/bot/intents', { headers: { 'Authorization': `Bearer ${adminToken}` } }); 
-                currentKnowledgeBase = await response.json(); 
-                renderKnowledgeTable(currentKnowledgeBase); 
-            } catch (e) { 
-                if(grid) grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-10">Gagal terhubung.</div>`; 
+            const grid = document.getElementById('knowledge-base-grid');
+            if (grid) grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-10">Mengambil data AI...</div>`;
+            try {
+                const response = await fetch('/api/bot/intents', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                currentKnowledgeBase = await response.json();
+                renderKnowledgeTable(currentKnowledgeBase);
+            } catch (e) {
+                if (grid) grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-10">Gagal terhubung.</div>`;
             }
         }
 
         function renderKnowledgeTable(dataArray) {
-            const grid = document.getElementById('knowledge-base-grid'); 
-            if(!grid) return;
+            const grid = document.getElementById('knowledge-base-grid');
+            if (!grid) return;
             grid.innerHTML = '';
-            
+
             if (dataArray.length === 0) {
                 grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-10">Tidak ada data.</div>`;
                 return;
             }
-            
+
             dataArray.forEach(item => {
                 const isSystem = PROTECTED_INTENTS.includes(item.intent);
-                
+
                 // Highlight {variable} in response with exact styling from user's code
                 const highlightedResponse = (item.response || '').replace(/\{([^}]+)\}/g, '<span class="bg-[#faf8ff] px-1 py-0.5 rounded border border-[#c3c6d7] text-[#fd761a] font-mono text-[12px]">{$1}</span>');
 
@@ -874,9 +909,9 @@
                             <span class="material-symbols-outlined text-[20px]">delete</span>
                         </button>
                     </div>`;
-                
-                const statusBadge = isSystem 
-                    ? `<span class="bg-[#dae2fd] text-[#434655] font-semibold text-[12px] px-2 py-0.5 rounded-full border border-[#c3c6d7]/50">SYSTEM</span>` 
+
+                const statusBadge = isSystem
+                    ? `<span class="bg-[#dae2fd] text-[#434655] font-semibold text-[12px] px-2 py-0.5 rounded-full border border-[#c3c6d7]/50">SYSTEM</span>`
                     : `<span class="bg-[#004ac6]/10 text-[#004ac6] font-semibold text-[12px] px-2 py-0.5 rounded-full border border-[#004ac6]/20">ACTIVE</span>`;
 
                 // Handle examples
@@ -886,19 +921,19 @@
                 } else if (Array.isArray(item.examples)) {
                     examplesArr = item.examples;
                 }
-                
+
                 // Show max 4 chips initially
                 const MAX_CHIPS = 4;
                 const remaining = examplesArr.length > MAX_CHIPS ? examplesArr.length - MAX_CHIPS : 0;
-                
+
                 let chipsHtml = '';
                 examplesArr.forEach((ex, idx) => {
                     const extraClass = idx >= MAX_CHIPS ? 'hidden extra-chip' : '';
                     chipsHtml += `<span class="bg-[#f2f3ff] text-[#131b2e] border border-[#c3c6d7]/50 px-3 py-1 rounded-md text-[13px] ${extraClass}">${ex}</span>`;
                 });
-                
-                const moreChip = remaining > 0 
-                    ? `<span onclick="this.style.display='none'; Array.from(this.parentElement.querySelectorAll('.extra-chip')).forEach(el => el.classList.remove('hidden'));" class="text-[#004ac6] font-semibold text-[12px] self-center ml-1 cursor-pointer hover:underline">+${remaining} more</span>` 
+
+                const moreChip = remaining > 0
+                    ? `<span onclick="this.style.display='none'; Array.from(this.parentElement.querySelectorAll('.extra-chip')).forEach(el => el.classList.remove('hidden'));" class="text-[#004ac6] font-semibold text-[12px] self-center ml-1 cursor-pointer hover:underline">+${remaining} more</span>`
                     : '';
 
                 const div = document.createElement('div');
@@ -946,7 +981,7 @@
 
         function filterKnowledge() {
             const q = document.getElementById('knowledge-search').value.toLowerCase();
-            
+
             // Check if item.examples is an array or string
             renderKnowledgeTable(currentKnowledgeBase.filter(i => {
                 let examplesStr = '';
@@ -955,10 +990,10 @@
                 } else if (Array.isArray(i.examples)) {
                     examplesStr = i.examples.join(' ').toLowerCase();
                 }
-                
-                return (i.intent || '').toLowerCase().includes(q) || 
-                       examplesStr.includes(q) || 
-                       (i.response || '').toLowerCase().includes(q);
+
+                return (i.intent || '').toLowerCase().includes(q) ||
+                    examplesStr.includes(q) ||
+                    (i.response || '').toLowerCase().includes(q);
             }));
         }
 
@@ -993,7 +1028,7 @@
         function startSmartLoading() {
             document.getElementById('form-inputs').classList.add('hidden'); document.getElementById('smart-loading-container').classList.replace('hidden', 'flex'); document.getElementById('train-submit-btn').classList.add('hidden'); document.getElementById('train-cancel-btn').disabled = true;
             document.getElementById('spinner-circle').className = "absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"; document.getElementById('spinner-icon').innerText = 'psychology';
-            
+
             // Reset Smart Loading Elements
             document.getElementById('loading-bar-wrapper')?.classList.remove('hidden');
             const doneBtn = document.getElementById('train-done-btn');
@@ -1013,12 +1048,12 @@
             clearInterval(loadingInterval);
             const p = document.getElementById('loading-progress'), c = document.getElementById('spinner-circle'), t = document.getElementById('loading-text');
             p.style.width = '100%'; c.classList.remove('animate-spin');
-            if (isSuccess) { 
-                p.classList.replace('bg-primary-600', 'bg-green-500'); 
-                document.getElementById('spinner-icon').innerText = 'check_circle'; 
-                t.innerText = message; 
-                t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4"; 
-                
+            if (isSuccess) {
+                p.classList.replace('bg-primary-600', 'bg-green-500');
+                document.getElementById('spinner-icon').innerText = 'check_circle';
+                t.innerText = message;
+                t.className = "text-sm text-green-600 mb-5 font-bold text-center px-4";
+
                 // Hide progress bar, show 'Selesai' button
                 document.getElementById('loading-bar-wrapper')?.classList.add('hidden');
                 const doneBtn = document.getElementById('train-done-btn');
@@ -1029,11 +1064,11 @@
                 const header = document.getElementById('loading-header');
                 if (header) header.innerText = "Proses Selesai!";
             }
-            else { 
-                p.classList.replace('bg-primary-600', 'bg-red-500'); 
-                document.getElementById('spinner-icon').innerText = 'error'; 
-                t.innerText = message; 
-                t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4"; 
+            else {
+                p.classList.replace('bg-primary-600', 'bg-red-500');
+                document.getElementById('spinner-icon').innerText = 'error';
+                t.innerText = message;
+                t.className = "text-sm text-red-600 mb-5 font-bold text-center px-4";
                 document.getElementById('train-cancel-btn').disabled = false;
             }
         }
@@ -1046,12 +1081,12 @@
 
         function closeTrainModal() {
             const modal = document.getElementById('train-modal'); modal.classList.add('opacity-0'); document.getElementById('train-modal-box').classList.replace('scale-100', 'scale-95');
-            setTimeout(() => { 
-                modal.classList.replace('flex', 'hidden'); 
-                document.getElementById('form-inputs').classList.remove('hidden'); 
-                document.getElementById('smart-loading-container').classList.replace('flex', 'hidden'); 
-                document.getElementById('train-submit-btn').classList.remove('hidden'); 
-                document.getElementById('train-cancel-btn').disabled = false; 
+            setTimeout(() => {
+                modal.classList.replace('flex', 'hidden');
+                document.getElementById('form-inputs').classList.remove('hidden');
+                document.getElementById('smart-loading-container').classList.replace('flex', 'hidden');
+                document.getElementById('train-submit-btn').classList.remove('hidden');
+                document.getElementById('train-cancel-btn').disabled = false;
 
                 // Reset modal states for subsequent uses
                 document.getElementById('loading-bar-wrapper')?.classList.remove('hidden');
@@ -1063,32 +1098,32 @@
                 const header = document.getElementById('loading-header');
                 if (header) header.innerText = "Mengajari AI Bot...";
             }, 300);
-            
+
             // Jika training sudah sukses (isDataChanged = false), sembunyikan banner saat modal ditutup
             if (!isDataChanged) { hideTrainBanner(); }
         }
 
         async function submitTrainData(e) {
-            e.preventDefault(); 
+            e.preventDefault();
             const intentName = document.getElementById('train-intent').value, examples = document.getElementById('train-examples').value, botResponse = mdToHtml(document.getElementById('train-response').value);
-            
+
             if (!intentName) return showToastAlert('⚠️ Peringatan', 'Nama Intent kosong!');
 
-            try { 
-                const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) }); 
-                if (r.ok) { 
-                    isDataChanged = true; 
-                    localStorage.setItem('bps_needs_training', 'true'); 
-                    showTrainBanner(); 
-                    fetchKnowledgeBase(); 
-                    closeTrainModal(); 
-                    showToastAlert('✅ Disimpan', 'Data tersimpan ke sistem. Latih AI untuk menerapkan.'); 
-                } else { 
-                    const err = await r.json(); 
-                    showToastAlert('❌ Gagal', err.error); 
-                } 
-            } catch (err) { 
-                showToastAlert('❌ Error', 'Jaringan bermasalah.'); 
+            try {
+                const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) });
+                if (r.ok) {
+                    isDataChanged = true;
+                    localStorage.setItem('bps_needs_training', 'true');
+                    showTrainBanner();
+                    fetchKnowledgeBase();
+                    closeTrainModal();
+                    showToastAlert('✅ Disimpan', 'Data tersimpan ke sistem. Latih AI untuk menerapkan.');
+                } else {
+                    const err = await r.json();
+                    showToastAlert('❌ Gagal', err.error);
+                }
+            } catch (err) {
+                showToastAlert('❌ Error', 'Jaringan bermasalah.');
             }
         }
 
@@ -1110,8 +1145,8 @@
 
         function triggerAITraining() {
             startSmartLoading();
-            const modal = document.getElementById('train-modal'); 
-            modal.classList.replace('hidden', 'flex'); 
+            const modal = document.getElementById('train-modal');
+            modal.classList.replace('hidden', 'flex');
             setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('train-modal-box').classList.replace('scale-95', 'scale-100'); }, 10);
             socket.emit('train_bot', { intentName: 'SKIP_WRITE', examples: '-', botResponse: '-' });
         }
@@ -1144,7 +1179,7 @@
 
         // Fitur Alias / Ubah Nama Warga otomatis maupun manual
         let userAliases = JSON.parse(localStorage.getItem('bps_user_aliases')) || {};
-        
+
         socket.on('user_name_updated', (data) => {
             if (data.senderId && data.name) {
                 userAliases[data.senderId] = data.name;
@@ -1160,31 +1195,68 @@
             }
         });
 
+        let currentChatFilter = 'all';
+        window.setChatFilter = function (filter) {
+            currentChatFilter = filter;
+            const btnAll = document.getElementById('tab-all');
+            const btnHelp = document.getElementById('tab-help');
+            if (filter === 'all') {
+                btnAll.className = "flex-1 bg-primary-600 text-white text-[11px] font-bold py-1.5 rounded-lg transition-colors border border-primary-600";
+                btnHelp.className = "flex-1 bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200 text-[11px] font-bold py-1.5 rounded-lg transition-colors flex items-center justify-center gap-1";
+            } else {
+                btnHelp.className = "flex-1 bg-primary-600 text-white text-[11px] font-bold py-1.5 rounded-lg transition-colors flex items-center justify-center gap-1 border border-primary-600";
+                btnAll.className = "flex-1 bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200 text-[11px] font-bold py-1.5 rounded-lg transition-colors";
+            }
+            renderUserList();
+        }
+
         function renderUserList() {
+            // Update help badge
+            const helpBadge = document.getElementById('help-count-badge');
+            if (needsHelpSet.size > 0) {
+                helpBadge.innerText = needsHelpSet.size;
+                helpBadge.classList.remove('hidden');
+            } else {
+                helpBadge.classList.add('hidden');
+            }
+
             const query = document.getElementById('search-user-input').value.toLowerCase();
-            const filtered = activeUsersList.filter(id => {
+
+            // Urutkan: Warga yang butuh bantuan admin pindah ke urutan teratas
+            let sortedUsers = [...activeUsersList].sort((a, b) => {
+                const aHelp = needsHelpSet.has(a) ? 1 : 0;
+                const bHelp = needsHelpSet.has(b) ? 1 : 0;
+                return bHelp - aHelp;
+            });
+
+            const filtered = sortedUsers.filter(id => {
+                // Terapkan filter tab
+                if (currentChatFilter === 'help' && !needsHelpSet.has(id)) return false;
+
                 const alias = userAliases[id] || id;
                 return id.toLowerCase().includes(query) || alias.toLowerCase().includes(query);
             });
+
             const userListEl = document.getElementById('user-list'); userListEl.innerHTML = ''; document.getElementById('active-count').innerText = `${activeUsersList.length} ACTIVE`;
             if (filtered.length === 0) return userListEl.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">Tidak ada warga.</div>`;
+
             filtered.forEach(id => {
                 const displayName = userAliases[id] || id;
                 const active = activeSenderId === id, unread = unreadCounts[id] || 0, help = needsHelpSet.has(id);
                 let bgCls = active ? 'border-primary-600 bg-primary-50' : 'border-transparent hover:bg-slate-50';
                 if (help && !active) bgCls = 'border-orange-500 bg-orange-50';
-                
+
                 const isOnline = onlineUsersSet.has(id);
                 const indicatorColor = isOnline ? 'bg-green-500' : 'bg-slate-300';
-                
+
                 const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=f1f5f9&color=64748b`;
                 const helpText = help ? `<p class="text-xs text-orange-500 italic truncate mt-0.5"><i class="fa-solid fa-robot mr-1"></i> User requested human agent.</p>` : `<p class="text-xs text-slate-500 truncate mt-0.5">Klik untuk melihat pesan</p>`;
                 const unreadBadge = unread > 0 ? `<div class="shrink-0 flex items-center justify-center w-5 h-5 bg-primary-600 text-white text-[9px] font-bold rounded-full">${unread}</div>` : '';
-                
+
                 const div = document.createElement('div');
                 div.className = `p-4 border-l-4 ${bgCls} cursor-pointer flex gap-3 relative group`;
                 div.onclick = () => { switchTab('live-chat'); selectUser(id); };
-                
+
                 div.innerHTML = `
                     <div class="relative shrink-0">
                         <img src="${avatarUrl}" class="w-10 h-10 rounded-full" alt="Avatar">
@@ -1233,63 +1305,113 @@
 
         async function selectUser(id) {
             const displayName = userAliases[id] || id;
-            activeSenderId = id; 
-            document.getElementById('active-user-title').innerText = displayName; 
-            unreadCounts[id] = 0; 
-            renderUserList(); 
-            const chatBox = document.getElementById('chat-box'); 
+            activeSenderId = id;
+            document.getElementById('active-user-title').innerText = displayName;
+            unreadCounts[id] = 0;
+            renderUserList();
+            const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = '';
-            try { 
-                const r = await fetch(`/api/chat/history/${id}`, { headers: { 'Authorization': `Bearer ${adminToken}` } }); 
-                const h = await r.json(); 
-                if (h.length === 0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>'; 
-                else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at)); 
+            try {
+                const r = await fetch(`/api/chat/history/${id}`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                const h = await r.json();
+                if (h.length === 0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>';
+                else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at));
             } catch (e) { }
         }
 
         socket.on('receive_message', (d) => {
-            if (d.senderType === 'bot' && d.message.includes('meneruskan pesan')) { needsHelpSet.add(d.senderId); showToastAlert('🚨 Darurat!', `Warga <b>${d.senderId}</b> butuh bantuan.`); alertSound.play(); renderUserList(); }
+            if (d.senderType === 'bot' && d.message.toLowerCase().includes('meneruskan pesan')) {
+                updateNeedsHelp(d.senderId);
+                const aliasName = userAliases[d.senderId] || d.senderId;
+                showToastAlert('🚨 Panggilan Darurat', `Warga <b>${aliasName}</b> memanggil Petugas!`);
+                alertSound.play().catch(e => console.log('Audio autoplay blocked'));
+
+                let blinkCount = 0;
+                const originalTitle = document.title;
+                const blinker = setInterval(() => {
+                    document.title = blinkCount % 2 === 0 ? "🚨 (1) BUTUH PETUGAS!" : originalTitle;
+                    blinkCount++;
+                    if (blinkCount > 10) { clearInterval(blinker); document.title = originalTitle; }
+                }, 1000);
+
+                renderUserList();
+            }
             if (activeSenderId === d.senderId) { const cb = document.getElementById('chat-box'); if (cb.innerHTML.includes('Belum ada')) cb.innerHTML = ''; appendMessage(d.senderType === 'warga' ? 'user' : d.senderType, d.message, new Date()); }
             else if (d.senderType === 'warga') { unreadCounts[d.senderId] = (unreadCounts[d.senderId] || 0) + 1; if (!needsHelpSet.has(d.senderId)) notifSound.play(); renderUserList(); }
         });
 
         function appendMessage(sender, text, time) {
-            const timeStr = (time ? new Date(time) : new Date()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); 
-            const div = document.createElement('div'); 
+            const timeStr = (time ? new Date(time) : new Date()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const div = document.createElement('div');
             const cb = document.getElementById('chat-box');
             const parsedText = mdToHtml(text);
-            
+
             if (sender === 'user' || sender === 'warga') {
                 const aliasName = (userAliases[activeSenderId] || 'WARGA');
-                div.className = 'flex flex-col gap-1 items-start max-w-[85%] fade-in'; 
+                div.className = 'flex flex-col gap-1 items-start max-w-[85%] fade-in';
                 div.innerHTML = `
                     <span class="text-[10px] font-semibold text-slate-500 ml-1">${aliasName}</span>
                     <div class="bg-white border border-slate-200 text-slate-700 p-3.5 rounded-2xl rounded-tl-sm shadow-sm text-sm leading-relaxed whitespace-pre-line">${parsedText}</div>
                     <span class="text-[10px] text-slate-400 ml-1 mt-0.5">${timeStr}</span>
                 `;
             }
-            else if (sender === 'bot') { 
-                div.className = 'flex flex-col gap-1 items-start self-start max-w-[85%] fade-in'; 
+            else if (sender === 'bot') {
+                div.className = 'flex flex-col gap-1 items-start self-start max-w-[85%] fade-in';
                 div.innerHTML = `
                     <span class="text-[10px] font-semibold text-slate-500 ml-1">BIPS AI Bot <i class="fa-solid fa-robot ml-1 text-bot-cyan"></i></span>
                     <div class="bg-bot-cyan/10 border border-bot-cyan/30 text-slate-800 p-3.5 rounded-2xl rounded-tl-sm shadow-sm text-sm leading-relaxed whitespace-pre-line">${parsedText}</div>
                     <span class="text-[10px] text-slate-400 ml-1 mt-0.5">${timeStr}</span>
-                `; 
+                `;
             }
-            else { 
-                div.className = 'flex flex-col gap-1 items-end self-end max-w-[85%] fade-in'; 
+            else {
+                div.className = 'flex flex-col gap-1 items-end self-end max-w-[85%] fade-in';
                 div.innerHTML = `
                     <span class="text-[10px] font-semibold text-slate-500 mr-1">You (Admin)</span>
                     <div class="bg-primary-600 text-white p-3.5 rounded-2xl rounded-tr-sm shadow-sm text-sm leading-relaxed whitespace-pre-line">${parsedText}</div>
                     <span class="text-[10px] text-slate-400 mr-1 mt-0.5">${timeStr} <i class="fa-solid fa-check-double text-blue-400 ml-1"></i></span>
-                `; 
+                `;
             }
             cb.appendChild(div); cb.scrollTop = cb.scrollHeight;
         }
 
         function deleteChatHistory() {
             if (!activeSenderId) return showToastAlert('⚠️ Maaf', "Pilih warga dulu!");
-            openConfirmModal('Hapus Riwayat', `Hapus chat dengan <b>${activeSenderId}</b> permanen?`, async () => { try { if ((await fetch(`/api/chat/history/${activeSenderId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } })).ok) { document.getElementById('chat-box').innerHTML = `<div class="m-auto text-green-500 text-sm">Terhapus!</div>`; delete unreadCounts[activeSenderId]; needsHelpSet.delete(activeSenderId); renderUserList(); } } catch (e) { } });
+            const displayName = userAliases[activeSenderId] || activeSenderId;
+
+            openConfirmModal('Hapus Riwayat', `Hapus chat dengan <b>${displayName}</b> secara permanen?`, async () => {
+                try {
+                    const res = await fetch(`/api/chat/history/${activeSenderId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+
+                    if (res.ok) {
+                        document.getElementById('chat-box').innerHTML = `<div class="m-auto text-green-500 text-sm font-medium fade-in"><i class="fa-solid fa-check-circle mr-1"></i>Riwayat Terhapus!</div>`;
+                        delete unreadCounts[activeSenderId];
+                        updateNeedsHelp(activeSenderId, true);
+                        renderUserList();
+
+                        const deletedId = activeSenderId;
+
+                        setTimeout(() => {
+                            // Cari user lain selain yang baru dihapus
+                            const otherUsers = activeUsersList.filter(u => u !== deletedId);
+                            if (otherUsers.length > 0) {
+                                selectUser(otherUsers[0]);
+                            } else {
+                                // Kosongkan layar jika tidak ada chat warga lain yang aktif
+                                activeSenderId = null;
+                                document.getElementById('active-user-title').innerText = 'Pilih warga dari panel kiri...';
+                                document.getElementById('chat-box').innerHTML = '<div class="m-auto text-slate-400 text-sm flex flex-col items-center fade-in"><i class="fa-solid fa-inbox text-3xl mb-2 opacity-50"></i>Belum ada obrolan.</div>';
+                                const hdrContainer = document.getElementById('header-status-container');
+                                if (hdrContainer) hdrContainer.classList.add('hidden');
+                            }
+                        }, 1000);
+                    }
+                } catch (e) {
+                    showToastAlert('❌ Error', 'Gagal menghapus chat.');
+                }
+            });
         }
 
         function sendMessage() {
@@ -1298,7 +1420,7 @@
             if (text !== '/selesai') {
                 appendMessage('admin', text, new Date());
             } else {
-                needsHelpSet.delete(activeSenderId);
+                updateNeedsHelp(activeSenderId, true);
                 renderUserList();
 
                 // Notifikasi visual untuk Admin
@@ -1366,7 +1488,7 @@
         });
 
         document.getElementById('send-btn').addEventListener('click', sendMessage); document.getElementById('admin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-        
+
         // Add search listeners
         document.getElementById('search-user-input').addEventListener('input', renderUserList);
         document.getElementById('knowledge-search').addEventListener('input', filterKnowledge);
@@ -1392,9 +1514,9 @@
                     let ext = doc.filename.split('.').pop().toLowerCase();
                     let icon = 'fa-file';
                     let bg = 'bg-slate-50', textCol = 'text-slate-500', border = 'border-slate-100';
-                    if(ext === 'pdf') { icon = 'fa-file-pdf'; bg = 'bg-red-50'; textCol = 'text-red-500'; border = 'border-red-100'; }
-                    else if(ext === 'txt') { icon = 'fa-file-lines'; bg = 'bg-blue-50'; textCol = 'text-blue-500'; border = 'border-blue-100'; }
-                    else if(ext === 'doc' || ext === 'docx') { icon = 'fa-file-word'; bg = 'bg-blue-50'; textCol = 'text-blue-500'; border = 'border-blue-100'; }
+                    if (ext === 'pdf') { icon = 'fa-file-pdf'; bg = 'bg-red-50'; textCol = 'text-red-500'; border = 'border-red-100'; }
+                    else if (ext === 'txt') { icon = 'fa-file-lines'; bg = 'bg-blue-50'; textCol = 'text-blue-500'; border = 'border-blue-100'; }
+                    else if (ext === 'doc' || ext === 'docx') { icon = 'fa-file-word'; bg = 'bg-blue-50'; textCol = 'text-blue-500'; border = 'border-blue-100'; }
 
                     const div = document.createElement('div');
                     div.className = "flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors bg-white shadow-sm cursor-pointer";
@@ -1470,7 +1592,7 @@
 
                 const groqText = document.getElementById('groq-usage-text');
                 if (groqText) groqText.innerText = data.groq.toLocaleString();
-                
+
                 const geminiText = document.getElementById('gemini-usage-text');
                 if (geminiText) geminiText.innerText = data.gemini.toLocaleString();
 
@@ -1483,7 +1605,8 @@
     </script>
 
     <!-- Floating Train Reminder -->
-    <div id="floating-train-reminder" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#0b1c30] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-5 transition-all duration-500 z-50 translate-y-24 opacity-0 pointer-events-none">
+    <div id="floating-train-reminder"
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#0b1c30] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-5 transition-all duration-500 z-50 translate-y-24 opacity-0 pointer-events-none">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400">
                 <span class="material-symbols-outlined">warning</span>
@@ -1493,7 +1616,8 @@
                 <span class="text-[12px] text-slate-300">Otak AI perlu dilatih ulang agar sinkron.</span>
             </div>
         </div>
-        <button onclick="triggerAITraining()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg transition-colors flex items-center gap-2 whitespace-nowrap">
+        <button onclick="triggerAITraining()"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg transition-colors flex items-center gap-2 whitespace-nowrap">
             <span class="material-symbols-outlined text-[20px]">psychology</span> Latih AI Sekarang
         </button>
     </div>
@@ -1501,7 +1625,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Show floating train reminder if there are pending changes on load
-            if (isDataChanged) { 
+            if (isDataChanged) {
                 showTrainBanner();
             }
         });

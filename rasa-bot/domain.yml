@@ -15,7 +15,6 @@ intents:
   - tanya_tabel_dinamis
   - tanya_jumlah_umkm
   - tanya_seluruh_sekolah
-  - tanya_mitra
 responses:
   utter_sapaan:
     - text: Halo! 😊 Saya BIPS, siap membantu Anda menemukan data dan informasi yang dibutuhkan. Ada yang ingin ditanyakan?
@@ -43,9 +42,7 @@ responses:
   utter_tanya_jumlah_umkm:
     - text: Berdasarkan data BPS Provinsi Jambi tahun 2023, jumlah UMKM di Kota Jambi mencapai <b>46.912</b> usaha, yang terdiri dari Usaha Mikro, Kecil, dan Menengah. UMKM sektor kuliner mendominasi, dengan jumlah pelaku mencapai <b>18.587</b> usaha. Jumlah ini terus tumbuh, didukung oleh peningkatan digitalisasi usaha.<br>Dapat anda baca melalui link berikut:<br><a href="https://jambi.bps.go.id/id/statistics-table/2/MjEzMSMy/jumlah-usaha-mikro-kecil-dan-menengah.html" target="_blank">BPS UMKM JAMBI</a>
   utter_tanya_seluruh_sekolah:
-    - text: Untuk kemudahan pencarian Anda berdasarkan wilayah dan jenjang (mulai dari TK, SD, SMP, SMA, SMK, hingga SLB), berikut adalah portal dan platform resmi yang bisa langsung <b>digunakan</b>
-  utter_tanya_mitra:
-    - text: mungkin secepatnya
+    - text: Untuk kemudahan pencarian Anda berdasarkan wilayah dan jenjang (mulai dari TK, SD, SMP, SMA, SMK, hingga SLB), berikut adalah portal dan platform resmi yang bisa langsung <b>digunakan</b> wlwlwlwlwllw
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
