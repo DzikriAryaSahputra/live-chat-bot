@@ -1498,7 +1498,10 @@
         // ==========================================
         async function fetchExternalDocs() {
             try {
-                const res = await fetch('/api/bot/docs', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                const res = await fetch('/api/bot/docs', { 
+                    headers: { 'Authorization': `Bearer ${adminToken}` },
+                    cache: 'no-store' // Mencegah browser nge-cache list lama
+                });
                 const docs = await res.json();
                 const grid = document.getElementById('rag-documents-grid');
 
@@ -1528,12 +1531,34 @@
                             <h5 class="text-xs font-bold text-slate-700 truncate">${doc.filename}</h5>
                             <p class="text-[10px] text-slate-400 mt-0.5 font-medium">${doc.size}</p>
                         </div>
-                        <button onclick="deleteExternalDoc('${doc.filename}')" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="viewDocumentText('${doc.filename}')" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors mr-1" title="Lihat Isi Teks"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="deleteExternalDoc('${doc.filename}')" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                     `;
                     grid.appendChild(div);
                 });
 
             } catch (err) { console.error("Gagal load docs:", err); }
+        }
+
+        async function viewDocumentText(filename) {
+            try {
+                const res = await fetch(`/api/bot/docs/${encodeURIComponent(filename)}`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('doc-viewer-title').innerText = data.filename;
+                    document.getElementById('doc-viewer-content').innerText = data.content;
+                    document.getElementById('document-viewer-modal').classList.remove('hidden');
+                } else {
+                    showToastAlert('❌ Gagal', data.error || 'Gagal memuat isi dokumen.');
+                }
+            } catch (err) {
+                showToastAlert('❌ Gagal', 'Koneksi ke server terputus.');
+            }
+        }
+        
+        function closeDocumentViewer() {
+            document.getElementById('document-viewer-modal').classList.add('hidden');
         }
 
         async function handlePDFUpload(event) {
@@ -1543,9 +1568,16 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            const btnLabel = event.target.previousElementSibling.querySelector('.font-bold');
-            const originalText = btnLabel.innerText;
-            btnLabel.innerText = "Mengunggah...";
+            const btnLabel = event.target.parentElement.querySelector('.font-bold');
+            const iconDiv = event.target.parentElement.querySelector('.fa-cloud-arrow-up');
+            
+            const originalText = btnLabel ? btnLabel.innerText : 'Upload File';
+            
+            if (btnLabel) btnLabel.innerText = "Mengunggah...";
+            if (iconDiv) {
+                iconDiv.classList.remove('fa-cloud-arrow-up');
+                iconDiv.classList.add('fa-circle-notch', 'fa-spin');
+            }
 
             try {
                 const res = await fetch('/api/bot/upload-pdf', {
@@ -1564,8 +1596,12 @@
             } catch (err) {
                 showToastAlert('❌ Gagal', 'Koneksi ke server terputus.');
             } finally {
-                btnLabel.innerText = originalText;
-                event.target.value = ''; // reset
+                if (btnLabel) btnLabel.innerText = originalText;
+                if (iconDiv) {
+                    iconDiv.classList.remove('fa-circle-notch', 'fa-spin');
+                    iconDiv.classList.add('fa-cloud-arrow-up');
+                }
+                event.target.value = ''; // Reset input agar file yang sama bisa diupload ulang jika perlu
             }
         }
 
@@ -1620,6 +1656,31 @@
             class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg transition-colors flex items-center gap-2 whitespace-nowrap">
             <span class="material-symbols-outlined text-[20px]">psychology</span> Latih AI Sekarang
         </button>
+    </div>
+
+    <!-- Document Viewer Modal -->
+    <div id="document-viewer-modal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center">
+        <div class="bg-white w-[800px] max-w-[90vw] h-[80vh] rounded-2xl shadow-xl flex flex-col scale-in">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm" id="doc-viewer-title">Document Name</h3>
+                        <p class="text-[11px] text-slate-500 font-medium">Teks hasil ekstraksi AI</p>
+                    </div>
+                </div>
+                <button onclick="closeDocumentViewer()"
+                    class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors flex items-center justify-center">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 flex-1 overflow-y-auto bg-white custom-scrollbar rounded-b-2xl">
+                <pre id="doc-viewer-content" class="text-xs text-slate-600 whitespace-pre-wrap font-mono leading-relaxed p-4 bg-slate-50 rounded-xl border border-slate-200"></pre>
+            </div>
+        </div>
     </div>
 
     <script>

@@ -726,6 +726,26 @@ app.get('/api/bot/docs', authenticateJWT, (req, res) => {
     } catch (err) { res.status(500).json({ error: 'Gagal mengambil daftar dokumen.' }); }
 });
 
+app.get('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
+    try {
+        // Sanitasi input: path.basename akan menghilangkan path traversal seperti ../../../
+        const safeFilename = path.basename(req.params.filename);
+        if (!safeFilename) return res.status(400).json({ error: 'Nama file tidak valid.' });
+        
+        const fullPath = path.join(KNOWLEDGE_DOCS_DIR, safeFilename + '.txt');
+        
+        if (!fs.existsSync(fullPath)) {
+            return res.status(404).json({ error: 'Dokumen tidak ditemukan.' });
+        }
+        
+        const content = fs.readFileSync(fullPath, 'utf8');
+        res.json({ filename: safeFilename, content: content });
+    } catch (err) {
+        console.error("Gagal membaca dokumen:", err);
+        res.status(500).json({ error: 'Terjadi kesalahan saat membaca dokumen.' });
+    }
+});
+
 app.get('/api/bot/token-usage', authenticateJWT, (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
