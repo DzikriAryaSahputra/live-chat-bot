@@ -396,10 +396,10 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <span
+                                    <span id="groq-api-status"
                                         class="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1.5 border border-green-200"><span
                                             class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.6)]"></span>
-                                        Online</span>
+                                        <span class="status-text">Online</span></span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div>
@@ -436,10 +436,10 @@
                                             <p class="text-[11px] text-slate-500 font-medium">Fallback API Router</p>
                                         </div>
                                     </div>
-                                    <span
+                                    <span id="gemini-api-status"
                                         class="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1.5 border border-green-200"><span
                                             class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.6)]"></span>
-                                        Online</span>
+                                        <span class="status-text">Online</span></span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div>
@@ -487,10 +487,10 @@
                         </div>
 
                         <!-- Indexed Docs -->
-                        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-[280px] flex flex-col">
+                        <div id="rag-docs-container" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-[280px] flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
                                 <h4 class="font-bold text-slate-800">Recently Indexed Documents</h4>
-                                <a href="#" class="text-xs font-bold text-primary-600 hover:underline">View All</a>
+                                <a href="#" id="view-all-docs-btn" onclick="openViewAllDocsModal(event)" class="text-xs font-bold text-primary-600 hover:underline">View All</a>
                             </div>
 
                             <div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 custom-scrollbar"
@@ -1620,6 +1620,27 @@
             });
         }
 
+        function updateApiBadge(id, status) {
+            const badge = document.getElementById(id);
+            if (!badge) return;
+            const dot = badge.querySelector('span');
+            const text = badge.querySelector('.status-text');
+            if (status === 'LIMIT') {
+                badge.className = "bg-red-50 text-red-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1.5 border border-red-200";
+                dot.className = "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.6)]";
+                text.innerText = "Limit Tercapai";
+            } else {
+                badge.className = "bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1.5 border border-green-200";
+                dot.className = "w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.6)]";
+                text.innerText = "Online";
+            }
+        }
+
+        socket.on('api_status_update', (status) => {
+            updateApiBadge('groq-api-status', status.groq);
+            updateApiBadge('gemini-api-status', status.gemini);
+        });
+
         async function fetchTokenUsage() {
             try {
                 const res = await fetch('/api/bot/token-usage', { headers: { 'Authorization': `Bearer ${adminToken}` } });
@@ -1632,12 +1653,40 @@
                 const geminiText = document.getElementById('gemini-usage-text');
                 if (geminiText) geminiText.innerText = data.gemini.toLocaleString();
 
+                if (data.apiStatus) {
+                    updateApiBadge('groq-api-status', data.apiStatus.groq);
+                    updateApiBadge('gemini-api-status', data.apiStatus.gemini);
+                }
+
             } catch (e) { console.error('Gagal load token usage:', e); }
         }
 
         // Initialize Fetching RAG
         fetchExternalDocs();
         fetchTokenUsage();
+        
+        function openViewAllDocsModal(e) {
+            e.preventDefault();
+            const modal = document.getElementById('view-all-docs-modal');
+            const mainGrid = document.getElementById('rag-documents-grid');
+            const modalGrid = document.getElementById('view-all-docs-grid');
+            
+            modalGrid.innerHTML = mainGrid.innerHTML;
+            modal.classList.remove('hidden');
+        }
+
+        function closeViewAllDocsModal() {
+            document.getElementById('view-all-docs-modal').classList.add('hidden');
+        }
+
+        function searchViewAllDocs() {
+            const filter = document.getElementById('view-all-docs-search').value.toLowerCase();
+            const items = document.getElementById('view-all-docs-grid').children;
+            for (let i = 0; i < items.length; i++) {
+                const text = items[i].innerText || items[i].textContent;
+                items[i].style.display = text.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
     </script>
 
     <!-- Floating Train Reminder -->
@@ -1683,6 +1732,39 @@
         </div>
     </div>
 
+    <!-- View All Docs Modal -->
+    <div id="view-all-docs-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center">
+        <div class="bg-white w-[600px] max-w-[90vw] h-[80vh] rounded-2xl shadow-xl flex flex-col scale-in">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">All Indexed Documents</h3>
+                        <p class="text-[11px] text-slate-500 font-medium">Semua dokumen PDF di otak AI</p>
+                    </div>
+                </div>
+                <button onclick="closeViewAllDocsModal()" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors flex items-center justify-center">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="px-6 py-3 border-b border-slate-100 bg-white shrink-0">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="view-all-docs-search" onkeyup="searchViewAllDocs()" placeholder="Cari nama dokumen..." class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 block pl-10 p-2.5 outline-none transition-colors">
+                </div>
+            </div>
+
+            <div class="p-6 flex-1 overflow-y-auto bg-slate-50 custom-scrollbar rounded-b-2xl">
+                <div id="view-all-docs-grid" class="flex flex-col gap-3"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Show floating train reminder if there are pending changes on load
@@ -1691,6 +1773,10 @@
             }
         });
     </script>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
 </body>
 
 </html>

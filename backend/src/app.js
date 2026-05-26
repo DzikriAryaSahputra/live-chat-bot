@@ -61,7 +61,7 @@ function cosineSimilarity(vecA, vecB) {
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-function chunkText(text, maxChars = 800) {
+function chunkText(text, maxChars = 1500) {
     // 1. Rapihkan teks (hapus enter/spasi berlebih hasil ekstraksi PDF)
     const cleanText = text.replace(/\s+/g, ' ').trim();
     const words = cleanText.split(' ');
@@ -72,14 +72,37 @@ function chunkText(text, maxChars = 800) {
 
     for (let i = 0; i < words.length; i++) {
         const word = words[i];
+        
         // Jika menambahkan kata ini akan melebihi batas karakter
         if (currentLength + word.length > maxChars && currentChunk.length > 0) {
-            chunks.push(currentChunk.join(' '));
-            // Sisipkan sedikit kalimat sebelumnya (overlap ~15 kata) agar konteks tidak terputus
-            const overlapWords = currentChunk.slice(-15);
-            currentChunk = [...overlapWords];
+            // Smart Chunking: Coba cari tanda baca akhir kalimat (. ? !) di 30 kata terakhir
+            let cutIndex = -1;
+            for (let j = currentChunk.length - 1; j >= Math.max(0, currentChunk.length - 30); j--) {
+                if (currentChunk[j].endsWith('.') || currentChunk[j].endsWith('?') || currentChunk[j].endsWith('!')) {
+                    cutIndex = j;
+                    break;
+                }
+            }
+
+            if (cutIndex !== -1) {
+                // Potong tepat setelah tanda baca akhir kalimat
+                const actualChunk = currentChunk.slice(0, cutIndex + 1);
+                chunks.push(actualChunk.join(' '));
+                
+                // Sisa kata dioper ke chunk berikutnya, ditambah overlap kalimat sebelumnya
+                const leftover = currentChunk.slice(cutIndex + 1);
+                const overlap = actualChunk.slice(-10); // 10 kata overlap untuk menjaga konteks
+                currentChunk = [...overlap, ...leftover];
+            } else {
+                // Jika tidak ada tanda baca (teks berantakan), potong paksa
+                chunks.push(currentChunk.join(' '));
+                const overlapWords = currentChunk.slice(-15);
+                currentChunk = [...overlapWords];
+            }
+            
             currentLength = currentChunk.join(' ').length;
         }
+        
         currentChunk.push(word);
         currentLength += word.length + 1; // +1 untuk spasi
     }
@@ -198,8 +221,8 @@ async function getKnowledgeBaseContext(userMessage) {
                     }));
                     // Urutkan berdasarkan skor tertinggi
                     scoredChunks.sort((a, b) => b.score - a.score);
-                    // Ambil Top 6 chunks (agar AI tahu lebih banyak isi dari tengah ke bawah)
-                    const topChunks = scoredChunks.slice(0, 6);
+                    // Ambil Top 4 chunks (agar AI tahu isi dokumen tapi tidak menyentuh limit API gratis Groq/Gemini)
+                    const topChunks = scoredChunks.slice(0, 4);
                     for (const chunk of topChunks) {
                         externalDocs += `\n\n--- DOKUMEN [${chunk.fileName}] (Relevansi: ${(chunk.score * 100).toFixed(1)}%) ---\n${chunk.text}`;
                     }
@@ -207,7 +230,7 @@ async function getKnowledgeBaseContext(userMessage) {
             }
         }
 
-        // Limit TOTAL pengetahuan agar tidak melampaui batas (dinaikkan ke 10000 agar muat 6 chunk)
+        // Limit TOTAL pengetahuan agar tidak melampaui batas (diturunkan ke 10000 agar aman dari limit token)
         const combined = externalDocs;
         return combined.length > 10000 ? combined.substring(0, 10000) + "\n...[DIPOTONG KARENA LIMIT]" : combined;
     } catch (e) {
@@ -238,6 +261,17 @@ function trackTokenUsage(model, tokens) {
     } catch (err) {
         console.error("Gagal mencatat pemakaian token:", err.message);
     }
+}
+
+// Global API Status Tracker
+let globalApiStatus = { groq: 'OK', gemini: 'OK' };
+function triggerApiLimit(model) {
+    globalApiStatus[model] = 'LIMIT';
+    io.emit('api_status_update', globalApiStatus);
+    setTimeout(() => {
+        globalApiStatus[model] = 'OK';
+        io.emit('api_status_update', globalApiStatus);
+    }, 120000); // 120 detik (2 menit) auto-recovery
 }
 
 async function generateLLMResponse(userMessage) {
@@ -272,6 +306,7 @@ ${knowledgeStr}
             }
         } catch (groqErr) {
             console.error("⚠️ Groq API gagal/limit:", groqErr.response ? groqErr.response.data : groqErr.message);
+            if (groqErr.response && groqErr.response.status === 429) triggerApiLimit('groq');
         }
     }
 
@@ -292,6 +327,7 @@ ${knowledgeStr}
             }
         } catch (geminiErr) {
             console.error("⚠️ Gemini API gagal:", geminiErr.response ? geminiErr.response.data : geminiErr.message);
+            if (geminiErr.response && geminiErr.response.status === 429) triggerApiLimit('gemini');
         }
     }
 
@@ -692,12 +728,17 @@ app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (r
             existingEmbeddings = JSON.parse(fs.readFileSync(EMBEDDINGS_FILE, 'utf8'));
         }
 
+        // Buat judul natural dari nama file PDF (hilangkan ekstensi dan ubah tanda pisah jadi spasi)
+        const docTitle = req.file.originalname.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ');
+
         for (const chunk of chunks) {
-            const vec = await generateEmbedding(chunk);
+            // RAG Metadata Injection: Menyuntikkan judul dokumen ke setiap potongan teks
+            const contextChunk = `[Dokumen: ${docTitle}]\n${chunk}`;
+            const vec = await generateEmbedding(contextChunk);
             if (vec) {
                 existingEmbeddings.push({
                     txtFileName: fileName,
-                    text: chunk,
+                    text: contextChunk,
                     vector: vec
                 });
             }
@@ -755,7 +796,7 @@ app.get('/api/bot/token-usage', authenticateJWT, (req, res) => {
             usageData = JSON.parse(raw);
             if (usageData.date !== today) usageData = { date: today, groq: 0, gemini: 0 };
         }
-        res.json(usageData);
+        res.json({ ...usageData, apiStatus: globalApiStatus });
     } catch (err) {
         res.status(500).json({ error: 'Gagal mengambil data penggunaan token.' });
     }
