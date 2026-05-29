@@ -3,16 +3,18 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const cheerio = require('cheerio');
 
-// Modul CMS Bot
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const bcrypt = require('bcryptjs');
 const { spawn } = require('child_process');
 
 // Koneksi Database
@@ -30,6 +32,7 @@ const io = new Server(server, {
 });
 const port = process.env.PORT || 3000;
 
+app.use(helmet({ contentSecurityPolicy: false })); // Nonaktifkan CSP agar CDN (Tailwind/FontAwesome) tidak terblokir
 app.use(cors());
 app.use(express.json());
 
@@ -167,6 +170,33 @@ app.get('/error', (req, res) => {
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_negara_bps_sangat_rahasia';
+
+const SETTINGS_FILE = path.join(__dirname, '..', 'settings.json');
+
+function getSettings() {
+    if (fs.existsSync(SETTINGS_FILE)) {
+        return JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
+    }
+    const defaultSettings = {
+        admin: {
+            username: ADMIN_USER,
+            passwordHash: bcrypt.hashSync(ADMIN_PASS, 10)
+        },
+        liveChat: {
+            isEmergencyLeave: false,
+            startDay: 1,
+            endDay: 5,
+            startTime: '08:00',
+            endTime: '16:00'
+        }
+    };
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(defaultSettings, null, 4));
+    return defaultSettings;
+}
+
+function saveSettings(settings) {
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 4));
+}
 
 // Daftar Intent yang tidak bisa diubah/dihapus dari dashboard
 const PROTECTED_INTENTS = [
@@ -422,19 +452,34 @@ io.on('connection', (socket) => {
 
             // 4. KIRIM JAWABAN KE WARGA
             if (botReply) {
-                // FITUR 1: Cek Jam Operasional Admin (Senin-Jumat, 08:00 - 16:00)
+                // FITUR 1: Cek Jam Operasional Admin Dinamis dari Settings
                 if (botReply.toLowerCase().includes('meneruskan pesan')) {
+                    const settings = getSettings().liveChat;
                     const now = new Date();
                     const currentHour = now.getHours();
+                    const currentMinute = now.getMinutes();
                     const currentDay = now.getDay(); // 0: Minggu, 1: Senin, ..., 6: Sabtu
-                    
-                    const isWeekday = currentDay >= 1 && currentDay <= 5;
-                    const isWorkingHour = currentHour >= 8 && currentHour < 16;
 
-                    if (isWeekday && isWorkingHour) {
+                    const startHour = parseInt(settings.startTime.split(':')[0]);
+                    const startMin = parseInt(settings.startTime.split(':')[1]);
+                    const endHour = parseInt(settings.endTime.split(':')[0]);
+                    const endMin = parseInt(settings.endTime.split(':')[1]);
+
+                    const isWithinDays = currentDay >= settings.startDay && currentDay <= settings.endDay;
+                    const currentMinutesTotal = currentHour * 60 + currentMinute;
+                    const startMinutesTotal = startHour * 60 + startMin;
+                    const endMinutesTotal = endHour * 60 + endMin;
+                    const isWithinHours = currentMinutesTotal >= startMinutesTotal && currentMinutesTotal <= endMinutesTotal;
+
+                    if (!settings.isEmergencyLeave && isWithinDays && isWithinHours) {
                         activeSessions[senderId] = 'admin';
                     } else {
-                        botReply = "Maaf, layanan Live Chat dengan petugas BPS hanya tersedia pada hari kerja (Senin - Jumat, Pukul 08:00 - 16:00 WIB). Di luar jam tersebut, Anda tetap bisa bertanya dan BIPS akan mencoba menjawabnya.";
+                        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                        if (settings.isEmergencyLeave) {
+                            botReply = "Maaf, petugas layanan Live Chat BPS saat ini sedang tidak tersedia atau sedang libur.";
+                        } else {
+                            botReply = `Maaf, layanan Live Chat dengan petugas BPS hanya tersedia pada ${days[settings.startDay]} - ${days[settings.endDay]}, Pukul ${settings.startTime} - ${settings.endTime} WIB. Di luar jam tersebut, BIPS akan mencoba menjawabnya.`;
+                        }
                     }
                 }
 
@@ -587,12 +632,47 @@ io.on('connection', (socket) => {
 // 🛡️ REST API ROUTES
 // ==========================================
 
-app.post('/api/login', (req, res) => {
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 menit
+    max: 10, // maksimal 10 percobaan per IP
+    message: { error: 'Terlalu banyak percobaan login, silakan coba lagi dalam 15 menit.' }
+});
+
+app.post('/api/login', loginLimiter, (req, res) => {
     const { username, password } = req.body;
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
+    const settings = getSettings();
+    if (username === settings.admin.username && bcrypt.compareSync(password, settings.admin.passwordHash)) {
         const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
         res.json({ token });
     } else { res.status(401).json({ error: 'Username/Password salah!' }); }
+});
+
+app.get('/api/bot/settings', authenticateJWT, (req, res) => {
+    const settings = getSettings();
+    res.json({ admin: { username: settings.admin.username }, liveChat: settings.liveChat });
+});
+
+app.put('/api/bot/settings', authenticateJWT, (req, res) => {
+    try {
+        const { admin, liveChat } = req.body;
+        const currentSettings = getSettings();
+        
+        if (admin) {
+            if (admin.password) {
+                if (!admin.oldPassword || !bcrypt.compareSync(admin.oldPassword, currentSettings.admin.passwordHash)) {
+                    return res.status(401).json({ error: 'Sandi lama tidak cocok!' });
+                }
+                currentSettings.admin.passwordHash = bcrypt.hashSync(admin.password, 10);
+            }
+            if (admin.username) currentSettings.admin.username = admin.username;
+        }
+        if (liveChat) {
+            currentSettings.liveChat = { ...currentSettings.liveChat, ...liveChat };
+        }
+        
+        saveSettings(currentSettings);
+        res.json({ message: 'Pengaturan berhasil disimpan!' });
+    } catch (err) { res.status(500).json({ error: 'Gagal menyimpan pengaturan.' }); }
 });
 
 function authenticateJWT(req, res, next) {

@@ -24,3 +24,4 @@ test_iframe.html
 .DS_Store
 Thumbs.db
 *.log
+backend/settings.json

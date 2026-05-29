@@ -100,14 +100,30 @@
     </style>
 </head>
 
-<body class="bg-slate-50 h-screen w-screen overflow-hidden text-slate-800">
+<body class="bg-slate-50 h-screen w-screen overflow-hidden text-slate-800 flex flex-col md:flex-row relative">
 
-    <div class="flex h-full w-full">
+    <!-- MOBILE HEADER -->
+    <header class="md:hidden bg-white h-14 border-b border-slate-200 flex items-center justify-between px-4 shrink-0 z-40">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white shadow-sm">
+                <i class="fa-solid fa-chart-line text-sm"></i>
+            </div>
+            <h1 class="font-bold text-primary-600 text-sm tracking-tight">BPS Monitor</h1>
+        </div>
+        <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </header>
+
+    <!-- SIDEBAR OVERLAY (MOBILE) -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <div class="flex flex-1 overflow-hidden relative">
 
         <!-- ========================================== -->
         <!-- 1. LEFT SIDEBAR (GLOBAL) -->
         <!-- ========================================== -->
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 z-20">
+        <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 z-50 fixed inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 h-full shadow-2xl md:shadow-none">
             <!-- Top Section -->
             <div>
                 <!-- Logo -->
@@ -167,7 +183,7 @@
                 <!-- Dropdown Menu (Hidden by default) -->
                 <div id="profile-menu"
                     class="absolute bottom-full left-4 right-4 mb-2 bg-white border border-slate-100 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] py-2 hidden flex-col z-50">
-                    <button onclick="showToastAlert('Segera Hadir', 'Fitur pengaturan masih dalam pengembangan')"
+                    <button onclick="openSettingsPage()"
                         class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors text-left">
                         <i class="fa-solid fa-gear w-4 text-center"></i> Settings
                     </button>
@@ -206,7 +222,7 @@
             <div id="tab-live-chat" class="tab-content active w-full h-full">
 
                 <!-- Sub-Sidebar: Active Sessions -->
-                <div class="w-[320px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-10">
+                <div id="chat-sidebar" class="w-full md:w-[320px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-10">
                     <div class="p-5 border-b border-slate-100">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="font-bold text-slate-800">Active Sessions</h2>
@@ -238,11 +254,14 @@
                 </div>
 
                 <!-- Chat Console (Right Area) -->
-                <div class="flex-1 flex flex-col bg-[#f8fafc]">
+                <div id="chat-console" class="flex-1 flex flex-col bg-[#f8fafc] hidden md:flex w-full md:w-auto absolute md:relative inset-0 z-20">
                     <!-- Chat Header -->
                     <div
-                        class="h-[72px] px-6 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
+                        class="h-[72px] px-4 md:px-6 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
                         <div class="flex items-center gap-3">
+                            <button onclick="backToChatList()" class="md:hidden w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-lg">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
                             <div class="relative">
                                 <img src="https://ui-avatars.com/api/?name=Pilih+Obrolan&background=f1f5f9&color=64748b"
                                     id="header-avatar" class="w-10 h-10 rounded-full" alt="Avatar">
@@ -318,9 +337,9 @@
             <!-- TAB 2: KNOWLEDGE BASE NLU -->
             <!-- ============================== -->
             <div id="tab-knowledge-base" class="tab-content w-full h-full bg-slate-50 overflow-y-auto">
-                <div class="max-w-6xl mx-auto p-8">
+                <div class="max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-6">
                     <!-- Header -->
-                    <div class="flex justify-between items-end mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Knowledge Base NLU</h1>
                             <p class="text-sm text-slate-500 mt-1">Manage NLU intents, training phrases, and bot
@@ -341,14 +360,14 @@
 
                     <!-- Search Bar -->
                     <div
-                        class="relative mb-8 bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3">
+                        class="relative bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3">
                         <i class="fa-solid fa-search text-slate-400 ml-3"></i>
                         <input type="text" id="knowledge-search" placeholder="Search intents or training phrases..."
                             class="flex-1 bg-transparent border-none py-2 text-sm focus:outline-none text-slate-700">
                     </div>
 
                     <!-- Intents Grid -->
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-12" id="knowledge-base-grid">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12" id="knowledge-base-grid">
                         <div class="col-span-full text-center text-slate-400 py-10">Memuat data pengetahuan...</div>
                     </div>
                 </div>
@@ -358,14 +377,12 @@
             <!-- TAB 3: AI MANAGEMENT LLM -->
             <!-- ============================== -->
             <div id="tab-ai-management" class="tab-content w-full h-full bg-slate-50 overflow-y-auto">
-                <div class="max-w-5xl mx-auto p-8">
+                <div class="max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-6">
                     <!-- Header -->
-                    <div class="flex justify-between items-end mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Model & Vector Management
-                            </h1>
-                            <p class="text-sm text-slate-500 mt-1">Monitor LLM routing health and manage vector and
-                                knowledge base documents.</p>
+                            <h2 class="text-2xl font-bold text-slate-800">AI Management LLM</h2>
+                            <p class="text-slate-500 mt-1">Kelola dokumen pengetahuan (RAG) untuk otak LLM bot Anda.</p>
                         </div>
                         <button onclick="fetchExternalDocs(); fetchTokenUsage();"
                             class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-2.5 px-4 rounded-xl shadow-sm flex items-center gap-2 transition-colors">
@@ -374,8 +391,8 @@
                     </div>
 
                     <!-- LLM Routing Architecture -->
-                    <h3 class="text-sm font-bold text-slate-800 mb-4">LLM Routing Architecture</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <h3 class="text-sm font-bold text-slate-800">LLM Routing Architecture</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         <!-- Model Card 1 -->
                         <div
@@ -460,8 +477,8 @@
                     </div>
 
                     <!-- Document Management -->
-                    <h3 class="text-sm font-bold text-slate-800 mb-4">Document Management</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+                    <h3 class="text-sm font-bold text-slate-800">Document Management</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
 
                         <!-- Upload Card -->
                         <div
@@ -503,11 +520,105 @@
                 </div>
             </div>
 
+            <!-- ============================== -->
+            <!-- TAB: SETTINGS PAGE -->
+            <!-- ============================== -->
+            <div id="tab-settings" class="tab-content w-full h-full p-8 pb-24 bg-slate-50 overflow-y-auto">
+                <div class="max-w-4xl mx-auto flex flex-col gap-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">Pengaturan Sistem</h2>
+                            <p class="text-slate-500 mt-1">Kelola jam layanan Live Chat dan keamanan akun Admin</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Chat Settings -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-headset text-primary-500"></i> Layanan Live Chat</h3>
+                        
+                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">Mode Libur Darurat / Cuti</h4>
+                                <p class="text-xs text-slate-500 mt-1">Tutup layanan chat dengan Admin saat ini juga tanpa mempedulikan jadwal.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="setting-emergency" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Hari Mulai Buka</label>
+                                <select id="setting-start-day" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-white shadow-sm">
+                                    <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option><option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option><option value="0">Minggu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Hari Tutup</label>
+                                <select id="setting-end-day" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-white shadow-sm">
+                                    <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option><option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option><option value="0">Minggu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Jam Buka (WIB)</label>
+                                <input type="time" id="setting-start-time" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Jam Tutup (WIB)</label>
+                                <input type="time" id="setting-end-time" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Account Settings -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-lock text-slate-500"></i> Keamanan Akun Admin</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Username Admin</label>
+                                <input type="text" id="setting-username" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="admin">
+                            </div>
+                            <div class="md:col-span-2 pt-4 border-t border-slate-100">
+                                <h4 class="text-sm font-bold text-slate-800 mb-4">Ganti Sandi (Opsional)</h4>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Saat Ini <span class="text-slate-400 font-normal">(Diperlukan jika ganti sandi)</span></label>
+                                <input type="password" id="setting-old-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Baru</label>
+                                <input type="password" id="setting-new-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="••••••••">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 mt-4">
+                        <button onclick="switchTab('live-chat')" class="px-6 py-3 text-sm font-bold text-slate-500 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors shadow-sm">Batal</button>
+                        <button onclick="saveSettings()" class="px-6 py-3 text-sm font-bold bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors shadow flex items-center gap-2">
+                            <i class="fa-solid fa-save"></i> Simpan Pengaturan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
     <!-- Script navigasi sederhana untuk Dummy -->
     <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
         function toggleProfileMenu() {
             const menu = document.getElementById('profile-menu');
             const chevron = document.getElementById('profile-chevron');
@@ -1309,6 +1420,15 @@
             document.getElementById('active-user-title').innerText = displayName;
             unreadCounts[id] = 0;
             renderUserList();
+            
+            // Mobile Responsive Logic
+            if (window.innerWidth < 768) {
+                document.getElementById('chat-sidebar').classList.add('hidden');
+                document.getElementById('chat-sidebar').classList.remove('flex');
+                document.getElementById('chat-console').classList.remove('hidden');
+                document.getElementById('chat-console').classList.add('flex');
+            }
+            
             const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = '';
             try {
@@ -1317,6 +1437,13 @@
                 if (h.length === 0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>';
                 else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at));
             } catch (e) { }
+        }
+
+        function backToChatList() {
+            document.getElementById('chat-sidebar').classList.remove('hidden');
+            document.getElementById('chat-sidebar').classList.add('flex');
+            document.getElementById('chat-console').classList.add('hidden');
+            document.getElementById('chat-console').classList.remove('flex');
         }
 
         socket.on('receive_message', (d) => {
@@ -1764,6 +1891,8 @@
             </div>
         </div>
     </div>
+    
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -1772,6 +1901,86 @@
                 showTrainBanner();
             }
         });
+
+        // Settings Page Logic
+        async function openSettingsPage() {
+            toggleProfileMenu(); // Close dropdown
+            
+            // Switch tab
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'text-primary-600', 'bg-primary-50', 'font-semibold');
+                el.classList.add('text-slate-500');
+            });
+            document.getElementById('tab-settings').classList.add('active');
+
+            try {
+                const res = await fetch('/api/bot/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                const data = await res.json();
+                
+                document.getElementById('setting-username').value = data.admin.username;
+                document.getElementById('setting-old-password').value = '';
+                document.getElementById('setting-new-password').value = '';
+                
+                document.getElementById('setting-emergency').checked = data.liveChat.isEmergencyLeave;
+                document.getElementById('setting-start-day').value = data.liveChat.startDay;
+                document.getElementById('setting-end-day').value = data.liveChat.endDay;
+                document.getElementById('setting-start-time').value = data.liveChat.startTime;
+                document.getElementById('setting-end-time').value = data.liveChat.endTime;
+            } catch (err) {
+                showToastAlert('❌ Gagal', 'Tidak dapat memuat pengaturan saat ini.');
+            }
+        }
+
+        async function saveSettings() {
+            const username = document.getElementById('setting-username').value.trim();
+            const oldPassword = document.getElementById('setting-old-password').value;
+            const newPassword = document.getElementById('setting-new-password').value;
+            const isEmergencyLeave = document.getElementById('setting-emergency').checked;
+            const startDay = parseInt(document.getElementById('setting-start-day').value);
+            const endDay = parseInt(document.getElementById('setting-end-day').value);
+            const startTime = document.getElementById('setting-start-time').value;
+            const endTime = document.getElementById('setting-end-time').value;
+
+            if (!username) return showToastAlert('❌ Gagal', 'Username tidak boleh kosong!');
+            if (newPassword && !oldPassword) {
+                return showToastAlert('❌ Gagal', 'Harap masukkan Sandi Lama untuk mengubah sandi.');
+            }
+
+            const payload = {
+                admin: { username },
+                liveChat: { isEmergencyLeave, startDay, endDay, startTime, endTime }
+            };
+            
+            if (newPassword) {
+                payload.admin.oldPassword = oldPassword;
+                payload.admin.password = newPassword;
+            }
+
+            try {
+                const res = await fetch('/api/bot/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    showToastAlert('✅ Berhasil', 'Pengaturan berhasil disimpan!');
+                    switchTab('live-chat');
+                    if (newPassword || username !== document.getElementById('setting-username').defaultValue) {
+                        setTimeout(() => {
+                            showToastAlert('ℹ️ Info', 'Kredensial diubah. Silakan login kembali.');
+                            setTimeout(logoutAdmin, 2000);
+                        }, 1000);
+                    }
+                } else {
+                    showToastAlert('❌ Gagal', data.error || 'Terjadi kesalahan saat menyimpan pengaturan.');
+                }
+            } catch (err) {
+                showToastAlert('❌ Gagal', 'Gagal menghubungi server.');
+            }
+        }
     </script>
 
     <!-- Toast Notification Container -->
