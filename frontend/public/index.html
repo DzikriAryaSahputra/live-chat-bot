@@ -58,19 +58,47 @@
     a:hover {
       color: #1d4ed8 !important;
     }
+
+    /* Mobile View Overrides (dipanggil via JS jika widget ditarik di HP) */
+    body.mobile-view #widget-wrapper {
+      inset: 0 !important;
+      bottom: auto !important;
+      right: auto !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    body.mobile-view #chat-container {
+      position: absolute !important;
+      bottom: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100vh !important;
+      border-radius: 0 !important;
+      border: none !important;
+    }
+    body.mobile-view #chat-header, 
+    body.mobile-view #chat-footer {
+      border-radius: 0 !important;
+    }
+    body.mobile-view #open-chat-btn {
+      position: absolute !important;
+      bottom: 24px !important;
+      right: 24px !important;
+    }
   </style>
 </head>
 
 <body class="relative h-screen w-full bg-transparent pointer-events-none overflow-hidden">
 
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-auto">
+  <div id="widget-wrapper" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-auto">
 
     <!-- Chat Container -->
-    <div
+    <div id="chat-container"
       class="chat-container relative w-[380px] bg-gray-50 rounded-2xl shadow-widget overflow-hidden flex flex-col border border-gray-200 transition-all transform origin-bottom-right h-[600px] max-h-[80vh]">
 
       <!-- Header -->
-      <header class="bg-[#0f2b56] text-white p-4 flex items-center justify-between rounded-t-2xl shrink-0">
+      <header id="chat-header" class="bg-[#0f2b56] text-white p-4 flex items-center justify-between rounded-t-2xl shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-white/20">
             <img class="w-full h-full object-cover" alt="BIPS Avatar" src="img/SISCA_BOT.png"
@@ -104,7 +132,7 @@
       <div class="flex-1 overflow-y-auto p-5 bg-[#f8fafc] flex flex-col gap-4" id="chat-box"></div>
 
       <!-- Input Area -->
-      <footer
+      <footer id="chat-footer"
         class="bg-white p-4 border-t border-gray-100 rounded-b-2xl shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
         <div class="relative flex items-center">
           <input id="user-input" type="text" autocomplete="off" placeholder="Ketik pesan..."
@@ -151,8 +179,8 @@
 
     </div>
 
-    <!-- Open Button (selector: .fixed.bottom-6.right-6 > button.w-14.h-14) -->
-    <button type="button"
+    <!-- Open Button -->
+    <button type="button" id="open-chat-btn"
       class="w-14 h-14 rounded-full bg-[#f59e0b] hover:bg-[#d97706] shadow-lg hover:shadow-xl text-white flex items-center justify-center transition-all transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-4 focus:ring-amber-200 group">
       <i class="fa-solid fa-comment-dots text-2xl"></i>
     </button>

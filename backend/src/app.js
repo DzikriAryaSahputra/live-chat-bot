@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const cheerio = require('cheerio');
+const cron = require('node-cron');
 
 const fs = require('fs');
 const path = require('path');
@@ -149,7 +150,7 @@ app.use(express.static(PUBLIC_DIR));
 // 🛤️ FRONTEND ROUTING (URL CANTIK)
 // ==========================================
 app.get('/', (req, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, 'chatwidget.html'));
+    res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
 app.get('/login', (req, res) => {
@@ -203,6 +204,27 @@ const PROTECTED_INTENTS = [
     'greet', 'goodbye', 'affirm', 'deny', 'mood_great', 'trigger_alihkan_admin', 'cari_info_website',
     'hubungi_admin', 'teruskan_admin', 'tanya_admin'
 ];
+
+// ==========================================
+// 🚫 FILTER KATA KASAR / PROMOSI (Khusus Nama)
+// ==========================================
+const TOXIC_WORDS = [
+    'anjing', 'babi', 'monyet', 'bangsat', 'sialan', 'jancok', 'goblok', 'tolol', 'bego', 'bodoh',
+    'judi', 'slot', 'gacor', 'poker', 'casino', 'zeus', 'maxwin', 'togel', 'pragmatic'
+];
+
+function sanitizeName(name) {
+    if (!name) return null;
+    const lowerName = name.toLowerCase();
+    
+    // Cek apakah nama mengandung kata-kata di daftar hitam
+    for (const word of TOXIC_WORDS) {
+        if (lowerName.includes(word)) {
+            return "Warga Anonim"; // Paksa jadi Warga Anonim jika terdeteksi kotor/spam
+        }
+    }
+    return name; // Jika aman, kembalikan nama asli
+}
 
 // ==========================================
 // 📡 MANAJEMEN LIVE CHAT & SOCKET.IO
@@ -397,7 +419,8 @@ io.on('connection', (socket) => {
             socket.join(data.senderId);
             console.log(`📡 Klien telah memasuki jaringan room: ${data.senderId}`);
             if (data.name) {
-                io.emit('user_name_updated', { senderId: data.senderId, name: data.name });
+                const safeName = sanitizeName(data.name);
+                io.emit('user_name_updated', { senderId: data.senderId, name: safeName });
             }
             // Pancarkan ulang daftar, karena ada user yang baru online!
             broadcastUserList();
@@ -406,7 +429,8 @@ io.on('connection', (socket) => {
 
     socket.on('set_user_name', (data) => {
         if (data.senderId && data.name) {
-            io.emit('user_name_updated', { senderId: data.senderId, name: data.name });
+            const safeName = sanitizeName(data.name);
+            io.emit('user_name_updated', { senderId: data.senderId, name: safeName });
         }
     });
 
@@ -901,6 +925,23 @@ app.delete('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
             res.status(404).json({ error: 'Dokumen tidak ditemukan.' });
         }
     } catch (err) { res.status(500).json({ error: 'Gagal menghapus dokumen.' }); }
+});
+
+// ==========================================
+// 🧹 CRON JOBS (TUGAS OTOMATIS)
+// ==========================================
+
+// Hapus riwayat obrolan yang usianya lebih dari 30 hari (Berjalan setiap hari jam 02:00 AM)
+cron.schedule('0 2 * * *', async () => {
+    try {
+        const result = await db.query(`DELETE FROM chat_logs WHERE created_at < NOW() - INTERVAL '30 days'`);
+        if (result.rowCount > 0) {
+            console.log(`🧹 [CRON] Menghapus ${result.rowCount} riwayat chat yang sudah kedaluwarsa (>30 hari).`);
+            broadcastUserList();
+        }
+    } catch (err) {
+        console.error('❌ [CRON] Gagal menghapus riwayat chat lama:', err.message);
+    }
 });
 
 server.listen(port, () => console.log(`🚀 Server menyala di http://localhost:${port}`));

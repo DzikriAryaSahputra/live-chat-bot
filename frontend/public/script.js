@@ -9,6 +9,30 @@ const socket = io({
     reconnectionAttempts: Infinity,
 });
 
+// Listener untuk sinyal LAYOUT_MODE dari iframe parent (widget.js)
+window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'LAYOUT_MODE') {
+        if (e.data.isMobile) {
+            document.body.classList.add('mobile-view');
+        } else {
+            document.body.classList.remove('mobile-view');
+        }
+    }
+});
+
+// Cek standalone mode (bukan dalam iframe) agar bisa deteksi otomatis
+if (window.self === window.top) {
+    function checkStandaloneLayout() {
+        if (window.innerWidth < 768) {
+            document.body.classList.add('mobile-view');
+        } else {
+            document.body.classList.remove('mobile-view');
+        }
+    }
+    window.addEventListener('resize', checkStandaloneLayout);
+    checkStandaloneLayout();
+}
+
 let mySenderId = localStorage.getItem('bps_sender_id');
 if (!mySenderId) {
     // Gunakan kombinasi angka acak dan timestamp agar tidak bisa sembarangan ditebak orang lain (unguesabble)
@@ -33,7 +57,7 @@ const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const chatContainer = document.querySelector('.chat-container');
 const closeBtn = document.querySelector('button[aria-label="Close"]');
-const openBtn = document.querySelector('.fixed.bottom-6.right-6 > button.w-14.h-14');
+const openBtn = document.getElementById('open-chat-btn');
 
 // ==========================================
 // FUNGSI PENDETEKSI WAKTU (SAPAAN DINAMIS)
@@ -63,6 +87,7 @@ openBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     chatContainer.classList.remove('scale-0', 'opacity-0', 'pointer-events-none');
     chatContainer.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
+    openBtn.classList.add('scale-0', 'opacity-0', 'pointer-events-none');
     userInput.focus();
     notifyParentWindow('CHAT_OPENED');
 });
@@ -72,6 +97,7 @@ closeBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     chatContainer.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
     chatContainer.classList.add('scale-0', 'opacity-0', 'pointer-events-none');
+    openBtn.classList.remove('scale-0', 'opacity-0', 'pointer-events-none');
     notifyParentWindow('CHAT_CLOSED');
 });
 

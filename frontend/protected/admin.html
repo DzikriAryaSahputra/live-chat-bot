@@ -170,8 +170,8 @@
 
                     <div class="h-px bg-slate-100 my-2 mx-2"></div>
 
-                    <button
-                        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 hover:text-primary-600 transition-colors text-left">
+                    <button id="nav-buku-panduan" onclick="switchTab('buku-panduan')"
+                        class="nav-item relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 hover:text-primary-600 transition-colors text-left">
                         <i class="fa-solid fa-book-open text-[16px] w-5 text-center"></i>
                         <span>Buku Panduan</span>
                     </button>
@@ -198,10 +198,10 @@
                 <div onclick="toggleProfileMenu()"
                     class="flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer group">
                     <div class="flex items-center gap-3 min-w-0">
-                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=eff6ff&color=2563eb"
+                        <img id="sidebar-admin-avatar" src="https://ui-avatars.com/api/?name=Super+Admin&background=eff6ff&color=2563eb"
                             class="w-9 h-9 rounded-full" alt="Avatar">
                         <div class="min-w-0">
-                            <h4 class="text-sm font-bold text-slate-700 truncate">Admin User</h4>
+                            <h4 id="sidebar-admin-name" class="text-sm font-bold text-slate-700 truncate">Super Admin</h4>
                             <p class="text-[11px] text-slate-400 truncate">System Manager</p>
                         </div>
                     </div>
@@ -598,6 +598,85 @@
                         <button onclick="saveSettings()" class="px-6 py-3 text-sm font-bold bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors shadow flex items-center gap-2">
                             <i class="fa-solid fa-save"></i> Simpan Pengaturan
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================== -->
+            <!-- TAB: BUKU PANDUAN -->
+            <!-- ============================== -->
+            <div id="tab-buku-panduan" class="tab-content w-full h-full p-4 md:p-8 bg-slate-50 overflow-y-auto pb-24">
+                <div class="max-w-4xl mx-auto flex flex-col gap-6">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">Buku Panduan (User Manual)</h2>
+                            <p class="text-slate-500 mt-1">Panduan lengkap operasional Admin Dashboard BIPS.</p>
+                        </div>
+                    </div>
+
+                    <!-- 1. Live Chat -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded bg-primary-100 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-comments"></i></div>
+                            1. Manajemen Live Chat
+                        </h3>
+                        <div class="text-sm text-slate-600 space-y-3 ml-10">
+                            <p>Fitur Live Chat digunakan untuk memantau dan membalas pesan warga secara <i>real-time</i>.</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><strong>Pengambilalihan Otomatis:</strong> Jika warga mengetik kata kunci seperti <i>"Hubungi Admin"</i> pada jam kerja, bot akan otomatis berhenti membalas dan mengoper sesi ke Admin.</li>
+                                <li><strong>Mengakhiri Sesi:</strong> Untuk mengakhiri sesi obrolan secara paksa, ketikkan perintah <code>/selesai</code> di kotak pesan lalu kirim. Bot BIPS akan kembali melayani warga tersebut.</li>
+                                <li><strong>Indikator Butuh Bantuan:</strong> Warga yang meminta admin akan mendapatkan badge merah <b>(Butuh Petugas)</b> dan naik ke urutan teratas daftar obrolan.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 2. Knowledge Base NLU -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-brain"></i></div>
+                            2. Knowledge Base NLU (Kecerdasan Inti)
+                        </h3>
+                        <div class="text-sm text-slate-600 space-y-3 ml-10">
+                            <p>Menu ini adalah otak utama bot. Di sini Anda melatih bot mengenali pertanyaan umum (FAQ).</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><strong>Intent:</strong> Nama/kategori topik bahasan (contoh: <code>tanya_jam_kerja</code>). Nama harus disambung dengan garis bawah (<i>underscore</i>).</li>
+                                <li><strong>Training Phrases:</strong> Pancingan kalimat warga. Usahakan masukkan minimal 5 variasi pertanyaan per Intent agar bot semakin pintar mengenali.</li>
+                                <li><strong>Penting: Latih AI!</strong> Setelah menambah atau mengubah Intent, Anda <b>WAJIB</b> menekan tombol <span class="bg-primary-600 text-white px-2 py-0.5 rounded text-xs">Latih Ulang AI (Train)</span> di sudut kanan atas layar agar perubahan tersimpan permanen.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 3. AI Management LLM -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded bg-purple-100 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-microchip"></i></div>
+                            3. AI Management LLM (RAG / Otak Kedua)
+                        </h3>
+                        <div class="text-sm text-slate-600 space-y-3 ml-10">
+                            <p>Generative AI (seperti Groq/Gemini) bertindak sebagai pelapis (fallback). Jika bot NLU tidak menemukan jawaban yang tepat, ia akan membaca dokumen PDF yang Anda unggah untuk menjawab warga.</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><strong>Unggah PDF:</strong> Anda dapat mengunggah file publikasi resmi BPS (hanya PDF). Bot akan menyerap teksnya.</li>
+                                <li><strong>Format Teks:</strong> Pastikan PDF yang diunggah berisi teks yang bisa di-<i>copy-paste</i>, bukan gambar hasil <i>scan</i>. AI tidak bisa membaca gambar.</li>
+                                <li><strong>Limit Token:</strong> Penggunaan AI dihitung dalam jumlah Token. Statistik harian token dapat dilihat di atas halaman.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 4. Pengaturan Sistem -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded bg-slate-100 text-slate-600 flex items-center justify-center"><i class="fa-solid fa-cog"></i></div>
+                            4. Pengaturan Sistem & Keamanan
+                        </h3>
+                        <div class="text-sm text-slate-600 space-y-3 ml-10">
+                            <p>Halaman pengaturan digunakan untuk mengubah profil admin dan menetapkan jadwal operasional Live Chat.</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><strong>Jam Operasional:</strong> Tentukan hari dan jam di mana warga diizinkan memanggil Admin. Di luar jam ini, bot akan menolak permintaan warga yang ingin chat dengan Admin.</li>
+                                <li><strong>Mode Darurat (Libur):</strong> Jika dicentang, layanan Admin akan ditutup total terlepas dari jam operasionalnya.</li>
+                                <li><strong>Ganti Password:</strong> Pastikan mengingat password baru Anda! Jika Anda kelupaan kata sandi dan terkunci dari sistem, hubungi bagian IT BPS untuk mereset sandi Anda melalui terminal/server secara aman.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1896,6 +1975,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Fetch username on load
+            fetch('/api/bot/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } })
+                .then(res => res.json())
+                .then(data => {
+                    if(data && data.admin && data.admin.username) {
+                        document.getElementById('sidebar-admin-name').innerText = data.admin.username;
+                        document.getElementById('sidebar-admin-avatar').src = `https://ui-avatars.com/api/?name=${data.admin.username}&background=eff6ff&color=2563eb`;
+                    }
+                }).catch(e => console.error(e));
+
             // Show floating train reminder if there are pending changes on load
             if (isDataChanged) {
                 showTrainBanner();
@@ -1966,6 +2055,11 @@
                 
                 const data = await res.json();
                 if (res.ok) {
+                    // Update UI Sidebar name dynamically
+                    if (payload.admin && payload.admin.username) {
+                        document.getElementById('sidebar-admin-name').innerText = payload.admin.username;
+                        document.getElementById('sidebar-admin-avatar').src = `https://ui-avatars.com/api/?name=${payload.admin.username}&background=eff6ff&color=2563eb`;
+                    }
                     showToastAlert('✅ Berhasil', 'Pengaturan berhasil disimpan!');
                     switchTab('live-chat');
                     if (newPassword || username !== document.getElementById('setting-username').defaultValue) {

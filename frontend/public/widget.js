@@ -32,9 +32,17 @@
         if (event.origin !== hostUrl) return;
 
         if (event.data === 'CHAT_OPENED') {
-            // Perbesar ukuran iframe agar kotak chat terlihat utuh
-            iframe.style.width = '420px';
-            iframe.style.height = '620px';
+            // Cek lebar layar (jika mobile < 768px, penuhi layar 100%)
+            var isMobile = window.innerWidth < 768;
+            if (isMobile) {
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+            } else {
+                iframe.style.width = '420px';
+                iframe.style.height = '620px';
+            }
+            // Kirim sinyal layout ke dalam iframe
+            iframe.contentWindow.postMessage({ type: 'LAYOUT_MODE', isMobile: isMobile }, '*');
         } else if (event.data === 'CHAT_CLOSED') {
             // Beri jeda 300ms membiarkan animasi chat menutup, baru iframe dikecilkan
             setTimeout(function() {

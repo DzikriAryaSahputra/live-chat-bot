@@ -39,7 +39,8 @@ Kini *chatbot* sudah dirancang sepenuhnya menggunakan sistem **Skrip Injektor Di
 
 ### 📝 Catatan Penting Parameter Kode:
 - `src="https://domaintarget.go.id/widget.js"` 👉 **Wajib diubah** dengan URL Production/Server aplikasi Node.js chatbot ini di BPS Jambi. Saat diuji lokalan, Anda bisa menggunakan `src="http://localhost:3000/widget.js"`.
-- Anda tidak perlu memusingkan `z-index` atau ukuran layar iframe secara manual. Skrip `widget.js` secara otomatis akan melahirkan kotak Iframe transparan yang akan **membesar** ketika di-klik dan **mengecil** kembali saat *chat* ditutup. Dengan ini, kursor warga 100% aman mengklik berbagai tombol BPS di belakangnya!
+- Anda tidak perlu memusingkan `z-index` atau ukuran layar iframe secara manual. Skrip `widget.js` secara otomatis akan melahirkan kotak Iframe transparan yang akan **membesar** ketika di-klik dan **mengecil** kembali saat *chat* ditutup. 
+- **Responsivitas Mobile & Desktop:** Skrip widget sudah terintegrasi kecerdasan deteksi layar. Jika warga membuka web BPS melalui HP (lebar layar < 768px), *widget* otomatis akan merentangkan iframe ke mode Layar Penuh (100% lebar & tinggi) layaknya aplikasi WhatsApp, mencegah UI chat terpotong. Di layar PC/Desktop, widget akan kembali mengapung cantik sebagai kotak 420x620px di pojok kanan bawah. Pastikan web portal BPS Anda memiliki `<meta name="viewport" content="width=device-width, initial-scale=1.0">` agar efek ini optimal!
 
 ---
 

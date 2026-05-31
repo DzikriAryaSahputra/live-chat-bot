@@ -25,3 +25,8 @@ test_iframe.html
 Thumbs.db
 *.log
 backend/settings.json
+
+# Local Databases (SQLite)
+*.db
+*.db-shm
+*.db-wal
