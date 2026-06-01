@@ -94,3 +94,9 @@ nlu:
       - berapa sekolah di jambi?
       - di jambi ada berapa sekolah?
       - sekolah di jambi
+      - sekolah
+  - intent: tanya_lansia
+    examples: |
+      - ada berapa lansia dijambi?
+      - berapa lansia
+      - lansia jambi

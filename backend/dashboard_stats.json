@@ -1,0 +1,13 @@
+{
+  "avgResponseTime": 638.6923076923077,
+  "responseCount": 13,
+  "topIntents": {
+    "tanya_jam_operasional": 1,
+    "tanya_sensus_ekonomi": 1,
+    "hubungi_admin": 1,
+    "tanya_seluruh_sekolah": 3,
+    "sapaan": 3,
+    "tanya apa aja": 1,
+    "tanya_lansia": 2
+  }
+}

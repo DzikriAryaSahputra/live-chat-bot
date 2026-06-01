@@ -20,6 +20,9 @@
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         const adminToken = localStorage.getItem('bps_admin_token');
         if (!adminToken) window.location.replace('/error?code=403');
@@ -75,11 +78,59 @@
 
         .tab-content {
             display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
 
         .tab-content.active {
             display: flex;
+            opacity: 1;
+            animation: fadeInTab 0.4s ease-out forwards;
         }
+
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Skeleton Loading */
+        @keyframes skeletonPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .skeleton {
+            background: #e2e8f0;
+            color: transparent !important;
+            border-radius: 6px;
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+            user-select: none;
+            pointer-events: none;
+        }
+        .skeleton * {
+            visibility: hidden;
+        }
+
+        /* Hover Effect for Cards */
+        .hover-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Staggered Fade-in */
+        .animate-fade-up {
+            opacity: 0;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
 
         .nav-item.active {
             color: #2563eb;
@@ -140,8 +191,13 @@
 
                 <!-- Navigation -->
                 <nav class="mt-4 flex flex-col gap-1 px-3">
-                    <button onclick="switchTab('live-chat')" id="nav-live-chat"
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard"
                         class="nav-item active relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
+                        <i class="fa-solid fa-house text-[16px] w-5 text-center"></i>
+                        <span>Dashboard Overview</span>
+                    </button>
+                    <button onclick="switchTab('live-chat')" id="nav-live-chat"
+                        class="nav-item relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
                         <i class="fa-regular fa-message text-[16px] w-5 text-center"></i>
                         <span>Live Chat</span>
                     </button>
@@ -217,9 +273,137 @@
         <main class="flex-1 relative flex overflow-hidden">
 
             <!-- ============================== -->
+            <!-- TAB 0: DASHBOARD OVERVIEW -->
+            <!-- ============================== -->
+            <div id="tab-dashboard" class="tab-content active w-full h-full bg-slate-50 overflow-y-auto">
+                <div class="max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-6 fade-in">
+                    <!-- Header -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-up delay-100">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Dashboard Overview</h1>
+                            <p class="text-sm text-slate-500 mt-1">Ringkasan performa BIPS Assistant hari ini.</p>
+                        </div>
+                        <button onclick="fetchDashboardStats()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-2.5 px-4 rounded-xl shadow-sm flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-arrows-rotate"></i> Perbarui
+                        </button>
+                    </div>
+
+                    <!-- Top KPI Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up delay-200">
+                        <!-- Warga Dilayani -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
+                            <div class="flex justify-between items-start">
+                                <span class="text-slate-500 text-sm font-semibold">Total Warga (Hari Ini)</span>
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-extrabold text-slate-800" id="dash-total-warga">0</h3>
+                                <p class="text-xs text-green-500 mt-1 font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> Real-time Active</p>
+                            </div>
+                        </div>
+
+                        <!-- Deflection Rate -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full relative overflow-hidden hover-card">
+                            <div class="flex justify-between items-start z-10">
+                                <span class="text-slate-500 text-sm font-semibold">Resolusi Bot AI</span>
+                                <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-robot"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-end justify-between mt-3 z-10">
+                                <div class="mb-1">
+                                     <p class="text-xs text-slate-500 font-semibold">Selesai tanpa Admin</p>
+                                </div>
+                                <div class="relative w-14 h-14 flex items-center justify-center shrink-0">
+                                    <canvas id="aiResolutionChart"></canvas>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center mt-0.5">
+                                        <span class="text-[13px] font-extrabold text-slate-800" id="dash-ai-resolution-text">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Dekorasi Glow Background -->
+                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-400 rounded-full blur-[40px] opacity-20 pointer-events-none"></div>
+                        </div>
+
+                        <!-- Token Usage -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
+                            <div class="flex justify-between items-start">
+                                <span class="text-slate-500 text-sm font-semibold">Pemakaian Token AI</span>
+                                <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-extrabold text-slate-800" id="dash-total-tokens">0</h3>
+                                <p class="text-xs text-slate-500 mt-1 font-semibold">Groq & Gemini (Hari Ini)</p>
+                            </div>
+                        </div>
+
+                        <!-- Avg Response Time -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
+                            <div class="flex justify-between items-start">
+                                <span class="text-slate-500 text-sm font-semibold">Kecepatan Respon</span>
+                                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-stopwatch"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-extrabold text-slate-800"><span id="dash-avg-response">0</span> <span class="text-lg">ms</span></h3>
+                                <p class="text-xs text-slate-500 mt-1 font-semibold">Rata-rata waktu proses</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart & Table Area -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-up delay-300">
+                        <!-- Chart -->
+                        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm lg:col-span-2 flex flex-col h-[400px] hover-card">
+                            <div class="flex justify-between items-center mb-6 shrink-0">
+                                <h3 class="font-bold text-slate-800">Grafik Aktivitas Interaksi (Hari Ini)</h3>
+                            </div>
+                            <div class="relative w-full flex-1 min-h-0">
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Recent Qs & Top Intents -->
+                        <div class="flex flex-col gap-6 h-[400px] overflow-y-auto custom-scrollbar pr-1">
+                            
+                            <!-- Top Intents -->
+                            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col hover-card">
+                                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                                    <h3 class="font-bold text-slate-800">Topik Populer</h3>
+                                </div>
+                                <div class="p-4 flex flex-col gap-3" id="dash-top-intents">
+                                    <div class="text-center text-slate-400 py-6 text-sm">Memuat data...</div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Questions -->
+                            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col hover-card">
+                                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                                    <h3 class="font-bold text-slate-800">Riwayat Terakhir</h3>
+                                </div>
+                                <div class="p-5 flex flex-col gap-4" id="dash-recent-questions">
+                                    <div class="text-center text-slate-400 py-10">Memuat riwayat...</div>
+                                </div>
+                                <div class="p-4 border-t border-slate-100 mt-auto bg-slate-50 rounded-b-2xl">
+                                    <button onclick="switchTab('live-chat')" class="w-full text-center text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors">
+                                        Lihat Semua Obrolan &rarr;
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================== -->
             <!-- TAB 1: LIVE CHAT (3 COLUMNS) -->
             <!-- ============================== -->
-            <div id="tab-live-chat" class="tab-content active w-full h-full">
+            <div id="tab-live-chat" class="tab-content w-full h-full">
 
                 <!-- Sub-Sidebar: Active Sessions -->
                 <div id="chat-sidebar" class="w-full md:w-[320px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-10">
@@ -577,18 +761,22 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Username Admin</label>
-                                <input type="text" id="setting-username" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="admin">
+                                <input type="text" id="setting-username" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="Contoh: Admin BPS">
                             </div>
                             <div class="md:col-span-2 pt-4 border-t border-slate-100">
                                 <h4 class="text-sm font-bold text-slate-800 mb-4">Ganti Sandi (Opsional)</h4>
                             </div>
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Saat Ini <span class="text-slate-400 font-normal">(Diperlukan jika ganti sandi)</span></label>
                                 <input type="password" id="setting-old-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="••••••••">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Baru</label>
-                                <input type="password" id="setting-new-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="••••••••">
+                                <input type="password" id="setting-new-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="Minimal 6 karakter">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Konfirmasi Sandi Baru</label>
+                                <input type="password" id="setting-confirm-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="Ulangi sandi baru">
                             </div>
                         </div>
                     </div>
@@ -734,11 +922,17 @@
             activeNav.classList.remove('text-slate-500');
             activeNav.classList.add('active', 'text-primary-600', 'bg-primary-50', 'font-semibold');
 
-            // Update content sections
-            document.querySelectorAll('.tab-content').forEach(el => {
+            // Smooth fade out old tab
+            document.querySelectorAll('.tab-content.active').forEach(el => {
                 el.classList.remove('active');
+                // Force reflow
+                void el.offsetWidth;
             });
-            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            const newTab = document.getElementById('tab-' + tabId);
+            setTimeout(() => {
+                newTab.classList.add('active');
+            }, 50);
 
             // API Integrations
             if (tabId === 'knowledge-base') {
@@ -772,6 +966,7 @@
                             <div>
                                 <label class="block text-sm font-bold mb-1">Nama Topik (Intent)</label>
                                 <input type="text" id="train-intent" placeholder="Contoh: tanya_inflasi_jambi"
+                                    oninput="this.value = this.value.replace(/\s+/g, '_').toLowerCase()"
                                     class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-colors" />
                                 <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1"><span
                                         class="material-symbols-outlined text-[12px]">info</span> Gunakan huruf kecil
@@ -1295,12 +1490,26 @@
 
         async function submitTrainData(e) {
             e.preventDefault();
-            const intentName = document.getElementById('train-intent').value, examples = document.getElementById('train-examples').value, botResponse = mdToHtml(document.getElementById('train-response').value);
+            const intentName = document.getElementById('train-intent').value.trim();
+            const rawExamples = document.getElementById('train-examples').value;
+            const rawResponse = document.getElementById('train-response').value.trim();
+            const botResponse = mdToHtml(rawResponse);
 
-            if (!intentName) return showToastAlert('⚠️ Peringatan', 'Nama Intent kosong!');
+            if (!intentName) return showToastAlert('⚠️ Peringatan', 'Nama Intent tidak boleh kosong!');
+            if (/\s/.test(intentName)) return showToastAlert('⚠️ Format Salah', 'Nama Intent tidak boleh memakai spasi!');
+            if (!rawExamples.trim()) return showToastAlert('⚠️ Peringatan', 'Contoh pertanyaan tidak boleh kosong!');
+            if (!rawResponse) return showToastAlert('⚠️ Peringatan', 'Jawaban Bot tidak boleh kosong!');
+
+            // Auto-format: Ubah koma (,) atau titik koma (;) menjadi enter (\n), lalu bersihkan spasi berlebih
+            const formattedExamples = rawExamples
+                .replace(/[,;]/g, '\n')       // Ganti koma/titik koma jadi enter
+                .split('\n')                  // Pisahkan per baris
+                .map(line => line.trim())     // Hapus spasi di awal/akhir tiap baris
+                .filter(line => line !== '')  // Buang baris yang kosong
+                .join('\n');                  // Gabungkan kembali dengan enter
 
             try {
-                const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples, botResponse }) });
+                const r = await fetch('/api/bot/intents', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ intentName, examples: formattedExamples, botResponse }) });
                 if (r.ok) {
                     isDataChanged = true;
                     localStorage.setItem('bps_needs_training', 'true');
@@ -1915,7 +2124,7 @@
 
     <!-- Document Viewer Modal -->
     <div id="document-viewer-modal"
-        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center">
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] hidden flex justify-center items-center">
         <div class="bg-white w-[800px] max-w-[90vw] h-[80vh] rounded-2xl shadow-xl flex flex-col scale-in">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0">
                 <div class="flex items-center gap-3">
@@ -1989,7 +2198,202 @@
             if (isDataChanged) {
                 showTrainBanner();
             }
+
+            // Fetch dashboard stats
+            fetchDashboardStats();
         });
+
+        // Animasi Counter Angka (Odometer)
+        function animateValue(id, start, end, duration, formatFn = val => val) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                // Fungsi easing easeOutQuart agar cepat di awal lalu melambat di akhir
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                const current = Math.floor(easeProgress * (end - start) + start);
+                obj.innerText = formatFn(current);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerText = formatFn(end);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        let dashboardChartInstance = null;
+        let aiResolutionChartInstance = null;
+        async function fetchDashboardStats() {
+            try {
+                // Terapkan Skeleton Loading sebelum Fetch
+                const kpiIds = ['dash-total-warga', 'dash-ai-resolution-text', 'dash-total-tokens', 'dash-avg-response'];
+                kpiIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('skeleton');
+                });
+
+                const res = await fetch('/api/bot/dashboard-stats', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+                if (!res.ok) throw new Error('Gagal memuat dashboard');
+                const data = await res.json();
+
+                // Hapus Skeleton Loading
+                kpiIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.remove('skeleton');
+                });
+
+                // Update KPI dengan Animasi
+                animateValue('dash-total-warga', 0, data.totalWargaToday, 1500);
+                animateValue('dash-ai-resolution-text', 0, data.aiResolutionRate, 1500, val => val + '%');
+                animateValue('dash-total-tokens', 0, (data.tokenUsage.groq + data.tokenUsage.gemini), 1500, val => val.toLocaleString());
+                animateValue('dash-avg-response', 0, data.avgResponseTime || 0, 1500);
+
+                // Update Line Chart (Activity) with Gradients
+                const ctx = document.getElementById('activityChart').getContext('2d');
+                if (dashboardChartInstance) dashboardChartInstance.destroy();
+                
+                // Buat Gradient untuk Garis
+                const gradientStroke = ctx.createLinearGradient(0, 0, 500, 0);
+                gradientStroke.addColorStop(0, '#a855f7'); // Purple
+                gradientStroke.addColorStop(1, '#3b82f6'); // Blue
+
+                // Buat Gradient untuk Fill (Area bawah garis)
+                const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+                gradientFill.addColorStop(0, 'rgba(168, 85, 247, 0.4)'); // Purple semi-transparan
+                gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.05)'); // Blue transparan
+                
+                dashboardChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 24}, (_, i) => `${i.toString().padStart(2, '0')}:00`),
+                        datasets: [{
+                            label: 'Jumlah Pesan Warga',
+                            data: data.hourlyData,
+                            borderColor: gradientStroke,
+                            backgroundColor: gradientFill,
+                            borderWidth: 4,
+                            tension: 0.4, // Kurva mulus
+                            fill: true,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#a855f7',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#3b82f6',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { dash: [4, 4], display: false } },
+                            x: { grid: { display: false }, border: { display: false } }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    }
+                });
+
+                // Update Donut Chart (AI Resolution)
+                const donutCtx = document.getElementById('aiResolutionChart').getContext('2d');
+                if (aiResolutionChartInstance) aiResolutionChartInstance.destroy();
+
+                const donutGradient = donutCtx.createLinearGradient(0, 0, 0, 150);
+                donutGradient.addColorStop(0, '#a855f7'); // Purple
+                donutGradient.addColorStop(1, '#3b82f6'); // Blue
+
+                const remainingRate = 100 - data.aiResolutionRate;
+
+                aiResolutionChartInstance = new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Diselesaikan AI', 'Diteruskan ke Admin'],
+                        datasets: [{
+                            data: [data.aiResolutionRate, remainingRate],
+                            backgroundColor: [donutGradient, '#f1f5f9'],
+                            borderWidth: 0,
+                            borderRadius: [20, 0], // Ujung bulat untuk progres
+                            hoverOffset: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '80%', // Ketebalan donut
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ' + context.label + ': ' + context.raw + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Update Recent Questions
+                const rcContainer = document.getElementById('dash-recent-questions');
+                rcContainer.innerHTML = '';
+                if (data.recentQuestions.length === 0) {
+                    rcContainer.innerHTML = '<div class="text-center text-slate-400 py-4 text-sm">Belum ada percakapan hari ini.</div>';
+                } else {
+                    data.recentQuestions.forEach(q => {
+                        const timeStr = new Date(q.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        // limit message length
+                        const shortMsg = q.message.length > 60 ? q.message.substring(0, 60) + '...' : q.message;
+                        const aliasName = userAliases[q.sender_id] || q.sender_id;
+                        
+                        rcContainer.innerHTML += `
+                            <div class="flex flex-col gap-1 pb-3 border-b border-slate-100 last:border-0 last:pb-0">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-slate-700 truncate">${aliasName}</span>
+                                    <span class="text-[10px] text-slate-400">${timeStr}</span>
+                                </div>
+                                <p class="text-sm text-slate-500 italic">"${shortMsg}"</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Update Top Intents
+                const topIntentsContainer = document.getElementById('dash-top-intents');
+                topIntentsContainer.innerHTML = '';
+                if (!data.topIntents || data.topIntents.length === 0) {
+                    topIntentsContainer.innerHTML = '<div class="text-center text-slate-400 py-4 text-sm">Data belum tersedia.</div>';
+                } else {
+                    data.topIntents.forEach((item, index) => {
+                        const rankColors = ['bg-orange-100 text-orange-600', 'bg-blue-100 text-blue-600', 'bg-slate-100 text-slate-500'];
+                        const rankColor = rankColors[index] || 'bg-slate-100 text-slate-500';
+                        topIntentsContainer.innerHTML += `
+                            <div class="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-6 h-6 rounded-md ${rankColor} font-bold text-xs flex items-center justify-center shrink-0">
+                                        #${index + 1}
+                                    </div>
+                                    <span class="text-sm font-semibold text-slate-700 truncate capitalize">${item.intent.replace(/_/g, ' ')}</span>
+                                </div>
+                                <div class="text-xs font-bold text-primary-600 bg-primary-50 px-2 py-1 rounded-md shrink-0">
+                                    ${item.count}x
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
 
         // Settings Page Logic
         async function openSettingsPage() {
@@ -2010,6 +2414,7 @@
                 document.getElementById('setting-username').value = data.admin.username;
                 document.getElementById('setting-old-password').value = '';
                 document.getElementById('setting-new-password').value = '';
+                document.getElementById('setting-confirm-password').value = '';
                 
                 document.getElementById('setting-emergency').checked = data.liveChat.isEmergencyLeave;
                 document.getElementById('setting-start-day').value = data.liveChat.startDay;
@@ -2025,15 +2430,22 @@
             const username = document.getElementById('setting-username').value.trim();
             const oldPassword = document.getElementById('setting-old-password').value;
             const newPassword = document.getElementById('setting-new-password').value;
+            const confirmPassword = document.getElementById('setting-confirm-password').value;
             const isEmergencyLeave = document.getElementById('setting-emergency').checked;
             const startDay = parseInt(document.getElementById('setting-start-day').value);
             const endDay = parseInt(document.getElementById('setting-end-day').value);
             const startTime = document.getElementById('setting-start-time').value;
             const endTime = document.getElementById('setting-end-time').value;
 
+            // Validasi Standar RPL
             if (!username) return showToastAlert('❌ Gagal', 'Username tidak boleh kosong!');
-            if (newPassword && !oldPassword) {
-                return showToastAlert('❌ Gagal', 'Harap masukkan Sandi Lama untuk mengubah sandi.');
+            
+            if (newPassword || oldPassword) {
+                if (!oldPassword) return showToastAlert('⚠️ Peringatan', 'Harap masukkan Sandi Lama untuk mengubah sandi.');
+                if (!newPassword) return showToastAlert('⚠️ Peringatan', 'Sandi Baru tidak boleh kosong.');
+                if (newPassword.length < 6) return showToastAlert('⚠️ Keamanan', 'Sandi Baru harus minimal 6 karakter!');
+                if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(newPassword)) return showToastAlert('⚠️ Keamanan Lemah', 'Sandi Baru harus mengandung kombinasi huruf dan angka!');
+                if (newPassword !== confirmPassword) return showToastAlert('⚠️ Tidak Cocok', 'Konfirmasi Sandi Baru tidak sama!');
             }
 
             const payload = {

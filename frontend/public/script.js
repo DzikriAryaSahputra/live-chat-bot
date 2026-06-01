@@ -372,8 +372,13 @@ window.toggleVoiceMode = function() {
 function speakText(text) {
     if (!window.speechSynthesis) return;
     
-    // Bersihkan sintaks Markdown agar tidak dieja (misal: bintang bintang)
-    let cleanText = text
+    // 1. Buat elemen DOM sementara untuk mengekstrak teks asli (membuang semua tag HTML seperti <button>, <b>, <br>)
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = text;
+    let extractedText = tempDiv.textContent || tempDiv.innerText || "";
+
+    // 2. Bersihkan sisa sintaks Markdown agar tidak dieja (misal: bintang bintang)
+    let cleanText = extractedText
         .replace(/\*\*/g, '')
         .replace(/\*/g, '')
         .replace(/_/g, '')

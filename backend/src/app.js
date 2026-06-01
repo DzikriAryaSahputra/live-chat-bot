@@ -205,6 +205,30 @@ const PROTECTED_INTENTS = [
     'hubungi_admin', 'teruskan_admin', 'tanya_admin'
 ];
 
+const DASHBOARD_STATS_FILE = path.join(__dirname, '..', 'dashboard_stats.json');
+
+function recordDashboardStat(responseTime, intentName) {
+    try {
+        let stats = { avgResponseTime: 0, responseCount: 0, topIntents: {} };
+        if (fs.existsSync(DASHBOARD_STATS_FILE)) {
+            stats = JSON.parse(fs.readFileSync(DASHBOARD_STATS_FILE, 'utf8'));
+        }
+
+        if (responseTime > 0) {
+            stats.responseCount += 1;
+            stats.avgResponseTime = ((stats.avgResponseTime * (stats.responseCount - 1)) + responseTime) / stats.responseCount;
+        }
+
+        if (intentName && intentName !== 'nlu_fallback') {
+            stats.topIntents[intentName] = (stats.topIntents[intentName] || 0) + 1;
+        }
+
+        fs.writeFileSync(DASHBOARD_STATS_FILE, JSON.stringify(stats, null, 2));
+    } catch (e) {
+        console.error("Gagal mencatat statistik dashboard:", e.message);
+    }
+}
+
 // ==========================================
 // 🚫 FILTER KATA KASAR / PROMOSI (Khusus Nama)
 // ==========================================
@@ -452,6 +476,8 @@ io.on('connection', (socket) => {
 
         if (activeSessions[senderId] === 'admin') return;
 
+        const processStartTime = Date.now();
+
         try {
             // 1. PARSE INTENT KE RASA UNTUK MELIHAT TINGKAT KEPERCAYAAN (CONFIDENCE)
             const parseRes = await axios.post('http://localhost:5005/model/parse', { text: message }, { timeout: 5000 });
@@ -516,6 +542,9 @@ io.on('connection', (socket) => {
                         socket.emit('admin_status', { status: 'connected' });
                     }, 1500); // Jeda sedikit agar pesan bot selesai muncul
                 }
+                
+                const processEndTime = Date.now();
+                recordDashboardStat(processEndTime - processStartTime, intentName);
             }
         } catch (error) {
             socket.emit('bot_response', { message: 'Gagal menghubungi otak AI.' });
@@ -925,6 +954,97 @@ app.delete('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
             res.status(404).json({ error: 'Dokumen tidak ditemukan.' });
         }
     } catch (err) { res.status(500).json({ error: 'Gagal menghapus dokumen.' }); }
+});
+
+// ==========================================
+// 📊 DASHBOARD STATS ROUTE
+// ==========================================
+app.get('/api/bot/dashboard-stats', authenticateJWT, async (req, res) => {
+    try {
+        // 1. Total Warga Hari Ini
+        const wargaTodayRes = await db.query(`SELECT COUNT(DISTINCT sender_id) AS total FROM chat_logs WHERE created_at >= CURRENT_DATE AND sender_type = 'warga'`);
+        const totalWargaToday = parseInt(wargaTodayRes.rows[0].total) || 0;
+
+        // 2. Deflection Rate (AI Resolution)
+        const wargaAdminRes = await db.query(`
+            SELECT COUNT(DISTINCT sender_id) AS total_admin_handled
+            FROM chat_logs 
+            WHERE created_at >= CURRENT_DATE AND 
+            (sender_type = 'admin' OR (sender_type = 'bot' AND message ILIKE '%meneruskan pesan%'))
+        `);
+        const totalWargaAdmin = parseInt(wargaAdminRes.rows[0].total_admin_handled) || 0;
+        
+        let aiResolutionRate = 100;
+        if (totalWargaToday > 0) {
+            const aiHandled = totalWargaToday - totalWargaAdmin;
+            aiResolutionRate = Math.round((aiHandled / totalWargaToday) * 100);
+        }
+
+        // 3. Peak Hours (Jam Sibuk Hari Ini)
+        const peakHoursRes = await db.query(`
+            SELECT EXTRACT(HOUR FROM created_at) AS jam, COUNT(*) AS jumlah
+            FROM chat_logs
+            WHERE created_at >= CURRENT_DATE AND sender_type = 'warga'
+            GROUP BY jam
+            ORDER BY jam ASC
+        `);
+        
+        let hourlyData = Array(24).fill(0);
+        peakHoursRes.rows.forEach(row => {
+            hourlyData[row.jam] = parseInt(row.jumlah);
+        });
+
+        // 4. Token Usage
+        let tokenUsage = { groq: 0, gemini: 0 };
+        try {
+            if (fs.existsSync(TOKEN_USAGE_FILE)) {
+                const raw = fs.readFileSync(TOKEN_USAGE_FILE, 'utf8');
+                const parsed = JSON.parse(raw);
+                const today = new Date().toISOString().split('T')[0];
+                if (parsed.date === today) {
+                    tokenUsage = { groq: parsed.groq, gemini: parsed.gemini };
+                }
+            }
+        } catch (e) {}
+
+        // 5. Recent Questions (5 latest)
+        const recentQuestionsRes = await db.query(`
+            SELECT sender_id, message, created_at 
+            FROM chat_logs 
+            WHERE sender_type = 'warga' 
+            ORDER BY created_at DESC 
+            LIMIT 5
+        `);
+        
+        // 6. Top Intents & Avg Response Time
+        let extraStats = { avgResponseTime: 0, topIntents: [] };
+        try {
+            if (fs.existsSync(DASHBOARD_STATS_FILE)) {
+                const raw = JSON.parse(fs.readFileSync(DASHBOARD_STATS_FILE, 'utf8'));
+                
+                // Convert topIntents object to sorted array
+                const intentArr = Object.entries(raw.topIntents || {}).map(([intent, count]) => ({ intent, count }));
+                intentArr.sort((a, b) => b.count - a.count);
+                
+                extraStats.avgResponseTime = Math.round(raw.avgResponseTime || 0);
+                extraStats.topIntents = intentArr.slice(0, 5); // top 5
+            }
+        } catch(e) {}
+
+        res.json({
+            totalWargaToday,
+            aiResolutionRate,
+            hourlyData,
+            tokenUsage,
+            recentQuestions: recentQuestionsRes.rows,
+            avgResponseTime: extraStats.avgResponseTime,
+            topIntents: extraStats.topIntents
+        });
+
+    } catch (err) {
+        console.error('Error fetching dashboard stats:', err);
+        res.status(500).json({ error: 'Gagal memuat statistik dashboard.' });
+    }
 });
 
 // ==========================================
