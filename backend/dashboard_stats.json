@@ -1,13 +1,15 @@
 {
-  "avgResponseTime": 638.6923076923077,
-  "responseCount": 13,
+  "avgResponseTime": 654.695652173913,
+  "responseCount": 23,
   "topIntents": {
-    "tanya_jam_operasional": 1,
+    "tanya_jam_operasional": 2,
     "tanya_sensus_ekonomi": 1,
-    "hubungi_admin": 1,
+    "hubungi_admin": 4,
     "tanya_seluruh_sekolah": 3,
-    "sapaan": 3,
+    "sapaan": 5,
     "tanya apa aja": 1,
-    "tanya_lansia": 2
+    "tanya_lansia": 2,
+    "trigger_alihkan_admin": 3,
+    "tanya_visi_misi_bps": 1
   }
 }

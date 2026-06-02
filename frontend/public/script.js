@@ -22,6 +22,28 @@ window.addEventListener('message', (e) => {
 
 // Cek standalone mode (bukan dalam iframe) agar bisa deteksi otomatis
 if (window.self === window.top) {
+    // Mode Direct Link (Bukan Widget)
+    document.addEventListener('DOMContentLoaded', () => {
+        // Otomatis buka chat dan hilangkan tombol bubble
+        document.getElementById('chat-container').classList.remove('scale-0', 'opacity-0', 'pointer-events-none');
+        document.getElementById('chat-container').classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
+        document.getElementById('open-chat-btn').style.display = 'none';
+        
+        // Buat posisi ke tengah layar jika dibuka di laptop/PC
+        const wrapper = document.getElementById('widget-wrapper');
+        wrapper.classList.remove('bottom-6', 'right-6', 'items-end');
+        wrapper.classList.add('inset-0', 'items-center', 'justify-center');
+        
+        // Ubah ukuran chat container sedikit lebih besar untuk standalone
+        const chatContainer = document.getElementById('chat-container');
+        chatContainer.classList.remove('h-[600px]', 'max-h-[80vh]', 'origin-bottom-right');
+        chatContainer.classList.add('h-[85vh]', 'max-h-[800px]', 'w-[420px]', 'shadow-2xl');
+
+        // Sembunyikan tombol Tutup (X) di header, karena seluruh halaman adalah chat
+        const closeHeaderBtn = document.querySelector('button[aria-label="Close"]');
+        if (closeHeaderBtn) closeHeaderBtn.style.display = 'none';
+    });
+
     function checkStandaloneLayout() {
         if (window.innerWidth < 768) {
             document.body.classList.add('mobile-view');

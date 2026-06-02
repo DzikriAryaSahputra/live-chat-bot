@@ -483,8 +483,44 @@
                         <!-- Toolbar -->
                         <div class="flex items-center gap-1 mb-2 px-2">
                             <button type="button" onclick="openLinkModal('admin-input')"
-                                class="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600"><i
+                                class="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Sisipkan Link"><i
                                     class="fa-solid fa-link text-xs"></i></button>
+                            
+                            <div class="relative">
+                                <button type="button" id="emoji-trigger" onclick="toggleEmojiPicker()"
+                                    class="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Sisipkan Emoji"><i
+                                        class="fa-regular fa-face-smile text-xs"></i></button>
+                                
+                                <!-- Custom Emoji Picker -->
+                                <div id="emoji-picker-container" class="hidden absolute bottom-full left-0 mb-2 bg-white border border-slate-200 shadow-xl rounded-xl p-2 w-[280px] z-50">
+                                    <div class="grid grid-cols-7 gap-1">
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😀')">😀</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😂')">😂</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😊')">😊</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😍')">😍</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🙏')">🙏</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('👍')">👍</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('👌')">👌</button>
+                                        
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😁')">😁</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😅')">😅</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😎')">😎</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🤔')">🤔</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🙌')">🙌</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🤝')">🤝</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🔥')">🔥</button>
+
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('✅')">✅</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('❌')">❌</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('⚠️')">⚠️</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('ℹ️')">ℹ️</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('📍')">📍</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('📅')">📅</button>
+                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('📊')">📊</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="flex-1"></div>
                             <div class="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
                                 <span
@@ -530,10 +566,10 @@
                                 responses.</p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <button onclick="fetchKnowledgeBase()"
+                            <button id="nlu-reload-btn" onclick="fetchKnowledgeBase()"
                                 class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold w-9 h-9 rounded-xl shadow-sm flex items-center justify-center transition-colors"
                                 title="Reload / Refresh">
-                                <i class="fa-solid fa-rotate-right text-sm"></i>
+                                <i id="nlu-reload-icon" class="fa-solid fa-rotate-right text-sm"></i>
                             </button>
                             <button onclick="openTrainModal()"
                                 class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-xl shadow-sm shadow-primary-500/30 flex items-center gap-2 transition-colors">
@@ -568,9 +604,9 @@
                             <h2 class="text-2xl font-bold text-slate-800">AI Management LLM</h2>
                             <p class="text-slate-500 mt-1">Kelola dokumen pengetahuan (RAG) untuk otak LLM bot Anda.</p>
                         </div>
-                        <button onclick="fetchExternalDocs(); fetchTokenUsage();"
+                        <button id="llm-sync-btn" onclick="handleLlmSync()"
                             class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-2.5 px-4 rounded-xl shadow-sm flex items-center gap-2 transition-colors">
-                            <i class="fa-solid fa-arrows-rotate"></i> Sync
+                            <i id="llm-sync-icon" class="fa-solid fa-arrows-rotate"></i> Sync
                         </button>
                     </div>
 
@@ -1257,14 +1293,23 @@
         // 📊 KNOWLEDGE BASE & CRUD
         // ==========================================
         async function fetchKnowledgeBase() {
+            const btn = document.getElementById('nlu-reload-btn');
+            const icon = document.getElementById('nlu-reload-icon');
+            if (btn) btn.disabled = true;
+            if (icon) icon.classList.add('animate-spin');
+
             const grid = document.getElementById('knowledge-base-grid');
             if (grid) grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-10">Mengambil data AI...</div>`;
             try {
+                await new Promise(r => setTimeout(r, 500)); // Delay UX
                 const response = await fetch('/api/bot/intents', { headers: { 'Authorization': `Bearer ${adminToken}` } });
                 currentKnowledgeBase = await response.json();
                 renderKnowledgeTable(currentKnowledgeBase);
             } catch (e) {
                 if (grid) grid.innerHTML = `<div class="col-span-full text-center text-red-500 py-10">Gagal terhubung.</div>`;
+            } finally {
+                if (btn) btn.disabled = false;
+                if (icon) icon.classList.remove('animate-spin');
             }
         }
 
@@ -1911,6 +1956,25 @@
         // ==========================================
         // 📚 DOKUMEN EKSTERNAL RAG (PDF)
         // ==========================================
+        
+        async function handleLlmSync() {
+            const btn = document.getElementById('llm-sync-btn');
+            const icon = document.getElementById('llm-sync-icon');
+            if(btn) btn.disabled = true;
+            if(icon) icon.classList.add('animate-spin');
+            
+            try {
+                await new Promise(r => setTimeout(r, 500)); // Delay UX
+                await Promise.all([fetchExternalDocs(), fetchTokenUsage()]);
+                showToastAlert('✅ Tersinkronisasi', 'Data LLM dan Token berhasil diperbarui.');
+            } catch(e) {
+                showToastAlert('❌ Gagal', 'Sinkronisasi gagal.');
+            } finally {
+                if(btn) btn.disabled = false;
+                if(icon) icon.classList.remove('animate-spin');
+            }
+        }
+
         async function fetchExternalDocs() {
             try {
                 const res = await fetch('/api/bot/docs', { 
@@ -2492,6 +2556,42 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
+    <script>
+        // Logika Custom Emoji Picker
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emoji-picker-container');
+            if(picker.classList.contains('hidden')) {
+                picker.classList.remove('hidden');
+            } else {
+                picker.classList.add('hidden');
+            }
+        }
+
+        function insertEmoji(emoji) {
+            const input = document.getElementById('admin-input');
+            const start = input.selectionStart || input.value.length;
+            const end = input.selectionEnd || input.value.length;
+            const val = input.value;
+            
+            input.value = val.slice(0, start) + emoji + val.slice(end);
+            input.focus();
+            input.selectionEnd = start + emoji.length;
+            
+            // Auto close picker setelah memilih (opsional)
+            document.getElementById('emoji-picker-container').classList.add('hidden');
+        }
+
+        // Tutup emoji picker jika admin mengklik di luar area
+        document.addEventListener('click', function(event) {
+            const trigger = document.getElementById('emoji-trigger');
+            const picker = document.getElementById('emoji-picker-container');
+            if (picker && !picker.classList.contains('hidden')) {
+                if (!trigger.contains(event.target) && !picker.contains(event.target)) {
+                    picker.classList.add('hidden');
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
