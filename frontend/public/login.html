@@ -209,7 +209,7 @@
             errorMsg.classList.add('hidden');
 
             try {
-                const response = await fetch('http://localhost:3000/api/login', {
+                const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: usernameVal, password: passwordVal })
@@ -219,6 +219,8 @@
 
                 if (response.ok) {
                     localStorage.setItem('bps_admin_token', data.token);
+                    localStorage.setItem('bps_admin_role', data.role);
+                    localStorage.setItem('bps_admin_name', data.fullName);
                     btn.classList.replace('primary-gradient', 'bg-green-500');
                     btn.innerHTML = '<span class="material-symbols-outlined text-lg">check_circle</span><span>Akses Diberikan!</span>';
 

@@ -133,12 +133,21 @@ function formatWaktuChat(waktuMentah) {
 // ==========================================
 // 3. FITUR FORMAT LINK
 // ==========================================
-function formatTextWithLink(text) {
+function formatTextWithLink(text, sender = 'bot') {
     if (!text) return '';
-    if (text.includes('<a href=') || text.includes("<a href='")) return text.replace(/\n/g, '<br>');
     
+    let escapedText = text;
+    // XSS Protection: HTML Escape hanya untuk pesan dari warga
+    if (sender === 'user' || sender === 'warga') {
+        escapedText = text.replace(/&/g, "&amp;")
+                          .replace(/</g, "&lt;")
+                          .replace(/>/g, "&gt;")
+                          .replace(/"/g, "&quot;")
+                          .replace(/'/g, "&#039;");
+    }
+
     // 1. Parsing Markdown: [Teks](URL)
-    let formattedText = text.replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, function(match, label, url) {
+    let formattedText = escapedText.replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, function(match, label, url) {
         return `<a href="${url}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-weight: 600;">${label}</a>`;
     });
 
@@ -234,7 +243,7 @@ function appendMessage(sender, text, timestamp = null) {
         wrapper.innerHTML = `
             <div class="message user-message bg-[#0f2b56] text-white p-3.5 rounded-2xl rounded-tr-sm shadow-sm text-sm leading-relaxed">
               <div class="flex flex-wrap items-end justify-between gap-2">
-                <span>${formatTextWithLink(text)}</span>
+                <span>${formatTextWithLink(text, sender)}</span>
                 <span class="text-[10px] text-blue-200 opacity-80 ml-auto whitespace-nowrap leading-none mb-[-2px]">${jamMenit}</span>
               </div>
             </div>
@@ -253,7 +262,7 @@ function appendMessage(sender, text, timestamp = null) {
             </div>
             <div class="message bot-message bg-white text-[#334155] p-4 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 text-sm leading-relaxed">
               <div class="flex flex-wrap items-end justify-between gap-2">
-                <span>${formatTextWithLink(text)}</span>
+                <span>${formatTextWithLink(text, sender)}</span>
                 <span class="text-[10px] text-gray-400 opacity-70 ml-auto whitespace-nowrap leading-none mb-[-2px]">${jamMenit}</span>
               </div>
             </div>

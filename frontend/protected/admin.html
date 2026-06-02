@@ -25,6 +25,8 @@
 
     <script>
         const adminToken = localStorage.getItem('bps_admin_token');
+        const adminRole = localStorage.getItem('bps_admin_role') || 'petugas';
+        const adminName = localStorage.getItem('bps_admin_name') || 'Petugas';
         if (!adminToken) window.location.replace('/error?code=403');
     </script>
     <script>
@@ -251,6 +253,11 @@
                         class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
                         <i class="fa-solid fa-microchip text-[15px] w-5 text-center"></i>
                         <span>AI Management LLM</span>
+                    </button>
+                    <button onclick="switchTab('kelola-petugas')" id="nav-kelola-petugas" style="display: none;"
+                        class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
+                        <i class="fa-solid fa-users-gear text-[15px] w-5 text-center"></i>
+                        <span>Kelola Petugas</span>
                     </button>
 
                     <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 mt-4">Lainnya</div>
@@ -650,7 +657,13 @@
                             </div>
                         </div>
 
-                        <div
+                        <div id="claim-bar" class="hidden flex items-center justify-between bg-orange-50 border border-orange-200 rounded-xl p-3 mb-2 shadow-sm">
+                            <span id="claim-status-text" class="text-xs font-bold text-orange-600"><i class="fa-solid fa-lock mr-1"></i> Percakapan ini belum diklaim.</span>
+                            <button id="claim-btn" onclick="claimCurrentChat()" class="bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold py-1.5 px-3 rounded shadow-sm transition-colors">
+                                Ambil Obrolan
+                            </button>
+                        </div>
+                        <div id="admin-input-container"
                             class="relative flex items-end bg-slate-50 border border-slate-200 rounded-xl overflow-hidden focus-within:border-primary-400 focus-within:ring-1 focus-within:ring-primary-400 transition-shadow p-1">
                             <input id="admin-input" placeholder="Type your message here..." autocomplete="off"
                                 class="w-full bg-transparent border-none py-2.5 px-3 text-sm focus:outline-none text-slate-700 min-h-[44px]" />
@@ -924,41 +937,7 @@
                         </div>
                     </div>
 
-                    <!-- Admin Account Settings -->
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i
-                                class="fa-solid fa-lock text-slate-500"></i> Keamanan Akun Admin</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Username Admin</label>
-                                <input type="text" id="setting-username"
-                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
-                                    placeholder="Contoh: Admin BPS">
-                            </div>
-                            <div class="md:col-span-2 pt-4 border-t border-slate-100">
-                                <h4 class="text-sm font-bold text-slate-800 mb-4">Ganti Sandi (Opsional)</h4>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Saat Ini <span
-                                        class="text-slate-400 font-normal">(Diperlukan jika ganti sandi)</span></label>
-                                <input type="password" id="setting-old-password"
-                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
-                                    placeholder="••••••••">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Baru</label>
-                                <input type="password" id="setting-new-password"
-                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
-                                    placeholder="Minimal 6 karakter">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Konfirmasi Sandi Baru</label>
-                                <input type="password" id="setting-confirm-password"
-                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
-                                    placeholder="Ulangi sandi baru">
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Admin Account Settings Dihapus karena pindah ke Kelola Petugas (RBAC) -->
 
                     <div class="flex justify-end gap-3 mt-4">
                         <button onclick="switchTab('live-chat')"
@@ -967,6 +946,75 @@
                             class="px-6 py-3 text-sm font-bold bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors shadow flex items-center gap-2">
                             <i class="fa-solid fa-save"></i> Simpan Pengaturan
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================== -->
+            <!-- TAB: KELOLA PETUGAS -->
+            <!-- ============================== -->
+            <div id="tab-kelola-petugas" class="tab-content w-full h-full p-4 md:p-8 bg-slate-50 overflow-y-auto pb-24">
+                <div class="max-w-5xl mx-auto flex flex-col gap-6">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">Manajemen Petugas (RBAC)</h2>
+                            <p class="text-slate-500 mt-1">Kelola akun admin dan petugas BPS yang bertugas melayani chat warga.</p>
+                        </div>
+                        <button onclick="document.getElementById('modal-add-user').classList.remove('hidden')"
+                            class="bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus"></i> Tambah Petugas
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-bold">No</th>
+                                    <th class="p-4 font-bold">Nama Petugas</th>
+                                    <th class="p-4 font-bold">Username</th>
+                                    <th class="p-4 font-bold">Role (Pangkat)</th>
+                                    <th class="p-4 font-bold text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-management-tbody" class="divide-y divide-slate-100 text-sm text-slate-700">
+                                <!-- Data diisi via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Tambah Petugas -->
+            <div id="modal-add-user" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+                <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl scale-100 transition-transform">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-user-shield text-primary-600"></i> Buat Akun Baru</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="add-user-fullname" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50" placeholder="Budi Santoso">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Username Login</label>
+                            <input type="text" id="add-user-username" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50" placeholder="budi_bps">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Sandi Akses</label>
+                            <input type="password" id="add-user-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50" placeholder="••••••••">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Tingkat Akses (Role)</label>
+                            <select id="add-user-role" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50">
+                                <option value="petugas">Petugas (Customer Service)</option>
+                                <option value="super_admin">Super Admin (Manajer Utama)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-slate-100 flex gap-3 justify-end bg-slate-50">
+                        <button onclick="document.getElementById('modal-add-user').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors text-sm">Batal</button>
+                        <button onclick="createUser()" class="px-5 py-2.5 rounded-xl font-bold text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-sm text-sm">Buat Akun</button>
                     </div>
                 </div>
             </div>
@@ -1151,6 +1199,8 @@
             } else if (tabId === 'ai-management') {
                 fetchExternalDocs();
                 fetchTokenUsage();
+            } else if (tabId === 'kelola-petugas') {
+                fetchAdminUsers();
             }
         }
     </script>
@@ -1373,7 +1423,7 @@
         setInterval(checkTokenExpiry, 60000); // Cek setiap 1 menit
         checkTokenExpiry(); // Cek langsung saat pertama dimuat
 
-        let activeSenderId = null; let activeUsersList = []; let unreadCounts = {};
+        let activeSenderId = null; let activeUsersList = []; let unreadCounts = {}; let claimedChatsState = {};
         let needsHelpSet = new Set(JSON.parse(localStorage.getItem('bps_needs_help') || '[]'));
         function updateNeedsHelp(id, remove = false) {
             if (remove) needsHelpSet.delete(id);
@@ -1400,8 +1450,17 @@
         function logoutAdmin() { openConfirmModal('Keluar', 'Yakin ingin keluar dari Dashboard?', () => { localStorage.removeItem('bps_admin_token'); window.location.replace('/login'); }); }
 
         // Pengolah Markdown ke HTML
-        function mdToHtml(text) {
+        function mdToHtml(text, sender = 'bot') {
             let html = text || '';
+            // XSS Protection: HTML Escape hanya untuk pesan dari warga
+            if (sender === 'warga' || sender === 'user') {
+                html = html.replace(/&/g, "&amp;")
+                           .replace(/</g, "&lt;")
+                           .replace(/>/g, "&gt;")
+                           .replace(/"/g, "&quot;")
+                           .replace(/'/g, "&#039;");
+            }
+
             html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
             html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
             html = html.replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-500 underline font-semibold">$1</a>');
@@ -1792,8 +1851,10 @@
             } else {
                 activeUsersList = data.userList;
                 onlineUsersSet = new Set(data.onlineUsers || []);
+                claimedChatsState = data.claimedChats || {};
             }
             renderUserList();
+            if (activeSenderId) updateClaimUI();
         });
 
         // Fitur Alias / Ubah Nama Warga otomatis maupun manual
@@ -1945,6 +2006,53 @@
                 if (h.length === 0) chatBox.innerHTML = '<div class="m-auto text-slate-400 text-sm">Belum ada riwayat.</div>';
                 else h.forEach(c => appendMessage(c.sender_type, c.message, c.created_at));
             } catch (e) { }
+            updateClaimUI();
+        }
+
+        function updateClaimUI() {
+            if (!activeSenderId) return;
+            const claimBar = document.getElementById('claim-bar');
+            const claimStatus = document.getElementById('claim-status-text');
+            const claimBtn = document.getElementById('claim-btn');
+            const adminInput = document.getElementById('admin-input');
+            const sendBtn = document.getElementById('send-btn');
+            
+            claimBar.classList.remove('hidden');
+            
+            const claimedBy = claimedChatsState[activeSenderId];
+            if (!claimedBy) {
+                // Unclaimed
+                claimStatus.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Percakapan belum diambil.';
+                claimStatus.className = 'text-xs font-bold text-orange-600';
+                claimBtn.style.display = 'block';
+                claimBar.className = 'flex items-center justify-between bg-orange-50 border border-orange-200 rounded-xl p-3 mb-2 shadow-sm';
+                adminInput.disabled = true;
+                sendBtn.disabled = true;
+                adminInput.placeholder = "Klik 'Ambil Obrolan' untuk membalas...";
+            } else if (claimedBy === adminName) {
+                // Claimed by me
+                claimStatus.innerHTML = '<i class="fa-solid fa-user-check mr-1"></i> Anda sedang melayani warga ini.';
+                claimStatus.className = 'text-xs font-bold text-green-700';
+                claimBtn.style.display = 'none';
+                claimBar.className = 'flex items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3 mb-2 shadow-sm';
+                adminInput.disabled = false;
+                sendBtn.disabled = false;
+                adminInput.placeholder = "Ketik balasan Anda di sini...";
+            } else {
+                // Claimed by someone else
+                claimStatus.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Sedang dilayani oleh: ${claimedBy}`;
+                claimStatus.className = 'text-xs font-bold text-slate-600';
+                claimBtn.style.display = 'none';
+                claimBar.className = 'flex items-center justify-between bg-slate-100 border border-slate-300 rounded-xl p-3 mb-2 shadow-sm';
+                adminInput.disabled = true;
+                sendBtn.disabled = true;
+                adminInput.placeholder = "Obrolan telah diambil petugas lain...";
+            }
+        }
+
+        function claimCurrentChat() {
+            if (!activeSenderId) return;
+            socket.emit('claim_chat', { targetSenderId: activeSenderId, adminName: adminName });
         }
 
         function backToChatList() {
@@ -1975,11 +2083,18 @@
             else if (d.senderType === 'warga') { unreadCounts[d.senderId] = (unreadCounts[d.senderId] || 0) + 1; if (!needsHelpSet.has(d.senderId)) notifSound.play(); renderUserList(); }
         });
 
+        socket.on('chat_ended', (data) => {
+            if (data.targetSenderId) {
+                updateNeedsHelp(data.targetSenderId, true);
+                renderUserList();
+            }
+        });
+
         function appendMessage(sender, text, time) {
             const timeStr = (time ? new Date(time) : new Date()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             const div = document.createElement('div');
             const cb = document.getElementById('chat-box');
-            const parsedText = mdToHtml(text);
+            const parsedText = mdToHtml(text, sender);
 
             if (sender === 'user' || sender === 'warga') {
                 const aliasName = (userAliases[activeSenderId] || 'WARGA');
@@ -2051,7 +2166,7 @@
 
         function sendMessage() {
             const inp = document.getElementById('admin-input'); const text = inp.value.trim(); if (!activeSenderId || !text) return;
-            socket.emit('admin_message', { targetSenderId: activeSenderId, message: text });
+            socket.emit('admin_message', { targetSenderId: activeSenderId, message: text, adminName: adminName });
             if (text !== '/selesai') {
                 appendMessage('admin', text, new Date());
             } else {
@@ -2167,7 +2282,9 @@
                     return;
                 }
 
+                let totalKb = 0;
                 docs.forEach(doc => {
+                    totalKb += parseFloat(doc.size) || 0;
                     let ext = doc.filename.split('.').pop().toLowerCase();
                     let icon = 'fa-file';
                     let bg = 'bg-slate-50', textCol = 'text-slate-500', border = 'border-slate-100';
@@ -2185,13 +2302,25 @@
                             <h5 class="text-xs font-bold text-slate-700 truncate">${doc.filename}</h5>
                             <p class="text-[10px] text-slate-400 mt-0.5 font-medium">${doc.size}</p>
                         </div>
+                        <button onclick="viewOriginalPdf('${doc.filename}')" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-green-600 rounded-md hover:bg-green-50 transition-colors mr-1 ${ext === 'pdf' ? '' : 'hidden'}" title="Lihat PDF Asli"><i class="fa-solid fa-file-pdf"></i></button>
                         <button onclick="viewDocumentText('${doc.filename}')" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors mr-1" title="Lihat Isi Teks"><i class="fa-solid fa-eye"></i></button>
                         <button onclick="deleteExternalDoc('${doc.filename}')" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                     `;
                     grid.appendChild(div);
                 });
 
+                const summaryInfo = document.getElementById('docs-summary-info');
+                if (summaryInfo) {
+                    let totalSizeStr = totalKb > 1024 ? (totalKb / 1024).toFixed(2) + ' MB' : totalKb.toFixed(1) + ' KB';
+                    summaryInfo.innerHTML = `<i class="fa-solid fa-database"></i> ${docs.length} File (${totalSizeStr})`;
+                }
+
             } catch (err) { console.error("Gagal load docs:", err); }
+        }
+
+        function viewOriginalPdf(filename) {
+            const url = `/api/bot/pdf/${encodeURIComponent(filename)}?token=${adminToken}`;
+            window.open(url, '_blank');
         }
 
         async function viewDocumentText(filename) {
@@ -2410,13 +2539,18 @@
             </div>
 
             <div class="px-6 py-3 border-b border-slate-100 bg-white shrink-0">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" id="view-all-docs-search" onkeyup="searchViewAllDocs()"
-                        placeholder="Cari nama dokumen..."
-                        class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 block pl-10 p-2.5 outline-none transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="view-all-docs-search" onkeyup="searchViewAllDocs()"
+                            placeholder="Cari nama dokumen..."
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 block pl-10 p-2.5 outline-none transition-colors">
+                    </div>
+                    <div class="bg-primary-50 border border-primary-100 text-primary-700 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap" id="docs-summary-info">
+                        <i class="fa-solid fa-database"></i> 0 File (0 KB)
+                    </div>
                 </div>
             </div>
 
@@ -2430,14 +2564,22 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Fetch username on load
+            // Role Based Access Control UI
+            document.getElementById('sidebar-admin-name').innerText = adminName;
+            document.getElementById('sidebar-admin-avatar').src = `https://ui-avatars.com/api/?name=${adminName}&background=eff6ff&color=2563eb`;
+
+            if (adminRole === 'petugas') {
+                document.getElementById('nav-knowledge-base').style.display = 'none';
+                document.getElementById('nav-ai-management').style.display = 'none';
+            } else if (adminRole === 'super_admin') {
+                document.getElementById('nav-kelola-petugas').style.display = 'flex';
+            }
+
+            // Fetch livechat settings using new API
             fetch('/api/bot/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } })
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.admin && data.admin.username) {
-                        document.getElementById('sidebar-admin-name').innerText = data.admin.username;
-                        document.getElementById('sidebar-admin-avatar').src = `https://ui-avatars.com/api/?name=${data.admin.username}&background=eff6ff&color=2563eb`;
-                    }
+                    // Logic to load livechat settings if any
                 }).catch(e => console.error(e));
 
             // Show floating train reminder if there are pending changes on load
@@ -2657,10 +2799,6 @@
                 const res = await fetch('/api/bot/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } });
                 const data = await res.json();
 
-                document.getElementById('setting-username').value = data.admin.username;
-                document.getElementById('setting-old-password').value = '';
-                document.getElementById('setting-new-password').value = '';
-                document.getElementById('setting-confirm-password').value = '';
 
                 document.getElementById('setting-emergency').checked = data.liveChat.isEmergencyLeave;
                 document.getElementById('setting-start-day').value = data.liveChat.startDay;
@@ -2673,36 +2811,15 @@
         }
 
         async function saveSettings() {
-            const username = document.getElementById('setting-username').value.trim();
-            const oldPassword = document.getElementById('setting-old-password').value;
-            const newPassword = document.getElementById('setting-new-password').value;
-            const confirmPassword = document.getElementById('setting-confirm-password').value;
             const isEmergencyLeave = document.getElementById('setting-emergency').checked;
             const startDay = parseInt(document.getElementById('setting-start-day').value);
             const endDay = parseInt(document.getElementById('setting-end-day').value);
             const startTime = document.getElementById('setting-start-time').value;
             const endTime = document.getElementById('setting-end-time').value;
 
-            // Validasi Standar RPL
-            if (!username) return showToastAlert('❌ Gagal', 'Username tidak boleh kosong!');
-
-            if (newPassword || oldPassword) {
-                if (!oldPassword) return showToastAlert('⚠️ Peringatan', 'Harap masukkan Sandi Lama untuk mengubah sandi.');
-                if (!newPassword) return showToastAlert('⚠️ Peringatan', 'Sandi Baru tidak boleh kosong.');
-                if (newPassword.length < 6) return showToastAlert('⚠️ Keamanan', 'Sandi Baru harus minimal 6 karakter!');
-                if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(newPassword)) return showToastAlert('⚠️ Keamanan Lemah', 'Sandi Baru harus mengandung kombinasi huruf dan angka!');
-                if (newPassword !== confirmPassword) return showToastAlert('⚠️ Tidak Cocok', 'Konfirmasi Sandi Baru tidak sama!');
-            }
-
             const payload = {
-                admin: { username },
                 liveChat: { isEmergencyLeave, startDay, endDay, startTime, endTime }
             };
-
-            if (newPassword) {
-                payload.admin.oldPassword = oldPassword;
-                payload.admin.password = newPassword;
-            }
 
             try {
                 const res = await fetch('/api/bot/settings', {
@@ -2713,24 +2830,111 @@
 
                 const data = await res.json();
                 if (res.ok) {
-                    // Update UI Sidebar name dynamically
-                    if (payload.admin && payload.admin.username) {
-                        document.getElementById('sidebar-admin-name').innerText = payload.admin.username;
-                        document.getElementById('sidebar-admin-avatar').src = `https://ui-avatars.com/api/?name=${payload.admin.username}&background=eff6ff&color=2563eb`;
-                    }
                     showToastAlert('✅ Berhasil', 'Pengaturan berhasil disimpan!');
                     switchTab('live-chat');
-                    if (newPassword || username !== document.getElementById('setting-username').defaultValue) {
-                        setTimeout(() => {
-                            showToastAlert('ℹ️ Info', 'Kredensial diubah. Silakan login kembali.');
-                            setTimeout(logoutAdmin, 2000);
-                        }, 1000);
-                    }
                 } else {
                     showToastAlert('❌ Gagal', data.error || 'Terjadi kesalahan saat menyimpan pengaturan.');
                 }
             } catch (err) {
                 showToastAlert('❌ Gagal', 'Gagal menghubungi server.');
+            }
+        }
+
+        // ==========================================
+        // MANAJEMEN PETUGAS (SUPER ADMIN ONLY)
+        // ==========================================
+        async function fetchAdminUsers() {
+            try {
+                const res = await fetch('/api/admin/users', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                if (res.ok) {
+                    const users = await res.json();
+                    const tbody = document.getElementById('user-management-tbody');
+                    tbody.innerHTML = '';
+                    users.forEach((u, i) => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition-colors';
+                        const isMe = u.username === adminName || u.username === document.getElementById('sidebar-admin-name').innerText;
+                        
+                        let roleBadge = u.role === 'super_admin' 
+                            ? '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200">Super Admin</span>'
+                            : '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">Petugas</span>';
+
+                        tr.innerHTML = `
+                            <td class="p-4">${i + 1}</td>
+                            <td class="p-4 font-bold text-slate-800 flex items-center gap-2">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.full_name)}&background=f1f5f9&color=64748b" class="w-7 h-7 rounded-full">
+                                ${u.full_name} ${isMe ? '<span class="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded ml-1 border border-green-200">(Anda)</span>' : ''}
+                            </td>
+                            <td class="p-4 text-slate-500 font-medium">${u.username}</td>
+                            <td class="p-4">${roleBadge}</td>
+                            <td class="p-4 text-right">
+                                <button onclick="deleteAdminUser(${u.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center disabled:opacity-50" ${isMe ? 'disabled title="Tidak bisa menghapus diri sendiri"' : ''}>
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function createUser() {
+            const fullName = document.getElementById('add-user-fullname').value.trim();
+            const username = document.getElementById('add-user-username').value.trim();
+            const password = document.getElementById('add-user-password').value;
+            const role = document.getElementById('add-user-role').value;
+
+            if (!fullName || !username || !password) {
+                return showToastAlert('⚠️ Peringatan', 'Harap isi semua bidang form.');
+            }
+
+            try {
+                const res = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: JSON.stringify({ username, password, fullName, role })
+                });
+
+                if (res.ok) {
+                    showToastAlert('✅ Berhasil', 'Petugas baru berhasil ditambahkan.');
+                    document.getElementById('modal-add-user').classList.add('hidden');
+                    document.getElementById('add-user-fullname').value = '';
+                    document.getElementById('add-user-username').value = '';
+                    document.getElementById('add-user-password').value = '';
+                    fetchAdminUsers();
+                } else {
+                    const data = await res.json();
+                    showToastAlert('❌ Gagal', data.error || 'Gagal menambahkan petugas.');
+                }
+            } catch (err) {
+                showToastAlert('❌ Gagal', 'Server error.');
+            }
+        }
+
+        async function deleteAdminUser(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus petugas ini? Mereka tidak akan bisa login lagi.')) return;
+            try {
+                const res = await fetch(`/api/admin/users/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                if (res.ok) {
+                    showToastAlert('✅ Berhasil', 'Petugas berhasil dihapus.');
+                    fetchAdminUsers();
+                } else {
+                    const data = await res.json();
+                    showToastAlert('❌ Gagal', data.error || 'Gagal menghapus petugas.');
+                }
+            } catch (err) {
+                showToastAlert('❌ Gagal', 'Server error.');
             }
         }
     </script>

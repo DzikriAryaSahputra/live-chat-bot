@@ -1,17 +1,19 @@
 {
-  "avgResponseTime": 759.1282051282051,
-  "responseCount": 39,
+  "avgResponseTime": 624.1294117647059,
+  "responseCount": 85,
   "topIntents": {
-    "tanya_jam_operasional": 3,
+    "tanya_jam_operasional": 7,
     "tanya_sensus_ekonomi": 1,
-    "hubungi_admin": 6,
+    "hubungi_admin": 17,
     "tanya_seluruh_sekolah": 3,
-    "sapaan": 10,
+    "sapaan": 27,
     "tanya apa aja": 1,
     "tanya_lansia": 2,
-    "trigger_alihkan_admin": 3,
-    "tanya_visi_misi_bps": 3,
+    "trigger_alihkan_admin": 11,
+    "tanya_visi_misi_bps": 4,
     "tanya_jumlah_umkm": 1,
-    "terima_kasih": 2
+    "terima_kasih": 4,
+    "tidak_ada": 2,
+    "out_of_scope": 1
   }
 }

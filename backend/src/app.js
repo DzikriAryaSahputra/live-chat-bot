@@ -32,6 +32,7 @@ const io = new Server(server, {
     upgradeTimeout: 30000,
 });
 const port = process.env.PORT || 3000;
+const RASA_API_URL = process.env.RASA_API_URL || 'http://localhost:5005';
 
 app.use(helmet({ contentSecurityPolicy: false })); // Nonaktifkan CSP agar CDN (Tailwind/FontAwesome) tidak terblokir
 app.use(cors());
@@ -253,6 +254,7 @@ function sanitizeName(name) {
 // ==========================================
 // 📡 MANAJEMEN LIVE CHAT & SOCKET.IO
 // ==========================================
+const claimedChats = {}; // Menyimpan state { "senderId": "Nama Petugas" }
 
 async function broadcastUserList() {
     try {
@@ -269,7 +271,7 @@ async function broadcastUserList() {
             }
         });
 
-        io.emit('user_list', { userList, onlineUsers });
+        io.emit('user_list', { userList, onlineUsers, claimedChats });
     } catch (err) {
         console.error('Gagal mengambil daftar user:', err.message);
     }
@@ -280,10 +282,6 @@ async function broadcastUserList() {
 // ==========================================
 async function getKnowledgeBaseContext(userMessage) {
     try {
-        const nluData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'data/nlu.yml'), 'utf8'));
-        const domainData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'domain.yml'), 'utf8'));
-        if (!nluData || !nluData.nlu) return '';
-
         let externalDocs = '';
         if (fs.existsSync(EMBEDDINGS_FILE) && userMessage) {
             const existingEmbeddings = JSON.parse(fs.readFileSync(EMBEDDINGS_FILE, 'utf8'));
@@ -421,7 +419,7 @@ io.use((socket, next) => {
         jwt.verify(token, JWT_SECRET, (err, decoded) => {
             if (err) {
                 return next(new Error('Authentication Error'));
-            } else if (decoded.role === 'admin') {
+            } else if (decoded.role === 'super_admin' || decoded.role === 'petugas' || decoded.role === 'admin') {
                 socket.data.isAdmin = true;
                 return next();
             } else {
@@ -464,9 +462,19 @@ io.on('connection', (socket) => {
         setTimeout(() => { broadcastUserList(); }, 500);
     });
 
+    const userRateLimits = {};
+
     // 💬 WARGA MENGIRIM PESAN
     socket.on('user_message', async (data) => {
         const { senderId, message } = data;
+
+        // Anti-Spam Rate Limiter (Max 1 pesan per 1.5 detik per warga)
+        const now = Date.now();
+        if (userRateLimits[senderId] && now - userRateLimits[senderId] < 1500) {
+            return socket.emit('bot_response', { message: 'Tolong jangan terlalu cepat mengirim pesan.' });
+        }
+        userRateLimits[senderId] = now;
+
         socket.join(senderId);
 
         try { await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'warga', message]); } catch (err) { }
@@ -480,7 +488,7 @@ io.on('connection', (socket) => {
 
         try {
             // 1. PARSE INTENT KE RASA UNTUK MELIHAT TINGKAT KEPERCAYAAN (CONFIDENCE)
-            const parseRes = await axios.post('http://localhost:5005/model/parse', { text: message }, { timeout: 5000 });
+            const parseRes = await axios.post(`${RASA_API_URL}/model/parse`, { text: message }, { timeout: 5000 });
             const intentName = parseRes.data.intent.name;
             const confidence = parseRes.data.intent.confidence;
 
@@ -488,7 +496,7 @@ io.on('connection', (socket) => {
 
             // 2. JIKA CONFIDENCE >= 85% DAN BUKAN FALLBACK, BIARKAN RASA YANG MENJAWAB
             if (intentName !== 'nlu_fallback' && confidence >= 0.85) {
-                const rasaResponse = await axios.post('http://localhost:5005/webhooks/rest/webhook', { sender: senderId, message: message }, { timeout: 5000 });
+                const rasaResponse = await axios.post(`${RASA_API_URL}/webhooks/rest/webhook`, { sender: senderId, message: message }, { timeout: 5000 });
                 if (rasaResponse.data && rasaResponse.data.length > 0) {
                     botReply = rasaResponse.data[0].text;
                 }
@@ -554,17 +562,46 @@ io.on('connection', (socket) => {
     // 👨‍💻 ADMIN MENGIRIM PESAN
     socket.on('admin_message', async (data) => {
         if (!socket.data.isAdmin) return;
-        const { targetSenderId, message } = data;
+        const { targetSenderId, message, adminName } = data;
+
+        if (claimedChats[targetSenderId] && claimedChats[targetSenderId] !== adminName) {
+            socket.emit('train_error', 'Chat ini telah diklaim oleh petugas lain.');
+            return;
+        }
 
         if (message.trim() === '/selesai') {
             delete activeSessions[targetSenderId];
+            if (claimedChats[targetSenderId] === adminName) delete claimedChats[targetSenderId];
             io.to(targetSenderId).emit('bot_response', { message: '✅ Sesi dengan petugas telah berakhir. BIPS kembali melayani Anda.' });
             io.to(targetSenderId).emit('admin_status', { status: 'disconnected' });
+            io.emit('chat_ended', { targetSenderId });
+            broadcastUserList();
             return;
         }
 
         try { await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [targetSenderId, 'admin', message]); } catch (err) { }
         io.to(targetSenderId).emit('admin_response', { message });
+    });
+
+    // 🏆 ADMIN CLAIM CHAT
+    socket.on('claim_chat', (data) => {
+        if (!socket.data.isAdmin) return;
+        const { targetSenderId, adminName } = data;
+        if (!claimedChats[targetSenderId]) {
+            claimedChats[targetSenderId] = adminName;
+            broadcastUserList();
+        } else if (claimedChats[targetSenderId] !== adminName) {
+            socket.emit('train_error', `Gagal: Chat ini sudah diambil oleh ${claimedChats[targetSenderId]}`);
+        }
+    });
+
+    socket.on('unclaim_chat', (data) => {
+        if (!socket.data.isAdmin) return;
+        const { targetSenderId, adminName } = data;
+        if (claimedChats[targetSenderId] === adminName) {
+            delete claimedChats[targetSenderId];
+            broadcastUserList();
+        }
     });
 
     // 🗑️ JALUR KHUSUS: WARGA MENGHAPUS CHAT-NYA SENDIRI
@@ -583,12 +620,15 @@ io.on('connection', (socket) => {
     // 🤖 ADMIN MELATIH BOT (SUNTIK ILMU)
     socket.on('train_bot', async (data) => {
         if (!socket.data.isAdmin) return socket.emit('train_error', '🛡️ Akses Ditolak!');
+        if (isTrainingModel) return socket.emit('train_error', '⏳ Harap tunggu, bot sedang dilatih oleh admin lain.');
+        
         const { intentName, examples, botResponse } = data;
         if (!intentName || !examples || !botResponse) return socket.emit('train_error', 'Data tidak boleh kosong!');
 
         const safeIntentName = intentName.trim().toLowerCase().replace(/\s+/g, '_');
 
         try {
+            isTrainingModel = true;
             if (safeIntentName !== 'skip_write') {
                 const nluPath = path.join(RASA_DIR, 'data/nlu.yml');
                 let nluData = yaml.load(fs.readFileSync(nluPath, 'utf8')) || { version: "3.1", nlu: [] };
@@ -620,62 +660,63 @@ io.on('connection', (socket) => {
                 shell: true
             });
 
-            // Log HANYA dicetak di Terminal VS Code, tidak lagi dikirim ke UI Dashboard
-            trainProcess.stdout.on('data', chunk => {
-                console.log(`[RASA LOG]: ${chunk.toString()}`);
-            });
-
-            // Mengubah pelabelan ERROR menjadi PROCESS agar log biasa tidak terlihat menakutkan
-            trainProcess.stderr.on('data', chunk => {
-                console.log(`[RASA PROCESS]: ${chunk.toString()}`);
-            });
+            trainProcess.stdout.on('data', chunk => console.log(`[RASA LOG]: ${chunk.toString()}`));
+            trainProcess.stderr.on('data', chunk => console.log(`[RASA PROCESS]: ${chunk.toString()}`));
 
             trainProcess.on('close', async (code) => {
                 if (code !== 0) {
+                    isTrainingModel = false;
                     return socket.emit('train_error', 'Gagal melatih AI. Cek terminal server.');
                 }
 
-                let latestModelPath = "models"; // Default fallback
-
-                // 👇 PEMBERSIH MODEL OTOMATIS (Mencegah Penumpukan Sampah Model) 👇
+                let latestModelPath = "models";
                 try {
                     const modelsDir = path.join(RASA_DIR, 'models');
                     if (fs.existsSync(modelsDir)) {
                         const files = fs.readdirSync(modelsDir)
                             .filter(f => f.endsWith('.tar.gz'))
                             .map(f => ({ name: f, fullPath: path.join(modelsDir, f), time: fs.statSync(path.join(modelsDir, f)).mtime.getTime() }))
-                            .sort((a, b) => b.time - a.time); // Urutkan dari terbaru ke terlama
+                            .sort((a, b) => b.time - a.time);
 
-                        // Menangkap file model paling baru untuk digunakan di Hot Reload
-                        if (files.length > 0) {
-                            latestModelPath = files[0].fullPath;
+                        if (files.length > 0) latestModelPath = files[0].fullPath;
+                        if (files.length > 3) {
+                            for (let i = 3; i < files.length; i++) fs.unlinkSync(files[i].fullPath);
                         }
 
-                        // Jika ada lebih dari 3 file, hapus sisanya (index 3 dst)
-                        if (files.length > 3) {
-                            for (let i = 3; i < files.length; i++) {
-                                fs.unlinkSync(files[i].fullPath);
+                        // Coba Replace Model ke Rasa API dengan Retry
+                        let isReloadSuccess = false;
+                        for (let attempt = 1; attempt <= 3; attempt++) {
+                            try {
+                                console.log(`[RASA API] Mencoba memuat ulang model... (Percobaan ${attempt})`);
+                                await axios.put(`${process.env.RASA_API_URL || 'http://localhost:5005'}/model`, { model_file: latestModelPath }, { timeout: 60000 });
+                                console.log(`✅ [RASA API] Model baru berhasil dimuat!`);
+                                isReloadSuccess = true;
+                                break;
+                            } catch (reloadErr) {
+                                console.log(`⚠️ Gagal memuat ulang model (Percobaan ${attempt}): ${reloadErr.message}`);
+                                if (attempt < 3) await new Promise(res => setTimeout(res, 2000));
                             }
-                            console.log(`🧹 [CLEANUP] Menghapus ${files.length - 3} file model lama agar disk tidak penuh.`);
+                        }
+
+                        if (!isReloadSuccess) {
+                            console.log(`❌ [RASA API] Hot reload gagal. Silakan restart server Rasa manual jika bot tidak membalas.`);
+                            socket.emit('train_success', 'AI berhasil dilatih, namun gagal memuat ulang otomatis (Hot-Reload). Silakan tunggu sebentar atau restart server bot.');
+                        } else {
+                            socket.emit('train_success', 'AI berhasil disinkronisasi dan siap digunakan!');
                         }
                     }
-                } catch (cleanErr) {
-                    console.error("⚠️ [CLEANUP] Gagal menghapus model lama:", cleanErr.message);
+                } catch (err) {
+                    console.error('🧹 [CLEANUP/RELOAD ERROR]:', err);
+                    socket.emit('train_error', 'Gagal memuat ulang model.');
                 }
-
-                // 👇 PROSES HOT-RELOAD DAN TUNGGU SAMPAI SELESAI BARU EMIT SUKSES 👇
-                try {
-                    console.log("⚙️ [RASA API] Memulai Hot-Reload model baru...");
-                    await axios.put('http://localhost:5005/model', { model_file: latestModelPath }, { timeout: 60000 });
-                    console.log("✅ [RASA API] Model AI berhasil dimuat ulang (Hot-Reload) secara otomatis menggunakan file: " + path.basename(latestModelPath));
-                    socket.emit('train_success', 'AI berhasil disinkronisasi dan siap digunakan!');
-                } catch (e) {
-                    console.log("⚠️ [RASA API] Gagal Hot-Reload otomatis. Bot mungkin perlu direstart manual. Error: " + e.message);
-                    // Tetap beri sinyal sukses karena file model berhasil dilatih/dibuat, tapi sertakan catatan peringatan
-                    socket.emit('train_success', 'AI berhasil dilatih, namun gagal memuat ulang otomatis (Hot-Reload). Silakan tunggu sebentar atau restart server bot.');
-                }
+                
+                isTrainingModel = false;
             });
-        } catch (err) { socket.emit('train_error', 'Gagal memproses file sistem.'); }
+        } catch (error) {
+            isTrainingModel = false;
+            console.error('Train Error:', error);
+            socket.emit('train_error', 'Terjadi kesalahan sistem.');
+        }
     });
 
     socket.on('disconnect', () => console.log(`🔌 Terputus: ${socket.id}`));
@@ -691,47 +732,46 @@ const loginLimiter = rateLimit({
     message: { error: 'Terlalu banyak percobaan login, silakan coba lagi dalam 15 menit.' }
 });
 
-app.post('/api/login', loginLimiter, (req, res) => {
-    const { username, password } = req.body;
-    const settings = getSettings();
-    if (username === settings.admin.username && bcrypt.compareSync(password, settings.admin.passwordHash)) {
-        const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token });
-    } else { res.status(401).json({ error: 'Username/Password salah!' }); }
+app.post('/api/login', loginLimiter, async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const result = await db.query('SELECT * FROM admin_users WHERE username = $1', [username]);
+        if (result.rows.length === 0) return res.status(401).json({ error: 'Username/Password salah!' });
+        
+        const user = result.rows[0];
+        if (bcrypt.compareSync(password, user.password_hash)) {
+            const token = jwt.sign({ username: user.username, role: user.role, fullName: user.full_name }, JWT_SECRET, { expiresIn: '24h' });
+            res.json({ token, role: user.role, fullName: user.full_name });
+        } else {
+            res.status(401).json({ error: 'Username/Password salah!' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Terjadi kesalahan sistem' });
+    }
 });
 
 app.get('/api/bot/settings', authenticateJWT, (req, res) => {
     const settings = getSettings();
-    res.json({ admin: { username: settings.admin.username }, liveChat: settings.liveChat });
+    res.json({ liveChat: settings.liveChat });
 });
 
-app.put('/api/bot/settings', authenticateJWT, (req, res) => {
+app.put('/api/bot/settings', authenticateJWT, requireSuperAdmin, (req, res) => {
     try {
-        const { admin, liveChat } = req.body;
+        const { liveChat } = req.body;
         const currentSettings = getSettings();
-        
-        if (admin) {
-            if (admin.password) {
-                if (!admin.oldPassword || !bcrypt.compareSync(admin.oldPassword, currentSettings.admin.passwordHash)) {
-                    return res.status(401).json({ error: 'Sandi lama tidak cocok!' });
-                }
-                currentSettings.admin.passwordHash = bcrypt.hashSync(admin.password, 10);
-            }
-            if (admin.username) currentSettings.admin.username = admin.username;
-        }
-        if (liveChat) {
-            currentSettings.liveChat = { ...currentSettings.liveChat, ...liveChat };
-        }
-        
+        if (liveChat) currentSettings.liveChat = { ...currentSettings.liveChat, ...liveChat };
         saveSettings(currentSettings);
         res.json({ message: 'Pengaturan berhasil disimpan!' });
     } catch (err) { res.status(500).json({ error: 'Gagal menyimpan pengaturan.' }); }
 });
 
 function authenticateJWT(req, res, next) {
+    let token = null;
     const authHeader = req.headers.authorization;
-    if (authHeader) {
-        const token = authHeader.split(' ')[1];
+    if (authHeader) token = authHeader.split(' ')[1];
+    else if (req.query && req.query.token) token = req.query.token;
+
+    if (token) {
         jwt.verify(token, JWT_SECRET, (err, user) => {
             if (err) return res.status(403).json({ error: 'Sesi berakhir.' });
             req.user = user;
@@ -740,7 +780,38 @@ function authenticateJWT(req, res, next) {
     } else { res.status(401).json({ error: 'Akses ditolak.' }); }
 }
 
-app.get('/api/bot/intents', authenticateJWT, (req, res) => {
+function requireSuperAdmin(req, res, next) {
+    if (req.user && req.user.role === 'super_admin') next();
+    else res.status(403).json({ error: 'Akses ditolak. Khusus Super Admin.' });
+}
+
+// ==========================================
+// 👥 MANAJEMEN PETUGAS (SUPER ADMIN ONLY)
+// ==========================================
+app.get('/api/admin/users', authenticateJWT, requireSuperAdmin, async (req, res) => {
+    try {
+        const result = await db.query('SELECT id, username, full_name, role, created_at FROM admin_users ORDER BY id ASC');
+        res.json(result.rows);
+    } catch (err) { res.status(500).json({ error: 'Gagal memuat pengguna' }); }
+});
+
+app.post('/api/admin/users', authenticateJWT, requireSuperAdmin, async (req, res) => {
+    try {
+        const { username, password, fullName, role } = req.body;
+        const hashed = bcrypt.hashSync(password, 10);
+        await db.query('INSERT INTO admin_users (username, password_hash, full_name, role) VALUES ($1, $2, $3, $4)', [username, hashed, fullName, role]);
+        res.json({ message: 'Pengguna ditambahkan!' });
+    } catch (err) { res.status(500).json({ error: 'Gagal menambah pengguna (mungkin username sudah ada)' }); }
+});
+
+app.delete('/api/admin/users/:id', authenticateJWT, requireSuperAdmin, async (req, res) => {
+    try {
+        await db.query('DELETE FROM admin_users WHERE id = $1 AND role != \'super_admin\'', [req.params.id]);
+        res.json({ message: 'Pengguna dihapus!' });
+    } catch (err) { res.status(500).json({ error: 'Gagal menghapus pengguna' }); }
+});
+
+app.get('/api/bot/intents', authenticateJWT, requireSuperAdmin, (req, res) => {
     try {
         const nluData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'data/nlu.yml'), 'utf8'));
         const domainData = yaml.load(fs.readFileSync(path.join(RASA_DIR, 'domain.yml'), 'utf8'));
@@ -756,8 +827,9 @@ app.get('/api/bot/intents', authenticateJWT, (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Gagal ambil data' }); }
 });
 
-app.put('/api/bot/intents', authenticateJWT, (req, res) => {
-    const { intentName, examples, botResponse } = req.body;
+app.put('/api/bot/intents', authenticateJWT, requireSuperAdmin, (req, res) => {
+    let { intentName, examples, botResponse } = req.body;
+    intentName = intentName.trim().replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
     if (PROTECTED_INTENTS.includes(intentName)) {
         return res.status(403).json({ error: 'Topik ini dilindungi sistem!' });
     }
@@ -794,7 +866,7 @@ app.put('/api/bot/intents', authenticateJWT, (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Gagal memperbarui file YAML' }); }
 });
 
-app.delete('/api/bot/intents/:intentName', authenticateJWT, (req, res) => {
+app.delete('/api/bot/intents/:intentName', authenticateJWT, requireSuperAdmin, (req, res) => {
     const intentName = req.params.intentName;
     if (PROTECTED_INTENTS.includes(intentName)) {
         return res.status(403).json({ error: 'Topik ini tidak boleh dihapus!' });
@@ -833,9 +905,9 @@ app.delete('/api/chat/history/:senderId', authenticateJWT, async (req, res) => {
 // 📚 RAG EXTERNAL KNOWLEDGE (PDF & URL) ROUTES
 // ==========================================
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 50 * 1024 * 1024 } });
 
-app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (req, res) => {
+app.post('/api/bot/upload-pdf', authenticateJWT, requireSuperAdmin, upload.single('file'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'Tidak ada file yang diunggah.' });
     try {
         const dataBuffer = fs.readFileSync(req.file.path);
@@ -852,7 +924,8 @@ app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (r
 
         if (!fs.existsSync(KNOWLEDGE_DOCS_DIR)) fs.mkdirSync(KNOWLEDGE_DOCS_DIR);
         fs.writeFileSync(safePath, `[SUMBER: ${req.file.originalname}]\n\n${rawText}`);
-        fs.unlinkSync(req.file.path); // Hapus file temporary
+        const pdfSavePath = path.join(KNOWLEDGE_DOCS_DIR, fileName.replace('.txt', '.pdf'));
+        fs.renameSync(req.file.path, pdfSavePath); // Simpan file PDF asli agar bisa dilihat admin
 
         // === PROSES TRUE RAG: CHUNKING & EMBEDDING ===
         const chunks = chunkText(rawText);
@@ -888,7 +961,7 @@ app.post('/api/bot/upload-pdf', authenticateJWT, upload.single('file'), async (r
 
 
 
-app.get('/api/bot/docs', authenticateJWT, (req, res) => {
+app.get('/api/bot/docs', authenticateJWT, requireSuperAdmin, (req, res) => {
     try {
         if (!fs.existsSync(KNOWLEDGE_DOCS_DIR)) return res.json([]);
         const files = fs.readdirSync(KNOWLEDGE_DOCS_DIR).filter(f => f.endsWith('.txt'));
@@ -900,7 +973,7 @@ app.get('/api/bot/docs', authenticateJWT, (req, res) => {
     } catch (err) { res.status(500).json({ error: 'Gagal mengambil daftar dokumen.' }); }
 });
 
-app.get('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
+app.get('/api/bot/docs/:filename', authenticateJWT, requireSuperAdmin, (req, res) => {
     try {
         // Sanitasi input: path.basename akan menghilangkan path traversal seperti ../../../
         const safeFilename = path.basename(req.params.filename);
@@ -920,6 +993,26 @@ app.get('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
     }
 });
 
+app.get('/api/bot/pdf/:filename', authenticateJWT, requireSuperAdmin, (req, res) => {
+    try {
+        const safeFilename = path.basename(req.params.filename).replace('.txt', '');
+        if (!safeFilename) return res.status(400).json({ error: 'Nama file tidak valid.' });
+        
+        const fullPath = path.join(KNOWLEDGE_DOCS_DIR, safeFilename + '.pdf');
+        
+        if (!fs.existsSync(fullPath)) {
+            return res.status(404).json({ error: 'Dokumen PDF asli tidak ditemukan (kemungkinan dokumen versi lama).' });
+        }
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${safeFilename}.pdf"`);
+        res.sendFile(fullPath);
+    } catch (err) {
+        console.error("Gagal membaca dokumen PDF:", err);
+        res.status(500).json({ error: 'Terjadi kesalahan.' });
+    }
+});
+
 app.get('/api/bot/token-usage', authenticateJWT, (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
@@ -935,12 +1028,18 @@ app.get('/api/bot/token-usage', authenticateJWT, (req, res) => {
     }
 });
 
-app.delete('/api/bot/docs/:filename', authenticateJWT, (req, res) => {
+app.delete('/api/bot/docs/:filename', authenticateJWT, requireSuperAdmin, (req, res) => {
     try {
-        const targetFilename = req.params.filename.endsWith('.txt') ? req.params.filename : req.params.filename + '.txt';
+        const safeFilename = path.basename(req.params.filename);
+        const targetFilename = safeFilename.endsWith('.txt') ? safeFilename : safeFilename + '.txt';
         const safePath = path.join(KNOWLEDGE_DOCS_DIR, targetFilename);
         if (fs.existsSync(safePath)) {
             fs.unlinkSync(safePath);
+
+            const pdfPath = safePath.replace('.txt', '.pdf');
+            if (fs.existsSync(pdfPath)) {
+                fs.unlinkSync(pdfPath);
+            }
 
             // Hapus juga vektor dari embeddings.json
             if (fs.existsSync(EMBEDDINGS_FILE)) {
