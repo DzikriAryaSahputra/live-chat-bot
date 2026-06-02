@@ -100,3 +100,42 @@ nlu:
       - ada berapa lansia dijambi?
       - berapa lansia
       - lansia jambi
+
+  - intent: terima_kasih
+    examples: |
+      - terima kasih
+      - makasih ya
+      - thank you
+      - makasih banyak
+      - ini sangat membantu
+      - thanks
+      - mantap makasih
+      - oke terima kasih
+      - sip makasih
+  - intent: tidak_ada
+    examples: |
+      - tidak
+      - nggak
+      - gak
+      - ga ada
+      - sudah cukup
+      - ngga usah
+      - ngga ada
+      - ngga
+      - belum ada
+      - cukuplah
+      - tidak bot
+      - ga ada bot
+  - intent: out_of_scope
+    examples: |
+      - siapa presiden sekarang?
+      - cara masak nasi goreng gimana?
+      - apakah kamu bisa bernyanyi?
+      - beli pulsa
+      - mau pesen gojek
+      - cari jodoh
+      - laper nih
+      - cuaca hari ini gimana
+      - cara buat kopi
+      - kapan kiamat
+      - game yang seru apa

@@ -36,3 +36,18 @@ rules:
     steps:
       - intent: tanya_lansia
       - action: utter_tanya_lansia
+
+  - rule: Respon terima kasih
+    steps:
+      - intent: terima_kasih
+      - action: utter_terima_kasih
+      
+  - rule: Respon tidak ada
+    steps:
+      - intent: tidak_ada
+      - action: utter_tidak_ada
+
+  - rule: Respon out of scope
+    steps:
+      - intent: out_of_scope
+      - action: utter_out_of_scope

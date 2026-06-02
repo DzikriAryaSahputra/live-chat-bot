@@ -89,15 +89,30 @@
         }
 
         @keyframes fadeInTab {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Skeleton Loading */
         @keyframes skeletonPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
         }
+
         .skeleton {
             background: #e2e8f0;
             color: transparent !important;
@@ -106,6 +121,7 @@
             user-select: none;
             pointer-events: none;
         }
+
         .skeleton * {
             visibility: hidden;
         }
@@ -114,6 +130,7 @@
         .hover-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .hover-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
@@ -124,29 +141,44 @@
             opacity: 0;
             animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
 
         .nav-item.active {
             color: #2563eb;
             background-color: #eff6ff;
-            font-weight: 600;
+            font-weight: 700;
         }
 
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background-color: #2563eb;
-            border-radius: 0 4px 4px 0;
+        .nav-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item:not(.active):hover {
+            transform: translateX(4px);
+            color: #3b82f6;
         }
     </style>
 </head>
@@ -154,27 +186,31 @@
 <body class="bg-slate-50 h-screen w-screen overflow-hidden text-slate-800 flex flex-col md:flex-row relative">
 
     <!-- MOBILE HEADER -->
-    <header class="md:hidden bg-white h-14 border-b border-slate-200 flex items-center justify-between px-4 shrink-0 z-40">
+    <header
+        class="md:hidden bg-white h-14 border-b border-slate-200 flex items-center justify-between px-4 shrink-0 z-40">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white shadow-sm">
                 <i class="fa-solid fa-chart-line text-sm"></i>
             </div>
             <h1 class="font-bold text-primary-600 text-sm tracking-tight">BPS Monitor</h1>
         </div>
-        <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
+        <button onclick="toggleSidebar()"
+            class="w-8 h-8 flex items-center justify-center text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
             <i class="fa-solid fa-bars"></i>
         </button>
     </header>
 
     <!-- SIDEBAR OVERLAY (MOBILE) -->
-    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
+    <div id="sidebar-overlay" onclick="toggleSidebar()"
+        class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
 
     <div class="flex flex-1 overflow-hidden relative">
 
         <!-- ========================================== -->
         <!-- 1. LEFT SIDEBAR (GLOBAL) -->
         <!-- ========================================== -->
-        <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 z-50 fixed inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 h-full shadow-2xl md:shadow-none">
+        <aside id="sidebar"
+            class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 z-50 fixed inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 h-full shadow-2xl md:shadow-none">
             <!-- Top Section -->
             <div>
                 <!-- Logo -->
@@ -190,79 +226,86 @@
                 </div>
 
                 <!-- Navigation -->
-                <nav class="mt-4 flex flex-col gap-1 px-3">
+                <nav class="mt-4 flex flex-col gap-1 px-4">
+                    <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 mt-2">Dashboard</div>
+
                     <button onclick="switchTab('dashboard')" id="nav-dashboard"
-                        class="nav-item active relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
-                        <i class="fa-solid fa-house text-[16px] w-5 text-center"></i>
-                        <span>Dashboard Overview</span>
+                        class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
+                        <i class="fa-solid fa-house text-[15px] w-5 text-center"></i>
+                        <span>Overview</span>
                     </button>
+
+                    <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 mt-4">Fitur</div>
+
                     <button onclick="switchTab('live-chat')" id="nav-live-chat"
-                        class="nav-item relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
-                        <i class="fa-regular fa-message text-[16px] w-5 text-center"></i>
+                        class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
+                        <i class="fa-regular fa-message text-[15px] w-5 text-center"></i>
                         <span>Live Chat</span>
                     </button>
                     <button onclick="switchTab('knowledge-base')" id="nav-knowledge-base"
-                        class="nav-item relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18.75" viewBox="0 0 24 25">
-                            <g fill="none">
-                                <path d="M6 17.57v-6.4l6 3.9l6-3.9v6.4c0 1.933-2.686 3.5-6 3.5s-6-1.567-6-3.5" />
-                                <path stroke="currentColor" stroke-linecap="square" stroke-width="2"
-                                    d="M6 11.67v5.9c0 1.933 2.686 3.5 6 3.5s6-1.567 6-3.5v-5.9m3-2.2v5.6M2.313 8.367L2 8.57l10 6.5l10-6.5l-10-6.5l-.312.203" />
-                                <path stroke="currentColor" stroke-width="2"
-                                    d="m6.25 2.57l.52 1.23L8 4.32l-1.23.52l-.52 1.23l-.52-1.23l-1.23-.52l1.23-.52z" />
-                            </g>
-                        </svg>
+                        class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
+                        <i class="fa-solid fa-brain text-[15px] w-5 text-center"></i>
                         <span>Knowledge Base NLU</span>
                     </button>
                     <button onclick="switchTab('ai-management')" id="nav-ai-management"
-                        class="nav-item relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-[18px] h-[18px] shrink-0 ml-px">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-                        </svg>
+                        class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
+                        <i class="fa-solid fa-microchip text-[15px] w-5 text-center"></i>
                         <span>AI Management LLM</span>
                     </button>
 
-                    <div class="h-px bg-slate-100 my-2 mx-2"></div>
+                    <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 mt-4">Lainnya</div>
 
                     <button id="nav-buku-panduan" onclick="switchTab('buku-panduan')"
-                        class="nav-item relative w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-500 hover:bg-slate-50 hover:text-primary-600 transition-colors text-left">
-                        <i class="fa-solid fa-book-open text-[16px] w-5 text-center"></i>
+                        class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-slate-50 transition-colors text-left">
+                        <i class="fa-solid fa-book-open text-[15px] w-5 text-center"></i>
                         <span>Buku Panduan</span>
                     </button>
                 </nav>
             </div>
 
-            <!-- Bottom Section -->
-            <div class="p-4 border-t border-slate-100 relative">
+            <!-- Bottom Section (Profile) -->
+            <div class="p-4 border-t border-slate-100 relative bg-slate-50">
                 <!-- Dropdown Menu (Hidden by default) -->
                 <div id="profile-menu"
-                    class="absolute bottom-full left-4 right-4 mb-2 bg-white border border-slate-100 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] py-2 hidden flex-col z-50">
+                    class="absolute bottom-full left-4 right-4 mb-3 bg-white border border-slate-200 rounded-xl shadow-lg py-2 hidden flex-col z-50 transform transition-all">
                     <button onclick="openSettingsPage()"
-                        class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors text-left">
-                        <i class="fa-solid fa-gear w-4 text-center"></i> Settings
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-primary-600 transition-colors text-left">
+                        <div class="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-500"><i
+                                class="fa-solid fa-gear text-xs"></i></div> Settings
                     </button>
-                    <div class="h-px bg-slate-100 my-1 mx-2"></div>
+                    <div class="h-px bg-slate-100 my-1 mx-4"></div>
                     <button onclick="logoutAdmin()"
-                        class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors text-left">
-                        <i class="fa-solid fa-arrow-right-from-bracket w-4 text-center"></i> Logout
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors text-left">
+                        <div class="w-7 h-7 rounded bg-red-50 flex items-center justify-center text-red-500"><i
+                                class="fa-solid fa-arrow-right-from-bracket text-xs"></i></div> Logout
                     </button>
                 </div>
 
-                <!-- Profile Trigger -->
                 <div onclick="toggleProfileMenu()"
-                    class="flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer group">
+                    class="flex items-center justify-between px-3 py-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-primary-300 transition-colors group relative shadow-sm">
                     <div class="flex items-center gap-3 min-w-0">
-                        <img id="sidebar-admin-avatar" src="https://ui-avatars.com/api/?name=Super+Admin&background=eff6ff&color=2563eb"
-                            class="w-9 h-9 rounded-full" alt="Avatar">
+                        <div class="relative">
+                            <img id="sidebar-admin-avatar"
+                                src="https://ui-avatars.com/api/?name=Super+Admin&background=eff6ff&color=2563eb"
+                                class="w-9 h-9 rounded-full object-cover border border-slate-200 group-hover:border-primary-200 transition-colors"
+                                alt="Avatar">
+                            <div
+                                class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full">
+                            </div>
+                        </div>
                         <div class="min-w-0">
-                            <h4 id="sidebar-admin-name" class="text-sm font-bold text-slate-700 truncate">Super Admin</h4>
-                            <p class="text-[11px] text-slate-400 truncate">System Manager</p>
+                            <h4 id="sidebar-admin-name"
+                                class="text-[13px] font-bold text-slate-800 truncate group-hover:text-primary-600 transition-colors">
+                                Super Admin</h4>
+                            <p class="text-[11px] font-medium text-slate-500 truncate">System Manager</p>
                         </div>
                     </div>
-                    <i id="profile-chevron"
-                        class="fa-solid fa-chevron-up text-[10px] text-slate-400 group-hover:text-slate-600 transition-transform"></i>
+
+                    <div
+                        class="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary-50 transition-colors">
+                        <i id="profile-chevron"
+                            class="fa-solid fa-chevron-up text-[10px] text-slate-400 group-hover:text-primary-600 transition-transform"></i>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -278,12 +321,14 @@
             <div id="tab-dashboard" class="tab-content active w-full h-full bg-slate-50 overflow-y-auto">
                 <div class="max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-6 fade-in">
                     <!-- Header -->
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-up delay-100">
+                    <div
+                        class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-up delay-100">
                         <div>
                             <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Dashboard Overview</h1>
                             <p class="text-sm text-slate-500 mt-1">Ringkasan performa BIPS Assistant hari ini.</p>
                         </div>
-                        <button onclick="fetchDashboardStats()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-2.5 px-4 rounded-xl shadow-sm flex items-center gap-2 transition-colors">
+                        <button onclick="fetchDashboardStats()"
+                            class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-2.5 px-4 rounded-xl shadow-sm flex items-center gap-2 transition-colors">
                             <i class="fa-solid fa-arrows-rotate"></i> Perbarui
                         </button>
                     </div>
@@ -291,47 +336,57 @@
                     <!-- Top KPI Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up delay-200">
                         <!-- Warga Dilayani -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
+                        <div
+                            class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
                             <div class="flex justify-between items-start">
                                 <span class="text-slate-500 text-sm font-semibold">Total Warga (Hari Ini)</span>
-                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-users"></i>
                                 </div>
                             </div>
                             <div>
                                 <h3 class="text-3xl font-extrabold text-slate-800" id="dash-total-warga">0</h3>
-                                <p class="text-xs text-green-500 mt-1 font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> Real-time Active</p>
+                                <p class="text-xs text-green-500 mt-1 font-semibold flex items-center gap-1"><i
+                                        class="fa-solid fa-arrow-trend-up"></i> Real-time Active</p>
                             </div>
                         </div>
 
                         <!-- Deflection Rate -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full relative overflow-hidden hover-card">
+                        <div
+                            class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full relative overflow-hidden hover-card">
                             <div class="flex justify-between items-start z-10">
                                 <span class="text-slate-500 text-sm font-semibold">Resolusi Bot AI</span>
-                                <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-robot"></i>
                                 </div>
                             </div>
                             <div class="flex items-end justify-between mt-3 z-10">
                                 <div class="mb-1">
-                                     <p class="text-xs text-slate-500 font-semibold">Selesai tanpa Admin</p>
+                                    <p class="text-xs text-slate-500 font-semibold">Selesai tanpa Admin</p>
                                 </div>
                                 <div class="relative w-14 h-14 flex items-center justify-center shrink-0">
                                     <canvas id="aiResolutionChart"></canvas>
                                     <div class="absolute inset-0 flex flex-col items-center justify-center mt-0.5">
-                                        <span class="text-[13px] font-extrabold text-slate-800" id="dash-ai-resolution-text">0%</span>
+                                        <span class="text-[13px] font-extrabold text-slate-800"
+                                            id="dash-ai-resolution-text">0%</span>
                                     </div>
                                 </div>
                             </div>
                             <!-- Dekorasi Glow Background -->
-                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-400 rounded-full blur-[40px] opacity-20 pointer-events-none"></div>
+                            <div
+                                class="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-400 rounded-full blur-[40px] opacity-20 pointer-events-none">
+                            </div>
                         </div>
 
                         <!-- Token Usage -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
+                        <div
+                            class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
                             <div class="flex justify-between items-start">
                                 <span class="text-slate-500 text-sm font-semibold">Pemakaian Token AI</span>
-                                <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-bolt"></i>
                                 </div>
                             </div>
@@ -342,15 +397,18 @@
                         </div>
 
                         <!-- Avg Response Time -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
+                        <div
+                            class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between h-full gap-3 hover-card">
                             <div class="flex justify-between items-start">
                                 <span class="text-slate-500 text-sm font-semibold">Kecepatan Respon</span>
-                                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-stopwatch"></i>
                                 </div>
                             </div>
                             <div>
-                                <h3 class="text-3xl font-extrabold text-slate-800"><span id="dash-avg-response">0</span> <span class="text-lg">ms</span></h3>
+                                <h3 class="text-3xl font-extrabold text-slate-800"><span id="dash-avg-response">0</span>
+                                    <span class="text-lg">ms</span></h3>
                                 <p class="text-xs text-slate-500 mt-1 font-semibold">Rata-rata waktu proses</p>
                             </div>
                         </div>
@@ -359,7 +417,8 @@
                     <!-- Chart & Table Area -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-up delay-300">
                         <!-- Chart -->
-                        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm lg:col-span-2 flex flex-col h-[400px] hover-card">
+                        <div
+                            class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm lg:col-span-2 flex flex-col h-[400px] hover-card">
                             <div class="flex justify-between items-center mb-6 shrink-0">
                                 <h3 class="font-bold text-slate-800">Grafik Aktivitas Interaksi (Hari Ini)</h3>
                             </div>
@@ -370,10 +429,12 @@
 
                         <!-- Right Column: Recent Qs & Top Intents -->
                         <div class="flex flex-col gap-6 h-[400px] overflow-y-auto custom-scrollbar pr-1">
-                            
+
                             <!-- Top Intents -->
-                            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col hover-card">
-                                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                            <div
+                                class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col hover-card">
+                                <div
+                                    class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
                                     <h3 class="font-bold text-slate-800">Topik Populer</h3>
                                 </div>
                                 <div class="p-4 flex flex-col gap-3" id="dash-top-intents">
@@ -382,15 +443,18 @@
                             </div>
 
                             <!-- Recent Questions -->
-                            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col hover-card">
-                                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                            <div
+                                class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col hover-card">
+                                <div
+                                    class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
                                     <h3 class="font-bold text-slate-800">Riwayat Terakhir</h3>
                                 </div>
                                 <div class="p-5 flex flex-col gap-4" id="dash-recent-questions">
                                     <div class="text-center text-slate-400 py-10">Memuat riwayat...</div>
                                 </div>
                                 <div class="p-4 border-t border-slate-100 mt-auto bg-slate-50 rounded-b-2xl">
-                                    <button onclick="switchTab('live-chat')" class="w-full text-center text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors">
+                                    <button onclick="switchTab('live-chat')"
+                                        class="w-full text-center text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors">
                                         Lihat Semua Obrolan &rarr;
                                     </button>
                                 </div>
@@ -406,7 +470,8 @@
             <div id="tab-live-chat" class="tab-content w-full h-full">
 
                 <!-- Sub-Sidebar: Active Sessions -->
-                <div id="chat-sidebar" class="w-full md:w-[320px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-10">
+                <div id="chat-sidebar"
+                    class="w-full md:w-[320px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-10">
                     <div class="p-5 border-b border-slate-100">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="font-bold text-slate-800">Active Sessions</h2>
@@ -438,12 +503,14 @@
                 </div>
 
                 <!-- Chat Console (Right Area) -->
-                <div id="chat-console" class="flex-1 flex flex-col bg-[#f8fafc] hidden md:flex w-full md:w-auto absolute md:relative inset-0 z-20">
+                <div id="chat-console"
+                    class="flex-1 flex flex-col bg-[#f8fafc] hidden md:flex w-full md:w-auto absolute md:relative inset-0 z-20">
                     <!-- Chat Header -->
                     <div
                         class="h-[72px] px-4 md:px-6 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
                         <div class="flex items-center gap-3">
-                            <button onclick="backToChatList()" class="md:hidden w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-lg">
+                            <button onclick="backToChatList()"
+                                class="md:hidden w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-lg">
                                 <i class="fa-solid fa-arrow-left"></i>
                             </button>
                             <div class="relative">
@@ -483,40 +550,83 @@
                         <!-- Toolbar -->
                         <div class="flex items-center gap-1 mb-2 px-2">
                             <button type="button" onclick="openLinkModal('admin-input')"
-                                class="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Sisipkan Link"><i
-                                    class="fa-solid fa-link text-xs"></i></button>
-                            
+                                class="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                                title="Sisipkan Link"><i class="fa-solid fa-link text-xs"></i></button>
+
                             <div class="relative">
                                 <button type="button" id="emoji-trigger" onclick="toggleEmojiPicker()"
-                                    class="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Sisipkan Emoji"><i
-                                        class="fa-regular fa-face-smile text-xs"></i></button>
-                                
-                                <!-- Custom Emoji Picker -->
-                                <div id="emoji-picker-container" class="hidden absolute bottom-full left-0 mb-2 bg-white border border-slate-200 shadow-xl rounded-xl p-2 w-[280px] z-50">
-                                    <div class="grid grid-cols-7 gap-1">
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😀')">😀</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😂')">😂</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😊')">😊</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😍')">😍</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🙏')">🙏</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('👍')">👍</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('👌')">👌</button>
-                                        
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😁')">😁</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😅')">😅</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('😎')">😎</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🤔')">🤔</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🙌')">🙌</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🤝')">🤝</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('🔥')">🔥</button>
+                                    class="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                                    title="Sisipkan Emoji"><i class="fa-regular fa-face-smile text-xs"></i></button>
 
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('✅')">✅</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('❌')">❌</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('⚠️')">⚠️</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('ℹ️')">ℹ️</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('📍')">📍</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('📅')">📅</button>
-                                        <button type="button" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg" onclick="insertEmoji('📊')">📊</button>
+                                <!-- Custom Emoji Picker -->
+                                <div id="emoji-picker-container"
+                                    class="hidden absolute bottom-full left-0 mb-2 bg-white border border-slate-200 shadow-xl rounded-xl p-2 w-[280px] z-50">
+                                    <div class="grid grid-cols-7 gap-1">
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('😀')">😀</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('😂')">😂</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('😊')">😊</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('😍')">😍</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('🙏')">🙏</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('👍')">👍</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('👌')">👌</button>
+
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('😁')">😁</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('😅')">😅</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('😎')">😎</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('🤔')">🤔</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('🙌')">🙌</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('🤝')">🤝</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('🔥')">🔥</button>
+
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('✅')">✅</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('❌')">❌</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('⚠️')">⚠️</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('ℹ️')">ℹ️</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('📍')">📍</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('📅')">📅</button>
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded text-lg"
+                                            onclick="insertEmoji('📊')">📊</button>
                                     </div>
                                 </div>
                             </div>
@@ -724,10 +834,12 @@
                         </div>
 
                         <!-- Indexed Docs -->
-                        <div id="rag-docs-container" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-[280px] flex flex-col">
+                        <div id="rag-docs-container"
+                            class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-[280px] flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
                                 <h4 class="font-bold text-slate-800">Recently Indexed Documents</h4>
-                                <a href="#" id="view-all-docs-btn" onclick="openViewAllDocsModal(event)" class="text-xs font-bold text-primary-600 hover:underline">View All</a>
+                                <a href="#" id="view-all-docs-btn" onclick="openViewAllDocsModal(event)"
+                                    class="text-xs font-bold text-primary-600 hover:underline">View All</a>
                             </div>
 
                             <div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 custom-scrollbar"
@@ -751,75 +863,108 @@
                             <p class="text-slate-500 mt-1">Kelola jam layanan Live Chat dan keamanan akun Admin</p>
                         </div>
                     </div>
-                    
+
                     <!-- Live Chat Settings -->
                     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-headset text-primary-500"></i> Layanan Live Chat</h3>
-                        
-                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i
+                                class="fa-solid fa-headset text-primary-500"></i> Layanan Live Chat</h3>
+
+                        <div
+                            class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
                             <div>
                                 <h4 class="text-sm font-bold text-slate-800">Mode Libur Darurat / Cuti</h4>
-                                <p class="text-xs text-slate-500 mt-1">Tutup layanan chat dengan Admin saat ini juga tanpa mempedulikan jadwal.</p>
+                                <p class="text-xs text-slate-500 mt-1">Tutup layanan chat dengan Admin saat ini juga
+                                    tanpa mempedulikan jadwal.</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="setting-emergency" class="sr-only peer">
-                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                <div
+                                    class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500">
+                                </div>
                             </label>
                         </div>
 
                         <div class="grid grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Hari Mulai Buka</label>
-                                <select id="setting-start-day" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-white shadow-sm">
-                                    <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option><option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option><option value="0">Minggu</option>
+                                <select id="setting-start-day"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-white shadow-sm">
+                                    <option value="1">Senin</option>
+                                    <option value="2">Selasa</option>
+                                    <option value="3">Rabu</option>
+                                    <option value="4">Kamis</option>
+                                    <option value="5">Jumat</option>
+                                    <option value="6">Sabtu</option>
+                                    <option value="0">Minggu</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Hari Tutup</label>
-                                <select id="setting-end-day" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-white shadow-sm">
-                                    <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option><option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option><option value="0">Minggu</option>
+                                <select id="setting-end-day"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-white shadow-sm">
+                                    <option value="1">Senin</option>
+                                    <option value="2">Selasa</option>
+                                    <option value="3">Rabu</option>
+                                    <option value="4">Kamis</option>
+                                    <option value="5">Jumat</option>
+                                    <option value="6">Sabtu</option>
+                                    <option value="0">Minggu</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Jam Buka (WIB)</label>
-                                <input type="time" id="setting-start-time" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm">
+                                <input type="time" id="setting-start-time"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Jam Tutup (WIB)</label>
-                                <input type="time" id="setting-end-time" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm">
+                                <input type="time" id="setting-end-time"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm">
                             </div>
                         </div>
                     </div>
 
                     <!-- Admin Account Settings -->
                     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-lock text-slate-500"></i> Keamanan Akun Admin</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i
+                                class="fa-solid fa-lock text-slate-500"></i> Keamanan Akun Admin</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Username Admin</label>
-                                <input type="text" id="setting-username" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="Contoh: Admin BPS">
+                                <input type="text" id="setting-username"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
+                                    placeholder="Contoh: Admin BPS">
                             </div>
                             <div class="md:col-span-2 pt-4 border-t border-slate-100">
                                 <h4 class="text-sm font-bold text-slate-800 mb-4">Ganti Sandi (Opsional)</h4>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Saat Ini <span class="text-slate-400 font-normal">(Diperlukan jika ganti sandi)</span></label>
-                                <input type="password" id="setting-old-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="••••••••">
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Saat Ini <span
+                                        class="text-slate-400 font-normal">(Diperlukan jika ganti sandi)</span></label>
+                                <input type="password" id="setting-old-password"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
+                                    placeholder="••••••••">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Sandi Baru</label>
-                                <input type="password" id="setting-new-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="Minimal 6 karakter">
+                                <input type="password" id="setting-new-password"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
+                                    placeholder="Minimal 6 karakter">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2">Konfirmasi Sandi Baru</label>
-                                <input type="password" id="setting-confirm-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm" placeholder="Ulangi sandi baru">
+                                <input type="password" id="setting-confirm-password"
+                                    class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 shadow-sm"
+                                    placeholder="Ulangi sandi baru">
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="flex justify-end gap-3 mt-4">
-                        <button onclick="switchTab('live-chat')" class="px-6 py-3 text-sm font-bold text-slate-500 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors shadow-sm">Batal</button>
-                        <button onclick="saveSettings()" class="px-6 py-3 text-sm font-bold bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors shadow flex items-center gap-2">
+                        <button onclick="switchTab('live-chat')"
+                            class="px-6 py-3 text-sm font-bold text-slate-500 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors shadow-sm">Batal</button>
+                        <button onclick="saveSettings()"
+                            class="px-6 py-3 text-sm font-bold bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors shadow flex items-center gap-2">
                             <i class="fa-solid fa-save"></i> Simpan Pengaturan
                         </button>
                     </div>
@@ -842,15 +987,23 @@
                     <!-- 1. Live Chat -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <div class="w-8 h-8 rounded bg-primary-100 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-comments"></i></div>
+                            <div
+                                class="w-8 h-8 rounded bg-primary-100 text-primary-600 flex items-center justify-center">
+                                <i class="fa-solid fa-comments"></i></div>
                             1. Manajemen Live Chat
                         </h3>
                         <div class="text-sm text-slate-600 space-y-3 ml-10">
-                            <p>Fitur Live Chat digunakan untuk memantau dan membalas pesan warga secara <i>real-time</i>.</p>
+                            <p>Fitur Live Chat digunakan untuk memantau dan membalas pesan warga secara
+                                <i>real-time</i>.</p>
                             <ul class="list-disc pl-5 space-y-1">
-                                <li><strong>Pengambilalihan Otomatis:</strong> Jika warga mengetik kata kunci seperti <i>"Hubungi Admin"</i> pada jam kerja, bot akan otomatis berhenti membalas dan mengoper sesi ke Admin.</li>
-                                <li><strong>Mengakhiri Sesi:</strong> Untuk mengakhiri sesi obrolan secara paksa, ketikkan perintah <code>/selesai</code> di kotak pesan lalu kirim. Bot BIPS akan kembali melayani warga tersebut.</li>
-                                <li><strong>Indikator Butuh Bantuan:</strong> Warga yang meminta admin akan mendapatkan badge merah <b>(Butuh Petugas)</b> dan naik ke urutan teratas daftar obrolan.</li>
+                                <li><strong>Pengambilalihan Otomatis:</strong> Jika warga mengetik kata kunci seperti
+                                    <i>"Hubungi Admin"</i> pada jam kerja, bot akan otomatis berhenti membalas dan
+                                    mengoper sesi ke Admin.</li>
+                                <li><strong>Mengakhiri Sesi:</strong> Untuk mengakhiri sesi obrolan secara paksa,
+                                    ketikkan perintah <code>/selesai</code> di kotak pesan lalu kirim. Bot BIPS akan
+                                    kembali melayani warga tersebut.</li>
+                                <li><strong>Indikator Butuh Bantuan:</strong> Warga yang meminta admin akan mendapatkan
+                                    badge merah <b>(Butuh Petugas)</b> dan naik ke urutan teratas daftar obrolan.</li>
                             </ul>
                         </div>
                     </div>
@@ -858,15 +1011,23 @@
                     <!-- 2. Knowledge Base NLU -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <div class="w-8 h-8 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-brain"></i></div>
+                            <div class="w-8 h-8 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                <i class="fa-solid fa-brain"></i></div>
                             2. Knowledge Base NLU (Kecerdasan Inti)
                         </h3>
                         <div class="text-sm text-slate-600 space-y-3 ml-10">
-                            <p>Menu ini adalah otak utama bot. Di sini Anda melatih bot mengenali pertanyaan umum (FAQ).</p>
+                            <p>Menu ini adalah otak utama bot. Di sini Anda melatih bot mengenali pertanyaan umum (FAQ).
+                            </p>
                             <ul class="list-disc pl-5 space-y-1">
-                                <li><strong>Intent:</strong> Nama/kategori topik bahasan (contoh: <code>tanya_jam_kerja</code>). Nama harus disambung dengan garis bawah (<i>underscore</i>).</li>
-                                <li><strong>Training Phrases:</strong> Pancingan kalimat warga. Usahakan masukkan minimal 5 variasi pertanyaan per Intent agar bot semakin pintar mengenali.</li>
-                                <li><strong>Penting: Latih AI!</strong> Setelah menambah atau mengubah Intent, Anda <b>WAJIB</b> menekan tombol <span class="bg-primary-600 text-white px-2 py-0.5 rounded text-xs">Latih Ulang AI (Train)</span> di sudut kanan atas layar agar perubahan tersimpan permanen.</li>
+                                <li><strong>Intent:</strong> Nama/kategori topik bahasan (contoh:
+                                    <code>tanya_jam_kerja</code>). Nama harus disambung dengan garis bawah
+                                    (<i>underscore</i>).</li>
+                                <li><strong>Training Phrases:</strong> Pancingan kalimat warga. Usahakan masukkan
+                                    minimal 5 variasi pertanyaan per Intent agar bot semakin pintar mengenali.</li>
+                                <li><strong>Penting: Latih AI!</strong> Setelah menambah atau mengubah Intent, Anda
+                                    <b>WAJIB</b> menekan tombol <span
+                                        class="bg-primary-600 text-white px-2 py-0.5 rounded text-xs">Latih Ulang AI
+                                        (Train)</span> di sudut kanan atas layar agar perubahan tersimpan permanen.</li>
                             </ul>
                         </div>
                     </div>
@@ -874,15 +1035,22 @@
                     <!-- 3. AI Management LLM -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <div class="w-8 h-8 rounded bg-purple-100 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-microchip"></i></div>
+                            <div class="w-8 h-8 rounded bg-purple-100 text-purple-600 flex items-center justify-center">
+                                <i class="fa-solid fa-microchip"></i></div>
                             3. AI Management LLM (RAG / Otak Kedua)
                         </h3>
                         <div class="text-sm text-slate-600 space-y-3 ml-10">
-                            <p>Generative AI (seperti Groq/Gemini) bertindak sebagai pelapis (fallback). Jika bot NLU tidak menemukan jawaban yang tepat, ia akan membaca dokumen PDF yang Anda unggah untuk menjawab warga.</p>
+                            <p>Generative AI (seperti Groq/Gemini) bertindak sebagai pelapis (fallback). Jika bot NLU
+                                tidak menemukan jawaban yang tepat, ia akan membaca dokumen PDF yang Anda unggah untuk
+                                menjawab warga.</p>
                             <ul class="list-disc pl-5 space-y-1">
-                                <li><strong>Unggah PDF:</strong> Anda dapat mengunggah file publikasi resmi BPS (hanya PDF). Bot akan menyerap teksnya.</li>
-                                <li><strong>Format Teks:</strong> Pastikan PDF yang diunggah berisi teks yang bisa di-<i>copy-paste</i>, bukan gambar hasil <i>scan</i>. AI tidak bisa membaca gambar.</li>
-                                <li><strong>Limit Token:</strong> Penggunaan AI dihitung dalam jumlah Token. Statistik harian token dapat dilihat di atas halaman.</li>
+                                <li><strong>Unggah PDF:</strong> Anda dapat mengunggah file publikasi resmi BPS (hanya
+                                    PDF). Bot akan menyerap teksnya.</li>
+                                <li><strong>Format Teks:</strong> Pastikan PDF yang diunggah berisi teks yang bisa
+                                    di-<i>copy-paste</i>, bukan gambar hasil <i>scan</i>. AI tidak bisa membaca gambar.
+                                </li>
+                                <li><strong>Limit Token:</strong> Penggunaan AI dihitung dalam jumlah Token. Statistik
+                                    harian token dapat dilihat di atas halaman.</li>
                             </ul>
                         </div>
                     </div>
@@ -890,15 +1058,22 @@
                     <!-- 4. Pengaturan Sistem -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <div class="w-8 h-8 rounded bg-slate-100 text-slate-600 flex items-center justify-center"><i class="fa-solid fa-cog"></i></div>
+                            <div class="w-8 h-8 rounded bg-slate-100 text-slate-600 flex items-center justify-center"><i
+                                    class="fa-solid fa-cog"></i></div>
                             4. Pengaturan Sistem & Keamanan
                         </h3>
                         <div class="text-sm text-slate-600 space-y-3 ml-10">
-                            <p>Halaman pengaturan digunakan untuk mengubah profil admin dan menetapkan jadwal operasional Live Chat.</p>
+                            <p>Halaman pengaturan digunakan untuk mengubah profil admin dan menetapkan jadwal
+                                operasional Live Chat.</p>
                             <ul class="list-disc pl-5 space-y-1">
-                                <li><strong>Jam Operasional:</strong> Tentukan hari dan jam di mana warga diizinkan memanggil Admin. Di luar jam ini, bot akan menolak permintaan warga yang ingin chat dengan Admin.</li>
-                                <li><strong>Mode Darurat (Libur):</strong> Jika dicentang, layanan Admin akan ditutup total terlepas dari jam operasionalnya.</li>
-                                <li><strong>Ganti Password:</strong> Pastikan mengingat password baru Anda! Jika Anda kelupaan kata sandi dan terkunci dari sistem, hubungi bagian IT BPS untuk mereset sandi Anda melalui terminal/server secara aman.</li>
+                                <li><strong>Jam Operasional:</strong> Tentukan hari dan jam di mana warga diizinkan
+                                    memanggil Admin. Di luar jam ini, bot akan menolak permintaan warga yang ingin chat
+                                    dengan Admin.</li>
+                                <li><strong>Mode Darurat (Libur):</strong> Jika dicentang, layanan Admin akan ditutup
+                                    total terlepas dari jam operasionalnya.</li>
+                                <li><strong>Ganti Password:</strong> Pastikan mengingat password baru Anda! Jika Anda
+                                    kelupaan kata sandi dan terkunci dari sistem, hubungi bagian IT BPS untuk mereset
+                                    sandi Anda melalui terminal/server secara aman.</li>
                             </ul>
                         </div>
                     </div>
@@ -964,7 +1139,7 @@
                 // Force reflow
                 void el.offsetWidth;
             });
-            
+
             const newTab = document.getElementById('tab-' + tabId);
             setTimeout(() => {
                 newTab.classList.add('active');
@@ -1753,7 +1928,7 @@
             document.getElementById('active-user-title').innerText = displayName;
             unreadCounts[id] = 0;
             renderUserList();
-            
+
             // Mobile Responsive Logic
             if (window.innerWidth < 768) {
                 document.getElementById('chat-sidebar').classList.add('hidden');
@@ -1761,7 +1936,7 @@
                 document.getElementById('chat-console').classList.remove('hidden');
                 document.getElementById('chat-console').classList.add('flex');
             }
-            
+
             const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = '';
             try {
@@ -1956,28 +2131,28 @@
         // ==========================================
         // 📚 DOKUMEN EKSTERNAL RAG (PDF)
         // ==========================================
-        
+
         async function handleLlmSync() {
             const btn = document.getElementById('llm-sync-btn');
             const icon = document.getElementById('llm-sync-icon');
-            if(btn) btn.disabled = true;
-            if(icon) icon.classList.add('animate-spin');
-            
+            if (btn) btn.disabled = true;
+            if (icon) icon.classList.add('animate-spin');
+
             try {
                 await new Promise(r => setTimeout(r, 500)); // Delay UX
                 await Promise.all([fetchExternalDocs(), fetchTokenUsage()]);
                 showToastAlert('✅ Tersinkronisasi', 'Data LLM dan Token berhasil diperbarui.');
-            } catch(e) {
+            } catch (e) {
                 showToastAlert('❌ Gagal', 'Sinkronisasi gagal.');
             } finally {
-                if(btn) btn.disabled = false;
-                if(icon) icon.classList.remove('animate-spin');
+                if (btn) btn.disabled = false;
+                if (icon) icon.classList.remove('animate-spin');
             }
         }
 
         async function fetchExternalDocs() {
             try {
-                const res = await fetch('/api/bot/docs', { 
+                const res = await fetch('/api/bot/docs', {
                     headers: { 'Authorization': `Bearer ${adminToken}` },
                     cache: 'no-store' // Mencegah browser nge-cache list lama
                 });
@@ -2023,7 +2198,7 @@
             try {
                 const res = await fetch(`/api/bot/docs/${encodeURIComponent(filename)}`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
                 const data = await res.json();
-                
+
                 if (res.ok) {
                     document.getElementById('doc-viewer-title').innerText = data.filename;
                     document.getElementById('doc-viewer-content').innerText = data.content;
@@ -2035,7 +2210,7 @@
                 showToastAlert('❌ Gagal', 'Koneksi ke server terputus.');
             }
         }
-        
+
         function closeDocumentViewer() {
             document.getElementById('document-viewer-modal').classList.add('hidden');
         }
@@ -2049,9 +2224,9 @@
 
             const btnLabel = event.target.parentElement.querySelector('.font-bold');
             const iconDiv = event.target.parentElement.querySelector('.fa-cloud-arrow-up');
-            
+
             const originalText = btnLabel ? btnLabel.innerText : 'Upload File';
-            
+
             if (btnLabel) btnLabel.innerText = "Mengunggah...";
             if (iconDiv) {
                 iconDiv.classList.remove('fa-cloud-arrow-up');
@@ -2143,13 +2318,13 @@
         // Initialize Fetching RAG
         fetchExternalDocs();
         fetchTokenUsage();
-        
+
         function openViewAllDocsModal(e) {
             e.preventDefault();
             const modal = document.getElementById('view-all-docs-modal');
             const mainGrid = document.getElementById('rag-documents-grid');
             const modalGrid = document.getElementById('view-all-docs-grid');
-            
+
             modalGrid.innerHTML = mainGrid.innerHTML;
             modal.classList.remove('hidden');
         }
@@ -2190,7 +2365,8 @@
     <div id="document-viewer-modal"
         class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] hidden flex justify-center items-center">
         <div class="bg-white w-[800px] max-w-[90vw] h-[80vh] rounded-2xl shadow-xl flex flex-col scale-in">
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0">
+            <div
+                class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                         <i class="fa-solid fa-file-lines"></i>
@@ -2206,15 +2382,18 @@
                 </button>
             </div>
             <div class="p-6 flex-1 overflow-y-auto bg-white custom-scrollbar rounded-b-2xl">
-                <pre id="doc-viewer-content" class="text-xs text-slate-600 whitespace-pre-wrap font-mono leading-relaxed p-4 bg-slate-50 rounded-xl border border-slate-200"></pre>
+                <pre id="doc-viewer-content"
+                    class="text-xs text-slate-600 whitespace-pre-wrap font-mono leading-relaxed p-4 bg-slate-50 rounded-xl border border-slate-200"></pre>
             </div>
         </div>
     </div>
 
     <!-- View All Docs Modal -->
-    <div id="view-all-docs-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center">
+    <div id="view-all-docs-modal"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center">
         <div class="bg-white w-[600px] max-w-[90vw] h-[80vh] rounded-2xl shadow-xl flex flex-col scale-in">
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0">
+            <div
+                class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center">
                         <i class="fa-solid fa-folder-open"></i>
@@ -2224,17 +2403,20 @@
                         <p class="text-[11px] text-slate-500 font-medium">Semua dokumen PDF di otak AI</p>
                     </div>
                 </div>
-                <button onclick="closeViewAllDocsModal()" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors flex items-center justify-center">
+                <button onclick="closeViewAllDocsModal()"
+                    class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors flex items-center justify-center">
                     <i class="fa-solid fa-times"></i>
                 </button>
             </div>
-            
+
             <div class="px-6 py-3 border-b border-slate-100 bg-white shrink-0">
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                         <i class="fa-solid fa-search"></i>
                     </span>
-                    <input type="text" id="view-all-docs-search" onkeyup="searchViewAllDocs()" placeholder="Cari nama dokumen..." class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 block pl-10 p-2.5 outline-none transition-colors">
+                    <input type="text" id="view-all-docs-search" onkeyup="searchViewAllDocs()"
+                        placeholder="Cari nama dokumen..."
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 block pl-10 p-2.5 outline-none transition-colors">
                 </div>
             </div>
 
@@ -2243,7 +2425,7 @@
             </div>
         </div>
     </div>
-    
+
 
 
     <script>
@@ -2252,7 +2434,7 @@
             fetch('/api/bot/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } })
                 .then(res => res.json())
                 .then(data => {
-                    if(data && data.admin && data.admin.username) {
+                    if (data && data.admin && data.admin.username) {
                         document.getElementById('sidebar-admin-name').innerText = data.admin.username;
                         document.getElementById('sidebar-admin-avatar').src = `https://ui-avatars.com/api/?name=${data.admin.username}&background=eff6ff&color=2563eb`;
                     }
@@ -2296,7 +2478,7 @@
                 const kpiIds = ['dash-total-warga', 'dash-ai-resolution-text', 'dash-total-tokens', 'dash-avg-response'];
                 kpiIds.forEach(id => {
                     const el = document.getElementById(id);
-                    if(el) el.classList.add('skeleton');
+                    if (el) el.classList.add('skeleton');
                 });
 
                 const res = await fetch('/api/bot/dashboard-stats', { headers: { 'Authorization': `Bearer ${adminToken}` } });
@@ -2306,7 +2488,7 @@
                 // Hapus Skeleton Loading
                 kpiIds.forEach(id => {
                     const el = document.getElementById(id);
-                    if(el) el.classList.remove('skeleton');
+                    if (el) el.classList.remove('skeleton');
                 });
 
                 // Update KPI dengan Animasi
@@ -2318,7 +2500,7 @@
                 // Update Line Chart (Activity) with Gradients
                 const ctx = document.getElementById('activityChart').getContext('2d');
                 if (dashboardChartInstance) dashboardChartInstance.destroy();
-                
+
                 // Buat Gradient untuk Garis
                 const gradientStroke = ctx.createLinearGradient(0, 0, 500, 0);
                 gradientStroke.addColorStop(0, '#a855f7'); // Purple
@@ -2328,11 +2510,11 @@
                 const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
                 gradientFill.addColorStop(0, 'rgba(168, 85, 247, 0.4)'); // Purple semi-transparan
                 gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.05)'); // Blue transparan
-                
+
                 dashboardChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: Array.from({length: 24}, (_, i) => `${i.toString().padStart(2, '0')}:00`),
+                        labels: Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`),
                         datasets: [{
                             label: 'Jumlah Pesan Warga',
                             data: data.hourlyData,
@@ -2392,11 +2574,11 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         cutout: '80%', // Ketebalan donut
-                        plugins: { 
+                        plugins: {
                             legend: { display: false },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
+                                    label: function (context) {
                                         return ' ' + context.label + ': ' + context.raw + '%';
                                     }
                                 }
@@ -2416,7 +2598,7 @@
                         // limit message length
                         const shortMsg = q.message.length > 60 ? q.message.substring(0, 60) + '...' : q.message;
                         const aliasName = userAliases[q.sender_id] || q.sender_id;
-                        
+
                         rcContainer.innerHTML += `
                             <div class="flex flex-col gap-1 pb-3 border-b border-slate-100 last:border-0 last:pb-0">
                                 <div class="flex justify-between items-center">
@@ -2462,7 +2644,7 @@
         // Settings Page Logic
         async function openSettingsPage() {
             toggleProfileMenu(); // Close dropdown
-            
+
             // Switch tab
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => {
@@ -2474,12 +2656,12 @@
             try {
                 const res = await fetch('/api/bot/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } });
                 const data = await res.json();
-                
+
                 document.getElementById('setting-username').value = data.admin.username;
                 document.getElementById('setting-old-password').value = '';
                 document.getElementById('setting-new-password').value = '';
                 document.getElementById('setting-confirm-password').value = '';
-                
+
                 document.getElementById('setting-emergency').checked = data.liveChat.isEmergencyLeave;
                 document.getElementById('setting-start-day').value = data.liveChat.startDay;
                 document.getElementById('setting-end-day').value = data.liveChat.endDay;
@@ -2503,7 +2685,7 @@
 
             // Validasi Standar RPL
             if (!username) return showToastAlert('❌ Gagal', 'Username tidak boleh kosong!');
-            
+
             if (newPassword || oldPassword) {
                 if (!oldPassword) return showToastAlert('⚠️ Peringatan', 'Harap masukkan Sandi Lama untuk mengubah sandi.');
                 if (!newPassword) return showToastAlert('⚠️ Peringatan', 'Sandi Baru tidak boleh kosong.');
@@ -2516,7 +2698,7 @@
                 admin: { username },
                 liveChat: { isEmergencyLeave, startDay, endDay, startTime, endTime }
             };
-            
+
             if (newPassword) {
                 payload.admin.oldPassword = oldPassword;
                 payload.admin.password = newPassword;
@@ -2528,7 +2710,7 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
                     body: JSON.stringify(payload)
                 });
-                
+
                 const data = await res.json();
                 if (res.ok) {
                     // Update UI Sidebar name dynamically
@@ -2560,7 +2742,7 @@
         // Logika Custom Emoji Picker
         function toggleEmojiPicker() {
             const picker = document.getElementById('emoji-picker-container');
-            if(picker.classList.contains('hidden')) {
+            if (picker.classList.contains('hidden')) {
                 picker.classList.remove('hidden');
             } else {
                 picker.classList.add('hidden');
@@ -2572,17 +2754,17 @@
             const start = input.selectionStart || input.value.length;
             const end = input.selectionEnd || input.value.length;
             const val = input.value;
-            
+
             input.value = val.slice(0, start) + emoji + val.slice(end);
             input.focus();
             input.selectionEnd = start + emoji.length;
-            
+
             // Auto close picker setelah memilih (opsional)
             document.getElementById('emoji-picker-container').classList.add('hidden');
         }
 
         // Tutup emoji picker jika admin mengklik di luar area
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const trigger = document.getElementById('emoji-trigger');
             const picker = document.getElementById('emoji-picker-container');
             if (picker && !picker.classList.contains('hidden')) {

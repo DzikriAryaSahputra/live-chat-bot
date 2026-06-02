@@ -67,6 +67,7 @@
       width: 100% !important;
       height: 100% !important;
     }
+
     body.mobile-view #chat-container {
       position: absolute !important;
       bottom: 0 !important;
@@ -77,10 +78,12 @@
       border-radius: 0 !important;
       border: none !important;
     }
-    body.mobile-view #chat-header, 
+
+    body.mobile-view #chat-header,
     body.mobile-view #chat-footer {
       border-radius: 0 !important;
     }
+
     body.mobile-view #open-chat-btn {
       position: absolute !important;
       bottom: 24px !important;
@@ -98,10 +101,11 @@
       class="chat-container relative w-[380px] bg-gray-50 rounded-2xl shadow-widget overflow-hidden flex flex-col border border-gray-200 transition-all transform origin-bottom-right h-[600px] max-h-[80vh]">
 
       <!-- Header -->
-      <header id="chat-header" class="bg-[#0f2b56] text-white p-4 flex items-center justify-between rounded-t-2xl shrink-0">
+      <header id="chat-header"
+        class="bg-[#0f2b56] text-white p-4 flex items-center justify-between rounded-t-2xl shrink-0">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-white/20">
-            <img class="w-full h-full object-cover" alt="BIPS Avatar" src="img/SISCA_BOT.png"
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-white/20 bg-white">
+            <img class="w-full h-full object-contain p-0.5" alt="BIPS Avatar" src="img/pngwing.com.png"
               onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" />
           </div>
           <div>
@@ -137,7 +141,7 @@
         <div class="relative flex items-center">
           <input id="user-input" type="text" autocomplete="off" placeholder="Ketik pesan..."
             class="w-full bg-gray-50 border border-gray-200 rounded-full py-3.5 pl-5 pr-24 text-sm focus:outline-none focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] text-gray-700 placeholder-gray-400 transition-colors" />
-          
+
           <button type="button" id="mic-btn" aria-label="Mulai bicara" title="Bicara ke BIPS"
             class="absolute right-12 text-gray-400 hover:text-[#f59e0b] w-10 h-10 flex items-center justify-center transition-all duration-300 rounded-full">
             <i class="fa-solid fa-microphone text-lg"></i>

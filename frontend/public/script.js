@@ -163,7 +163,7 @@ function showTypingIndicator() {
     let senderName = currentResponder === 'admin' ? 'Petugas BPS' : 'BIPS (Bot Informasi Pelayanan Statistik)';
     let senderFoto = currentResponder === 'admin'
         ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-5 h-5 rounded-full object-cover border border-gray-200">'
-        : `<img src="img/SISCA_BOT.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" alt="Bot" class="w-5 h-5 rounded-full object-cover shadow-sm">`;
+        : `<img src="img/pngwing.com.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" alt="Bot" class="w-5 h-5 rounded-full object-contain p-0.5 bg-white shadow-sm">`;
 
     wrapper.innerHTML = `
         <div class="sender-label label-bot flex items-center gap-1 text-[10px] text-gray-500 ml-1 font-medium">${senderFoto}<span>${senderName}</span></div>
@@ -244,7 +244,7 @@ function appendMessage(sender, text, timestamp = null) {
         let senderName = sender === 'admin' ? 'Petugas BPS' : 'BIPS (Bot Informasi Pelayanan Statistik)';
         let senderFoto = sender === 'admin'
             ? '<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin" class="w-6 h-6 rounded-full object-cover border border-gray-200">'
-            : `<img src="img/SISCA_BOT.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" alt="Bot" class="w-6 h-6 rounded-full object-cover shadow-sm">`;
+            : `<img src="img/pngwing.com.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712139.png'" alt="Bot" class="w-6 h-6 rounded-full object-contain p-0.5 bg-white shadow-sm">`;
 
         wrapper.innerHTML = `
             <div class="sender-label flex items-center gap-2">
