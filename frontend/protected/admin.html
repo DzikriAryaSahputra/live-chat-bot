@@ -985,6 +985,41 @@
                 </div>
             </div>
 
+            <!-- Modal Edit Petugas -->
+            <div id="modal-edit-user" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+                <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl scale-100 transition-transform">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-user-pen text-primary-600"></i> Edit Akun Petugas</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <input type="hidden" id="edit-user-id">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="edit-user-fullname" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Username Login</label>
+                            <input type="text" id="edit-user-username" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Sandi Baru (Opsional)</label>
+                            <input type="password" id="edit-user-password" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50" placeholder="Kosongkan jika tidak ingin ganti sandi">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Tingkat Akses (Role)</label>
+                            <select id="edit-user-role" class="w-full text-sm p-3 border border-slate-200 rounded-xl outline-none focus:border-primary-500 bg-slate-50">
+                                <option value="petugas">Petugas (Customer Service)</option>
+                                <option value="super_admin">Super Admin (Manajer Utama)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-slate-100 flex gap-3 justify-end bg-slate-50">
+                        <button onclick="document.getElementById('modal-edit-user').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors text-sm">Batal</button>
+                        <button onclick="updateUser()" class="px-5 py-2.5 rounded-xl font-bold text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-sm text-sm">Simpan Perubahan</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal Tambah Petugas -->
             <div id="modal-add-user" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
                 <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl scale-100 transition-transform">
@@ -2869,7 +2904,10 @@
                             </td>
                             <td class="p-4 text-slate-500 font-medium">${u.username}</td>
                             <td class="p-4">${roleBadge}</td>
-                            <td class="p-4 text-right">
+                            <td class="p-4 text-right flex justify-end gap-2">
+                                <button onclick="openEditUserModal(${u.id}, '${u.full_name}', '${u.username}', '${u.role}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
                                 <button onclick="deleteAdminUser(${u.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center disabled:opacity-50" ${isMe ? 'disabled title="Tidak bisa menghapus diri sendiri"' : ''}>
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
@@ -2880,6 +2918,49 @@
                 }
             } catch (err) {
                 console.error(err);
+            }
+        }
+
+        function openEditUserModal(id, fullname, username, role) {
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('edit-user-fullname').value = fullname;
+            document.getElementById('edit-user-username').value = username;
+            document.getElementById('edit-user-role').value = role;
+            document.getElementById('edit-user-password').value = '';
+            document.getElementById('modal-edit-user').classList.remove('hidden');
+        }
+
+        async function updateUser() {
+            const id = document.getElementById('edit-user-id').value;
+            const fullName = document.getElementById('edit-user-fullname').value.trim();
+            const username = document.getElementById('edit-user-username').value.trim();
+            const password = document.getElementById('edit-user-password').value;
+            const role = document.getElementById('edit-user-role').value;
+
+            if (!fullName || !username) {
+                return showToastAlert('⚠️ Peringatan', 'Harap isi nama lengkap dan username.');
+            }
+
+            try {
+                const res = await fetch(`/api/admin/users/${id}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: JSON.stringify({ username, password, fullName, role })
+                });
+
+                if (res.ok) {
+                    showToastAlert('✅ Berhasil', 'Akun petugas berhasil diperbarui.');
+                    document.getElementById('modal-edit-user').classList.add('hidden');
+                    fetchAdminUsers();
+                } else {
+                    const data = await res.json();
+                    showToastAlert('❌ Gagal', data.error || 'Gagal memperbarui petugas.');
+                }
+            } catch (err) {
+                showToastAlert('❌ Gagal', 'Server error.');
             }
         }
 

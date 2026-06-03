@@ -409,6 +409,7 @@ ${knowledgeStr}
 }
 
 let activeSessions = {};
+let isTrainingModel = false;
 
 // Middleware Socket.io: Verifikasi Token Admin
 io.use((socket, next) => {
@@ -802,6 +803,19 @@ app.post('/api/admin/users', authenticateJWT, requireSuperAdmin, async (req, res
         await db.query('INSERT INTO admin_users (username, password_hash, full_name, role) VALUES ($1, $2, $3, $4)', [username, hashed, fullName, role]);
         res.json({ message: 'Pengguna ditambahkan!' });
     } catch (err) { res.status(500).json({ error: 'Gagal menambah pengguna (mungkin username sudah ada)' }); }
+});
+
+app.put('/api/admin/users/:id', authenticateJWT, requireSuperAdmin, async (req, res) => {
+    try {
+        const { username, password, fullName, role } = req.body;
+        if (password) {
+            const hashed = bcrypt.hashSync(password, 10);
+            await db.query('UPDATE admin_users SET username = $1, password_hash = $2, full_name = $3, role = $4 WHERE id = $5', [username, hashed, fullName, role, req.params.id]);
+        } else {
+            await db.query('UPDATE admin_users SET username = $1, full_name = $2, role = $3 WHERE id = $4', [username, fullName, role, req.params.id]);
+        }
+        res.json({ message: 'Pengguna diperbarui!' });
+    } catch (err) { res.status(500).json({ error: 'Gagal memperbarui pengguna (mungkin username sudah ada)' }); }
 });
 
 app.delete('/api/admin/users/:id', authenticateJWT, requireSuperAdmin, async (req, res) => {

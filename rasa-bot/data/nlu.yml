@@ -88,19 +88,6 @@ nlu:
       - jam berapa buka
       - jam operasional
       - jam buka
-  - intent: tanya_seluruh_sekolah
-    examples: |
-      - ada berapa sekolah di jambi?
-      - berapa sekolah di jambi?
-      - di jambi ada berapa sekolah?
-      - sekolah di jambi
-      - sekolah
-  - intent: tanya_lansia
-    examples: |
-      - ada berapa lansia dijambi?
-      - berapa lansia
-      - lansia jambi
-
   - intent: terima_kasih
     examples: |
       - terima kasih
@@ -139,3 +126,10 @@ nlu:
       - cara buat kopi
       - kapan kiamat
       - game yang seru apa
+  - intent: tanya_seluruh_sekolah
+    examples: |
+      - ada berapa sekolah di jambi?
+      - berapa sekolah di jambi?
+      - di jambi ada berapa sekolah?
+      - sekolah di jambi
+      - sekolah
