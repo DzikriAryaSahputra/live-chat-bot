@@ -1,7 +1,7 @@
 @echo off
 color 0B
 echo =======================================================
-echo     AUTO-INSTALLER BPS LIVE CHAT BOT (SISCA)
+echo     AUTO-INSTALLER BPS LIVE CHAT BOT (BIPS)
 echo =======================================================
 echo.
 

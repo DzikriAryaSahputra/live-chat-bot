@@ -1,6 +1,6 @@
 =======================================================
 DAFTAR REQUIREMENTS & TEKNOLOGI (TECH STACK)
-BPS LIVE CHAT BOT (SISCA)
+BPS LIVE CHAT BOT (BIPS)
 =======================================================
 Dokumen ini berisi daftar lengkap semua alat (tools), bahasa pemrograman,
 dan pustaka (dependencies) yang digunakan untuk membangun proyek ini.

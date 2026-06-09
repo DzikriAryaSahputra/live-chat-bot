@@ -1,6 +1,6 @@
 # BPS Live Monitor & AI Chatbot
 
-Aplikasi ini adalah asisten pintar (S.I.S.C.A) untuk Badan Pusat Statistik (BPS) Kota Jambi, yang memadukan Live Chat Customer Service (Handoff ke Petugas Manusia) dan AI Chatbot (Rasa NLP + RAG dengan LLM Groq/Gemini).
+Aplikasi ini adalah asisten pintar (BIPS) untuk Badan Pusat Statistik (BPS) Kota Jambi, yang memadukan Live Chat Customer Service (Handoff ke Petugas Manusia) dan AI Chatbot (Rasa NLP + RAG dengan LLM Groq/Gemini).
 
 Aplikasi dibangun menggunakan arsitektur Microservices, memisahkan backend Node.js (untuk Socket.IO dan manajemen dashboard) dengan engine Python Rasa (untuk pemrosesan bahasa alami).
 
@@ -145,7 +145,7 @@ server {
 
 ```html
 <!-- ========================================== -->
-<!-- S.I.S.C.A. (Sistem Informasi Statistik & Chat Asisten) -->
+<!-- B.I.P.S. (BPS Intelligence & Public Service) -->
 <!-- ========================================== -->
 <script src="https://chat.bpsjambi.go.id/widget.js"></script>
 ```

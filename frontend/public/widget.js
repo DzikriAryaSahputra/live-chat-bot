@@ -1,12 +1,12 @@
 (function() {
-    // 1. Buat elemen Iframe penyedia chatbot SISCA
+    // 1. Buat elemen Iframe penyedia chatbot BIPS
     var iframe = document.createElement('iframe');
     
     // URL server chatbot (HARUS diganti ke URL production nanti)
     var hostUrl = 'http://localhost:3000';
     
     iframe.src = hostUrl + '/';
-    iframe.id = 'sisca-chatbot-iframe';
+    iframe.id = 'bips-chatbot-iframe';
     
     // 2. Styling bawaan agar tidak mengganggu web utama
     iframe.style.position = 'fixed';
