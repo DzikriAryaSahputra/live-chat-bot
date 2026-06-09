@@ -419,8 +419,39 @@ function speakText(text) {
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'id-ID';
     utterance.rate = 1.0;
+
+    // Paksa pilih suara berbahasa Indonesia jika tersedia (Perbaikan extra untuk Microsoft Edge)
+    let voices = window.speechSynthesis.getVoices();
+    
+    // Cari semua suara yang berbau Indonesia (id, id-ID, id-id, indonesia)
+    let idVoices = voices.filter(voice => {
+        const lang = voice.lang.toLowerCase();
+        return lang.startsWith('id') || voice.name.toLowerCase().includes('indonesia');
+    });
+
+    if (idVoices.length > 0) {
+        // Edge punya suara "Online (Natural)" atau "Gadis"/"Andika" yang terdengar sangat luwes
+        const bestVoice = idVoices.find(v => 
+            v.name.toLowerCase().includes('natural') || 
+            v.name.toLowerCase().includes('online') ||
+            v.name.toLowerCase().includes('gadis') ||
+            v.name.toLowerCase().includes('andika')
+        ) || idVoices[0];
+        utterance.voice = bestVoice;
+    } else {
+        // Fallback terakhir: jika array kosong karena Edge ngelag, paksa ke BCP 47 id-ID
+        utterance.lang = 'id-ID';
+        console.warn("⚠️ BIPS: Suara Bahasa Indonesia tidak ditemukan di browser/OS Anda. Menggunakan suara default (mungkin beraksen Inggris).");
+    }
     
     window.speechSynthesis.speak(utterance);
+}
+
+// Inisialisasi suara di awal (untuk mengatasi bug Edge yang telat memuat suara)
+if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
 }
 
 socket.on('bot_response', (data) => {

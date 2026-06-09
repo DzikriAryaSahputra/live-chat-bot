@@ -1,62 +1,172 @@
 # 📊 BPS Live Monitor & AI Chatbot
 
-Aplikasi ini menggunakan arsitektur Microservices. Untuk menjalankannya, buka 3 terminal terpisah di VS Code dan jalankan perintah berikut secara berurutan:
+Aplikasi ini adalah asisten pintar (S.I.S.C.A) untuk Badan Pusat Statistik (BPS) Kota Jambi, yang memadukan **Live Chat Customer Service** (Handoff ke Petugas Manusia) dan **AI Chatbot** (Rasa NLP + RAG dengan LLM Groq/Gemini).
 
-### Terminal 1: Menyalakan Backend (Node.js & Live Chat)
-- Buka terminal di folder utama project.
-- Ketik: `node src/app.js`  *(disarankan masuk folder backend dulu jika perlu)*
-- Akses URL Widget/Warga: http://localhost:3000
-- Akses URL Admin: http://localhost:3000/admin
-
-### Terminal 2: Menyalakan Otak AI (Rasa Core)
-- Buka terminal dan masuk ke folder: `cd rasa-bot`
-- Aktifkan environment: `venv\Scripts\activate`
-- Ketik: `rasa run --enable-api --cors "*"`
-*(Catatan: `rasa train --force` jika ingin paksa latih dari awal)*
-
-### Terminal 3: Menyalakan Tangan AI (Rasa Custom Actions)
-- Buka terminal dan masuk ke folder: `cd rasa-bot`
-- Aktifkan environment: `venv\Scripts\activate`
-- Ketik: `rasa run actions`
+Aplikasi dibangun menggunakan arsitektur **Microservices**, memisahkan backend Node.js (untuk Socket.IO dan manajemen dashboard) dengan engine Python Rasa (untuk pemrosesan bahasa alami).
 
 ---
 
-## 🛠️ Panduan Integrasi (Cara Menempel Chatbot di Portal Web BPS)
+## 🌟 Fitur Utama
+1. **Hybrid AI Engine**: Menggunakan Rasa untuk *Intent Classification* statis dan RAG (Retrieval-Augmented Generation) dengan LLM Groq/Gemini untuk menjawab dari dokumen PDF BPS.
+2. **Human Handoff**: Warga bisa meminta untuk bicara langsung dengan petugas.
+3. **Role-Based Access Control (RBAC)**: Pemisahan hak akses antara `super_admin` (manajemen user & AI) dan `petugas` (hanya balas chat).
+4. **Collision Control**: Obrolan yang sudah diklaim oleh satu petugas akan terkunci untuk petugas lain.
+5. **Dynamic Widget Injector**: Mudah dipasang ke website mana pun (BPS) hanya dengan 1 baris skrip.
 
-Kini *chatbot* sudah dirancang sepenuhnya menggunakan sistem **Skrip Injektor Dinamis** (`widget.js`). Metode ini digunakan untuk mengatasi limitasi teknis di mana area kotak Iframe tidak menghalangi kursor mouse (klik web utama) tetapi tetap bisa merespon klik ketika asisten SISCA terbuka.
+---
 
-**Instruksi Pemasangan untuk Tim IT BPS:**
-1. Sediakan halaman *website* Anda (layaknya portal beranda).
-2. Salin kode tag script di bawah ini.
-3. Tempelkan/Sisipkan persis tepat **di atas** baris `</body>` penutup halaman *website* tersebut.
+## 💻 Panduan Instalasi Lokal (Development)
+
+### Persyaratan Sistem (Prerequisites)
+- **Node.js** (v18 atau lebih baru)
+- **Python** (v3.9 atau v3.10 disarankan untuk Rasa)
+- **PostgreSQL** (v14 atau lebih baru)
+
+### Langkah-Langkah Instalasi
+
+1. **Siapkan Database (PostgreSQL)**
+   - Buat database baru bernama `bps_chatbot`.
+   - Buka PgAdmin atau psql CLI: `CREATE DATABASE bps_chatbot;`
+
+2. **Setup Backend (Node.js)**
+   - Buka terminal, masuk ke folder `backend`.
+   - Jalankan `npm install` untuk mengunduh modul.
+   - Buat file `.env` di dalam folder `backend` dengan isi berikut:
+     ```env
+     PORT=3000
+     DB_USER=postgres
+     DB_PASSWORD=password_database_anda
+     DB_HOST=localhost
+     DB_PORT=5432
+     DB_NAME=bps_chatbot
+     JWT_SECRET=supersecretkey_bps
+     GROQ_API_KEY=kunci_api_groq_anda
+     GEMINI_API_KEY=kunci_api_gemini_anda
+     ```
+   - Lakukan migrasi database (membuat tabel): `node db-migrate.js`
+
+3. **Setup AI Bot (Rasa & Python)**
+   - Buka terminal, masuk ke folder `rasa-bot`.
+   - Buat Virtual Environment: `python -m venv venv`
+   - Aktifkan Venv:
+     - Windows: `venv\Scripts\activate`
+     - Mac/Linux: `source venv/bin/activate`
+   - Install dependensi: `pip install rasa`
+
+### Cara Menjalankan Aplikasi di Lokal
+Anda wajib membuka **3 terminal terpisah** di VS Code dan menjalankannya secara bersamaan:
+
+- **Terminal 1 (Backend Node.js)**
+  ```bash
+  cd backend
+  node src/app.js
+  ```
+- **Terminal 2 (Rasa Core Server)**
+  ```bash
+  cd rasa-bot
+  venv\Scripts\activate
+  rasa run --enable-api --cors "*"
+  ```
+- **Terminal 3 (Rasa Custom Actions)**
+  ```bash
+  cd rasa-bot
+  venv\Scripts\activate
+  rasa run actions
+  ```
+
+Akses Dashboard Admin: `http://localhost:3000/login`
+Akses Widget Warga: `http://localhost:3000`
+
+---
+
+## 🚀 Panduan Instalasi Server (Production)
+
+Untuk *deployment* ke server sungguhan (VPS/Cloud Ubuntu), pastikan server sudah terinstal Node.js, Python 3.10, PostgreSQL, Nginx, dan PM2.
+
+### 1. Proses Instalasi Server
+- Kloning/unggah file proyek ini ke VPS Anda (misal di `/var/www/live-chat-bot`).
+- Setup PostgreSQL dan `.env` sama seperti cara lokal. Ubah `DB_PASSWORD` sesuai server.
+
+### 2. Menjalankan Node.js dengan PM2 (Background Process)
+Agar server Node.js tetap berjalan walaupun terminal SSH ditutup, gunakan PM2:
+```bash
+sudo npm install -g pm2
+cd /var/www/live-chat-bot/backend
+pm2 start src/app.js --name "bps-backend"
+pm2 save
+pm2 startup
+```
+
+### 3. Menjalankan Rasa di Production (Screen / Systemd / Tmux)
+Karena proses instalasi Rasa cukup berat, disarankan menggunakan *Screen* atau membuat *Systemd Service*. Contoh menggunakan `screen`:
+```bash
+# Buka sesi screen untuk Rasa
+screen -S rasa-server
+cd /var/www/live-chat-bot/rasa-bot
+source venv/bin/activate
+rasa run --enable-api --cors "*" -p 5005
+# Tekan Ctrl+A lalu D untuk meminimalkan layar (detach)
+
+# Buka sesi screen untuk Actions
+screen -S rasa-actions
+cd /var/www/live-chat-bot/rasa-bot
+source venv/bin/activate
+rasa run actions -p 5055
+# Tekan Ctrl+A lalu D untuk meminimalkan layar (detach)
+```
+
+### 4. Konfigurasi Nginx (Reverse Proxy & SSL HTTPS)
+Agar aplikasi bisa diakses melalui domain (misal: `chat.bpsjambi.go.id`) dan mendukung WSS (WebSockets) untuk *real-time chat*:
+- Buat konfigurasi Nginx: `sudo nano /etc/nginx/sites-available/bps-chat`
+```nginx
+server {
+    listen 80;
+    server_name chat.bpsjambi.go.id;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+}
+```
+- Aktifkan: `sudo ln -s /etc/nginx/sites-available/bps-chat /etc/nginx/sites-enabled/`
+- Restart Nginx: `sudo systemctl restart nginx`
+- Jangan lupa instal Sertifikat SSL (HTTPS) menggunakan **Certbot (Let's Encrypt)** agar kamera, mic, dan WebSockets aman.
+
+---
+
+## 🛠️ Panduan Integrasi Widget ke Portal Web BPS
+
+1. Salin kode tag script di bawah ini.
+2. Tempelkan/Sisipkan persis tepat **di atas** baris `</body>` penutup halaman portal website BPS Anda.
 
 ```html
 <!-- ========================================== -->
-<!-- 🤖 S.I.S.C.A. (Sistem Informasi Statistik & Chat Asisten) - LIVE CHAT BPS KOTA JAMBI  -->
+<!-- 🤖 S.I.S.C.A. (Sistem Informasi Statistik & Chat Asisten) -->
 <!-- ========================================== -->
-<script src="https://domaintarget.go.id/widget.js"></script>
+<script src="https://chat.bpsjambi.go.id/widget.js"></script>
 ```
 
-### 📝 Catatan Penting Parameter Kode:
-- `src="https://domaintarget.go.id/widget.js"` 👉 **Wajib diubah** dengan URL Production/Server aplikasi Node.js chatbot ini di BPS Jambi. Saat diuji lokalan, Anda bisa menggunakan `src="http://localhost:3000/widget.js"`.
-- Anda tidak perlu memusingkan `z-index` atau ukuran layar iframe secara manual. Skrip `widget.js` secara otomatis akan melahirkan kotak Iframe transparan yang akan **membesar** ketika di-klik dan **mengecil** kembali saat *chat* ditutup. 
-- **Responsivitas Mobile & Desktop:** Skrip widget sudah terintegrasi kecerdasan deteksi layar. Jika warga membuka web BPS melalui HP (lebar layar < 768px), *widget* otomatis akan merentangkan iframe ke mode Layar Penuh (100% lebar & tinggi) layaknya aplikasi WhatsApp, mencegah UI chat terpotong. Di layar PC/Desktop, widget akan kembali mengapung cantik sebagai kotak 420x620px di pojok kanan bawah. Pastikan web portal BPS Anda memiliki `<meta name="viewport" content="width=device-width, initial-scale=1.0">` agar efek ini optimal!
+### 📝 Catatan Penting
+- Ganti URL `chat.bpsjambi.go.id` pada skrip di atas dengan nama domain production Anda yang sesungguhnya.
+- Skrip ini secara otomatis akan mengatur UI, mendeteksi lebar layar warga (Mobile/Desktop), dan membuat *Iframe* mengecil/membesar secara cerdas.
 
 ---
 
-## 🧠 Panduan Manajemen NLU
+## 🧠 Panduan Manajemen NLU (Admin Dashboard)
 
-Agar chatbot merespon dengan cerdas dan tidak tumpang tindih antara "Pengetahuan Dasar (NLU)" dan "Dokumen PDF (LLM RAG)", Admin wajib mematuhi **3 Aturan Emas NLU** berikut saat menambahkan topik baru di Dashboard:
+Agar chatbot RAG berfungsi optimal, mohon patuhi **3 Aturan Emas NLU** ini saat mengisi "Menu AI" di Dasbor:
 
 1. **Berikan Variasi Kalimat, Bukan Sekadar Pengulangan**
-   Berikan variasi gaya bahasa asli manusia, bukan sekadar mengubah urutan kata.
-   - ❌ *Kurang Bagus:* "apa visi misi bps", "apa visi misi bps jambi"
-   - ✅ *Sangat Bagus:* "apa visi misi bps", "tujuan utama instansi ini apa", "minta info visi misi dong"
-   *(Saran: Masukkan minimal 10-15 contoh per topik)*
+   Berikan gaya bahasa campuran (formal & santai). Minimal 10 contoh per topik.
+   - ❌ *Buruk:* "apa visi misi bps", "apa visi misi bps jambi"
+   - ✅ *Bagus:* "apa visi misi bps", "tujuan utama instansi ini apa", "minta info dong visi misi"
 
-2. **Gunakan Kata Kunci yang Sangat Spesifik (Unik)**
-   Setiap topik/intent harus memiliki "identitas kata" yang kuat.
-   - *Contoh:* Untuk topik **Sensus Ekonomi**, pastikan selalu menyertakan kata kunci "sensus", "ekonomi", atau "SE2026". Jangan gunakan angka acak seperti "2026" saja.
+2. **Gunakan Kata Kunci Spesifik (Unik)**
+   Untuk topik **Sensus Ekonomi**, wajib masukkan kata "sensus", "ekonomi", atau "SE2026". Jangan gunakan kata dasar seperti "2026" saja.
 
 3. **Hindari Topik "Sapu Jagat" (Kelewat Umum)**
-   Jangan membuat topik NLU yang bertugas merespons kata-kata generik (seperti sekadar *"data"*, *"angka"*, atau *"info"*). Biarkan pertanyaan berbasis data ditangani langsung oleh AI dengan membaca Dokumen PDF. Topik NLU sebaiknya difokuskan pada informasi statis (seperti: profil, alamat, jam operasional, link aplikasi).
+   Jangan buat NLU untuk sekadar *"data"* atau *"angka"*. Biarkan pertanyaan berbasis data kompleks ditangani langsung oleh AI LLM RAG yang membaca PDF. Topik NLU sebaiknya murni untuk profil statis, alamat, sapaan, atau penolakan.

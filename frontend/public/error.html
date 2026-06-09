@@ -15,12 +15,21 @@
         theme: {
           extend: {
             colors: {
-                "primary": "#f97316",
-                "surface": "#f8f6f6",
-                "on-surface": "#0f172a",
+                "outline-variant": "#e2e8f0",
+                "surface-tint": "#2563eb",
                 "on-surface-variant": "#64748b",
+                "surface-variant": "#f1f5f9",
+                "on-surface": "#0f172a",
+                "background": "#f8f6f6",
+                "primary": "#2563eb",
+                "surface": "#f8f6f6",
+                "outline": "#94a3b8",
             },
-            fontFamily: { "body": ["Plus Jakarta Sans", "sans-serif"] }
+            fontFamily: { 
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Plus Jakarta Sans", "sans-serif"],
+                "label": ["Plus Jakarta Sans"]
+            }
           },
         },
       }
@@ -29,7 +38,8 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8f6f6; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); }
-        .bento-glow { background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 70%); }
+        .primary-gradient { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .bento-glow { background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 70%); }
     </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen flex items-center justify-center overflow-hidden">
@@ -60,7 +70,7 @@
                 Silakan tunggu, sistem sedang mendiagnosis masalah yang terjadi pada sesi Anda.
             </p>
 
-            <button onclick="goBack()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 active:scale-95">
+            <button onclick="goBack()" class="w-full primary-gradient hover:opacity-90 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all flex justify-center items-center space-x-2 active:scale-95 group">
                 <span class="material-symbols-outlined text-[18px]">arrow_back</span>
                 <span id="btn-text">Kembali ke Jalur Aman</span>
             </button>

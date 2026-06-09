@@ -77,7 +77,7 @@ function chunkText(text, maxChars = 1500) {
 
     for (let i = 0; i < words.length; i++) {
         const word = words[i];
-        
+
         // Jika menambahkan kata ini akan melebihi batas karakter
         if (currentLength + word.length > maxChars && currentChunk.length > 0) {
             // Smart Chunking: Coba cari tanda baca akhir kalimat (. ? !) di 30 kata terakhir
@@ -93,7 +93,7 @@ function chunkText(text, maxChars = 1500) {
                 // Potong tepat setelah tanda baca akhir kalimat
                 const actualChunk = currentChunk.slice(0, cutIndex + 1);
                 chunks.push(actualChunk.join(' '));
-                
+
                 // Sisa kata dioper ke chunk berikutnya, ditambah overlap kalimat sebelumnya
                 const leftover = currentChunk.slice(cutIndex + 1);
                 const overlap = actualChunk.slice(-10); // 10 kata overlap untuk menjaga konteks
@@ -104,10 +104,10 @@ function chunkText(text, maxChars = 1500) {
                 const overlapWords = currentChunk.slice(-15);
                 currentChunk = [...overlapWords];
             }
-            
+
             currentLength = currentChunk.join(' ').length;
         }
-        
+
         currentChunk.push(word);
         currentLength += word.length + 1; // +1 untuk spasi
     }
@@ -241,7 +241,7 @@ const TOXIC_WORDS = [
 function sanitizeName(name) {
     if (!name) return null;
     const lowerName = name.toLowerCase();
-    
+
     // Cek apakah nama mengandung kata-kata di daftar hitam
     for (const word of TOXIC_WORDS) {
         if (lowerName.includes(word)) {
@@ -387,8 +387,8 @@ ${knowledgeStr}
     // 2. Fallback ke Gemini API (Kuat)
     if (process.env.GEMINI_API_KEY) {
         try {
-            // Menggunakan gemini-2.0-flash (Versi 2.5 belum dirilis secara publik di endpoint v1beta)
-            const geminiRes = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+            // Menggunakan gemini-2.5-flash sesuai permintaan (model terbaru yang lebih cerdas)
+            const geminiRes = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
                 contents: [{ parts: [{ text: systemPrompt + "\n\nPERTANYAAN WARGA: " + userMessage }] }]
             }, { timeout: 15000 });
 
@@ -401,7 +401,7 @@ ${knowledgeStr}
             }
         } catch (geminiErr) {
             console.error("⚠️ Gemini API gagal:", geminiErr.response ? geminiErr.response.data : geminiErr.message);
-            if (geminiErr.response && geminiErr.response.status === 429) triggerApiLimit('gemini');
+            if (geminiErr.response && (geminiErr.response.status === 429 || geminiErr.response.status === 503)) triggerApiLimit('gemini');
         }
     }
 
@@ -415,7 +415,7 @@ let isTrainingModel = false;
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
     socket.data.isAdmin = false;
-    
+
     if (token) {
         jwt.verify(token, JWT_SECRET, (err, decoded) => {
             if (err) {
@@ -545,13 +545,13 @@ io.on('connection', (socket) => {
                 await db.query('INSERT INTO chat_logs (sender_id, sender_type, message) VALUES ($1, $2, $3)', [senderId, 'bot', botReply]);
                 io.emit('receive_message', { senderId: senderId, message: botReply, senderType: 'bot' });
                 socket.emit('bot_response', { message: botReply });
-                
+
                 if (activeSessions[senderId] === 'admin') {
                     setTimeout(() => {
                         socket.emit('admin_status', { status: 'connected' });
                     }, 1500); // Jeda sedikit agar pesan bot selesai muncul
                 }
-                
+
                 const processEndTime = Date.now();
                 recordDashboardStat(processEndTime - processStartTime, intentName);
             }
@@ -622,7 +622,7 @@ io.on('connection', (socket) => {
     socket.on('train_bot', async (data) => {
         if (!socket.data.isAdmin) return socket.emit('train_error', '🛡️ Akses Ditolak!');
         if (isTrainingModel) return socket.emit('train_error', '⏳ Harap tunggu, bot sedang dilatih oleh admin lain.');
-        
+
         const { intentName, examples, botResponse } = data;
         if (!intentName || !examples || !botResponse) return socket.emit('train_error', 'Data tidak boleh kosong!');
 
@@ -710,7 +710,7 @@ io.on('connection', (socket) => {
                     console.error('🧹 [CLEANUP/RELOAD ERROR]:', err);
                     socket.emit('train_error', 'Gagal memuat ulang model.');
                 }
-                
+
                 isTrainingModel = false;
             });
         } catch (error) {
@@ -738,7 +738,7 @@ app.post('/api/login', loginLimiter, async (req, res) => {
         const { username, password } = req.body;
         const result = await db.query('SELECT * FROM admin_users WHERE username = $1', [username]);
         if (result.rows.length === 0) return res.status(401).json({ error: 'Username/Password salah!' });
-        
+
         const user = result.rows[0];
         if (bcrypt.compareSync(password, user.password_hash)) {
             const token = jwt.sign({ username: user.username, role: user.role, fullName: user.full_name }, JWT_SECRET, { expiresIn: '24h' });
@@ -866,14 +866,14 @@ app.put('/api/bot/intents', authenticateJWT, requireSuperAdmin, (req, res) => {
 
         // 3. Update Domain (Register the intent and its response)
         const domainPath = path.join(RASA_DIR, 'domain.yml'); let domainData = yaml.load(fs.readFileSync(domainPath, 'utf8')) || { version: "3.1", intents: [], responses: {} };
-        if (domainData) { 
+        if (domainData) {
             if (!domainData.intents) domainData.intents = [];
             if (!domainData.intents.includes(intentName)) {
                 domainData.intents.push(intentName);
             }
-            if (!domainData.responses) domainData.responses = {}; 
-            domainData.responses[`utter_${intentName}`] = [{ text: botResponse }]; 
-            fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 })); 
+            if (!domainData.responses) domainData.responses = {};
+            domainData.responses[`utter_${intentName}`] = [{ text: botResponse }];
+            fs.writeFileSync(domainPath, yaml.dump(domainData, { lineWidth: -1 }));
         }
 
         res.json({ message: 'Ilmu diperbarui!' });
@@ -992,13 +992,13 @@ app.get('/api/bot/docs/:filename', authenticateJWT, requireSuperAdmin, (req, res
         // Sanitasi input: path.basename akan menghilangkan path traversal seperti ../../../
         const safeFilename = path.basename(req.params.filename);
         if (!safeFilename) return res.status(400).json({ error: 'Nama file tidak valid.' });
-        
+
         const fullPath = path.join(KNOWLEDGE_DOCS_DIR, safeFilename + '.txt');
-        
+
         if (!fs.existsSync(fullPath)) {
             return res.status(404).json({ error: 'Dokumen tidak ditemukan.' });
         }
-        
+
         const content = fs.readFileSync(fullPath, 'utf8');
         res.json({ filename: safeFilename, content: content });
     } catch (err) {
@@ -1011,13 +1011,13 @@ app.get('/api/bot/pdf/:filename', authenticateJWT, requireSuperAdmin, (req, res)
     try {
         const safeFilename = path.basename(req.params.filename).replace('.txt', '');
         if (!safeFilename) return res.status(400).json({ error: 'Nama file tidak valid.' });
-        
+
         const fullPath = path.join(KNOWLEDGE_DOCS_DIR, safeFilename + '.pdf');
-        
+
         if (!fs.existsSync(fullPath)) {
             return res.status(404).json({ error: 'Dokumen PDF asli tidak ditemukan (kemungkinan dokumen versi lama).' });
         }
-        
+
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename="${safeFilename}.pdf"`);
         res.sendFile(fullPath);
@@ -1086,7 +1086,7 @@ app.get('/api/bot/dashboard-stats', authenticateJWT, async (req, res) => {
             (sender_type = 'admin' OR (sender_type = 'bot' AND message ILIKE '%meneruskan pesan%'))
         `);
         const totalWargaAdmin = parseInt(wargaAdminRes.rows[0].total_admin_handled) || 0;
-        
+
         let aiResolutionRate = 100;
         if (totalWargaToday > 0) {
             const aiHandled = totalWargaToday - totalWargaAdmin;
@@ -1101,7 +1101,7 @@ app.get('/api/bot/dashboard-stats', authenticateJWT, async (req, res) => {
             GROUP BY jam
             ORDER BY jam ASC
         `);
-        
+
         let hourlyData = Array(24).fill(0);
         peakHoursRes.rows.forEach(row => {
             hourlyData[row.jam] = parseInt(row.jumlah);
@@ -1118,7 +1118,7 @@ app.get('/api/bot/dashboard-stats', authenticateJWT, async (req, res) => {
                     tokenUsage = { groq: parsed.groq, gemini: parsed.gemini };
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
 
         // 5. Recent Questions (5 latest)
         const recentQuestionsRes = await db.query(`
@@ -1128,21 +1128,21 @@ app.get('/api/bot/dashboard-stats', authenticateJWT, async (req, res) => {
             ORDER BY created_at DESC 
             LIMIT 5
         `);
-        
+
         // 6. Top Intents & Avg Response Time
         let extraStats = { avgResponseTime: 0, topIntents: [] };
         try {
             if (fs.existsSync(DASHBOARD_STATS_FILE)) {
                 const raw = JSON.parse(fs.readFileSync(DASHBOARD_STATS_FILE, 'utf8'));
-                
+
                 // Convert topIntents object to sorted array
                 const intentArr = Object.entries(raw.topIntents || {}).map(([intent, count]) => ({ intent, count }));
                 intentArr.sort((a, b) => b.count - a.count);
-                
+
                 extraStats.avgResponseTime = Math.round(raw.avgResponseTime || 0);
                 extraStats.topIntents = intentArr.slice(0, 5); // top 5
             }
-        } catch(e) {}
+        } catch (e) { }
 
         res.json({
             totalWargaToday,
