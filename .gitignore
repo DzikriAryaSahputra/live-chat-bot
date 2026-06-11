@@ -13,6 +13,7 @@ backend/uploads/*
 backend/knowledge_docs/*
 !backend/knowledge_docs/.gitkeep
 backend/token_usage.json
+backend/dashboard_stats.json
 
 # Keamanan
 .env
