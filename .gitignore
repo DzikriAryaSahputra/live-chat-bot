@@ -20,6 +20,7 @@ backend/dashboard_stats.json
 
 # Testing File (Lokal Saja)
 test_iframe.html
+presentation.md
 
 # OS Cache & Logs
 .DS_Store
